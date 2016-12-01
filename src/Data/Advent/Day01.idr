@@ -84,16 +84,19 @@ distance' = abs . uncurry (+)
 distance : List Instruction -> Integer
 distance = distance' . snd . foldl (flip follow) (N, (0, 0))
 
+main' : (List Instruction -> IO ()) -> IO ()
+main' f = do Right str <- readFile "input/day01.txt"
+               | Left err => printLn err
+             case parse instructions str of
+                  Right is => f is
+                  Left err => printLn err
+
 -- ---------------------------------------------------------------- [ Part One ]
 
 namespace PartOne
 
     main : IO ()
-    main = do Right str <- readFile "input/day1.txt"
-                | Left err => printLn err
-              case parse instructions str of
-                   Right is => printLn (distance is)
-                   Left err => printLn err
+    main = main' (printLn . distance)
 
 -- ---------------------------------------------------------------- [ Part Two ]
 
@@ -116,18 +119,16 @@ namespace PartTwo
                                     else Right $ insert loc' seen'
 
     main : IO ()
-    main = do Right str <- readFile "input/day1.txt"
-                | Left err => printLn err
-              case parse instructions str of
-                   Right is => printLn $ partTwo is (N, (0, 0)) empty
-                   Left err => printLn err
+    main = main' $ \is => case partTwo is (N, (0, 0)) empty of
+                               Nothing     => putStrLn "Failed!"
+                               Just answer => printLn answer
 
 -- -------------------------------------------------------------------- [ Main ]
 
 namespace Main
 
     main : IO ()
-    -- main = PartOne.main
-    main = PartTwo.main
+    main = putStr "Part One: " *> PartOne.main *>
+           putStr "Part Two: " *> PartTwo.main
 
 -- --------------------------------------------------------------------- [ EOF ]
