@@ -1,5 +1,12 @@
+-- --------------------------------------------------------------- [ Day01.idr ]
+-- Module      : Data.Advent.Day01
+-- Description : My solution to the Day 1 puzzle of the 2016 Advent of Code.
+-- Copyright   : Copyright (c) 2016, Eric Bailey
+-- License     : MIT
+-- Link        : http://adventofcode.com/2016/about
+-- --------------------------------------------------------------------- [ EOH ]
 ||| Day 1: No Time for a Taxicab
-module Data.Advent.Day1
+module Data.Advent.Day01
 
 import Control.Arrow
 import Control.Category
