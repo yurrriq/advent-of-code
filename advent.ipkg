@@ -1,6 +1,7 @@
 package advent
 
-pkgs       = lightyear
+pkgs       = contrib
+           , lightyear
 sourcedir  = src
 modules    = Data.Advent.Day01
 
