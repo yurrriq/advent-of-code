@@ -9,30 +9,42 @@ import public Lightyear
 import public Lightyear.Char
 import public Lightyear.Strings
 
-%access export
-
 -- -------------------------------------------------------------- [ Data Types ]
 
-public export
+%access public export
+
 data Heading = N | E | S | W
 
-public export
 data Direction = L | R
 
 implementation Show Direction where
     show L = "Left"
     show R = "Right"
 
+Instruction : Type
+Instruction = (Direction, Integer)
+
+Coordinates : Type
+Coordinates = (Integer, Integer)
+
+Position : Type
+Position = (Heading, Coordinates)
+
+-- -----------------------------------------------------------------------------
+
+%access export
+
 -- ----------------------------------------------------------------- [ Parsers ]
 
 direction : Parser Direction
 direction = (char 'L' *> pure L) <|> (char 'R' *> pure R) <?> "direction"
 
-instruction : Parser (Direction, Integer)
+instruction : Parser Instruction
 instruction = liftA2 MkPair direction integer <?> "instruction"
 
-instructions : Parser (List (Direction, Integer))
-instructions = commaSep instruction <?> "comma-separated list of instructions"
+instructions : Parser (List Instruction)
+instructions =
+    commaSep instruction <* spaces <* eof <?> "comma-separated instructions"
 
 -- ------------------------------------------------------------------- [ Logic ]
 
@@ -53,21 +65,23 @@ turn L = turnLeft
 turn R = turnRight
 
 -- TODO: Clean this up.
-move : Integer -> (Heading, (Integer, Integer)) -> (Heading, (Integer, Integer))
-move n state = applyMor (second (go (fst state))) state
+move : Integer -> Position -> Position
+move n state@(h, _) = applyMor (second (go h)) state
   where
+    go : Heading -> Morphism Coordinates Coordinates
     go N = second (arrow (+ n))
     go E = first  (arrow (+ n))
     go S = second (arrow (flip (-) n))
     go W = first  (arrow (flip (-) n))
 
-follow : (Direction, Integer) ->
-         (Heading, (Integer, Integer)) ->
-         (Heading, (Integer, Integer))
+follow : Instruction -> Position -> Position
 follow (dir, len) = applyMor $ first (arrow (turn dir)) >>> arrow (move len)
 
-distance : List (Direction, Integer) -> Integer
-distance = abs . uncurry (+) . snd . foldl (flip follow) (N, (0, 0))
+distance' : Coordinates -> Integer
+distance' = abs . uncurry (+)
+
+distance : List Instruction -> Integer
+distance = distance' . snd . foldl (flip follow) (N, (0, 0))
 
 -- ---------------------------------------------------------------- [ Part One ]
 
