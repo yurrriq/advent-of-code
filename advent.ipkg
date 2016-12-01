@@ -1,0 +1,16 @@
+package advent
+
+pkgs       = lightyear
+sourcedir  = src
+modules    = Data.Advent.Day01
+
+-- TODO: tests
+
+brief      = "Solutions to the 2016 Advent of Code."
+readme     = README.md
+license    = MIT
+author     = Eric Bailey
+
+homepage   = https://github.com/yurrriq/advent-of-idiris
+sourceloc  = git://git@github.com:yurrriq/advent-of-idris.git
+bugtracker = https://github.com/yurrriq/advent-of-idris/issues
