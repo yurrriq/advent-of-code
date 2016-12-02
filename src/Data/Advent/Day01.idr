@@ -21,20 +21,35 @@ import public Lightyear.Strings
 
 %access public export
 
-data Heading = N | E | S | W
+||| A cardinal heading.
+data Heading = ||| North
+               N
+             | ||| East
+               E
+             | ||| South
+               S
+             | ||| West
+               W
 
-data Direction = L | R
+||| A direction to walk in, left or right.
+data Direction = ||| Left
+                 L
+               | ||| Right
+                 R
 
 implementation Show Direction where
     show L = "Left"
     show R = "Right"
 
+||| A direction and a number of blocks.
 Instruction : Type
 Instruction = (Direction, Integer)
 
+||| A pair of coordinates on the street grid, `(x, y)`.
 Coordinates : Type
 Coordinates = (Integer, Integer)
 
+||| A heading and coordinates.
 Position : Type
 Position = (Heading, Coordinates)
 
