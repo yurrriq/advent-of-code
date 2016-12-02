@@ -3,7 +3,10 @@
 *My Idris solutions to the [2016 Advent of Code][AoC].*
 
 * [Day 1: No Time for a Taxicab][Day1] ↦ [src/Data/Advent/Day01.idr][Day01.idr]
+* [Day 2: Bathroom Security][Day2] ↦ [src/Data/Advent/Day02.idr][Day02.idr]
 
 [AoC]: http://adventofcode.com/2016
 [Day1]: http://adventofcode.com/2016/day/1
+[Day2]: http://adventofcode.com/2016/day/2
 [Day01.idr]: ./src/Data/Advent/Day01.idr
+[Day02.idr]: ./src/Data/Advent/Day02.idr
