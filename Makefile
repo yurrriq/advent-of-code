@@ -16,3 +16,6 @@ output/day%.txt: bin/day%
 clean:
 	find . -name '*.ibc' -delete
 	rm -fr bin/ output/
+
+shell:
+	nix-shell -p haskellPackages.idris gcc gmp
