@@ -3,7 +3,7 @@ OPTS  ?= -p contrib -p lightyear
 
 .PHONY: shell
 
-all: output/day01.txt
+all: output/day01.txt output/day02.txt
 
 bin/day%: src/Data/Advent/Day%.idr input/day%.txt
 	@mkdir -p bin
