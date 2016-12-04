@@ -6,6 +6,7 @@ sourcedir  = src
 modules    = Data.Ix
            , Data.Advent.Day01
            , Data.Advent.Day02
+           , Data.Advent.Day03
 
 -- TODO: tests
 
