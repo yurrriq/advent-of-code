@@ -1,4 +1,4 @@
--- --------------------------------------------------------------- [ Day02.idr ]
+-- ------------------------------------------------------------------ [ Ix.idr ]
 -- Module      : Data.Ix
 -- Description : A partial port of Haskell's Data.Ix to Idris.
 -- Copyright   : Copyright (c) 2016, Eric Bailey

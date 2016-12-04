@@ -3,7 +3,7 @@
 -- Description : My solution to the Day 1 puzzle of the 2016 Advent of Code.
 -- Copyright   : Copyright (c) 2016, Eric Bailey
 -- License     : MIT
--- Link        : http://adventofcode.com/2016/about
+-- Link        : http://adventofcode.com/2016/day/1
 -- --------------------------------------------------------------------- [ EOH ]
 ||| Day 1: No Time for a Taxicab
 module Data.Advent.Day01

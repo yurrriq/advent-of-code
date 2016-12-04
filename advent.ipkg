@@ -3,7 +3,8 @@ package advent
 pkgs       = contrib
            , lightyear
 sourcedir  = src
-modules    = Data.Advent.Day01
+modules    = Data.Ix
+           , Data.Advent.Day01
            , Data.Advent.Day02
 
 -- TODO: tests
