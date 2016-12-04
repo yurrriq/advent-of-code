@@ -18,4 +18,4 @@ clean:
 	rm -fr bin/ output/
 
 shell:
-	nix-shell -p haskellPackages.idris gcc gmp
+	nix-shell -p haskellPackages.idris gcc gmp libffi
