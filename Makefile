@@ -1,5 +1,5 @@
 IDRIS ?= idris
-OPTS  ?= -p contrib -p lightyear
+OPTS  ?= -p contrib -p lightyear -i src
 
 .PHONY: shell
 
