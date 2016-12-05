@@ -74,13 +74,23 @@ namespace PartOne
 
 namespace PartTwo
 
+    roomToMessage : (List Char, Integer, String) -> String
+    roomToMessage (cs, sid, _) =
+        let az = cycle ['a' .. 'z']
+            n = toNat sid `mod` 26 in
+            pack $ map (\c => index n (drop (toNat c `minus` 97) az)) cs
+
     main : IO ()
+    main = main' (filter isReal <$> some room) $ \rs =>
+           fromMaybe (-404) $ (\(_,sid,_) => sid) <$>
+           find (("northpoleobjectstorage" ==) . roomToMessage) rs
 
 -- -------------------------------------------------------------------- [ Main ]
 
 namespace Main
 
     main : IO ()
-    main = putStr "Part One: " *> PartOne.main
+    main = putStr "Part One: " *> PartOne.main *>
+           putStr "Part Two: " *> PartTwo.main
 
 -- --------------------------------------------------------------------- [ EOF ]
