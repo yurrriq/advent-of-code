@@ -1,6 +1,7 @@
 package advent
 
 pkgs       = contrib
+           , effects
            , lightyear
 sourcedir  = src
 modules    = Data.Ix
