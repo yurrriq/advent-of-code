@@ -40,20 +40,16 @@ countPossible = foldl go 0
     go : Integer -> Vect 3 Integer -> Integer
     go n sides = if isPossible sides then n + 1 else n
 
+main' : Parser (List (Vect 3 Integer)) -> IO ()
+main' p = either putStrLn (printLn . countPossible)
+                 !(run $ parseFile (const show) (const id) p "input/day03.txt")
+
 -- ---------------------------------------------------------------- [ Part One ]
 
 namespace PartOne
 
     main : IO ()
-    main =
-        do Right input <- run $ parseFile rErr pErr triangles "input/day03.txt"
-             | Left err => putStrLn err
-           printLn $ countPossible input
-      where
-        rErr : String -> FileError -> String
-        rErr = const show
-        pErr : String -> String -> String
-        pErr = const id
+    main = main' triangles
 
 -- -------------------------------------------------------------------- [ Main ]
 
