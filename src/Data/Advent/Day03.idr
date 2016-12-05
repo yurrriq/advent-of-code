@@ -51,11 +51,19 @@ namespace PartOne
     main : IO ()
     main = main' triangles
 
+-- ---------------------------------------------------------------- [ Part Two ]
+
+namespace PartTwo
+
+    main : IO ()
+    main = main' (concatMap (toList . transpose) <$> some (ntimes 3 triangle))
+
 -- -------------------------------------------------------------------- [ Main ]
 
 namespace Main
 
     main : IO ()
-    main = putStr "Part One: " *> PartOne.main
+    main = putStr "Part One: " *> PartOne.main *>
+           putStr "Part Two: " *> PartTwo.main
 
 -- --------------------------------------------------------------------- [ EOF ]
