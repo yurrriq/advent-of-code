@@ -1,9 +1,11 @@
 IDRIS ?= idris
 OPTS  ?= -p contrib -p effects -p lightyear -i src
 
+DAYS := 01 02 03 04
+
 .PHONY: shell
 
-all: output/day01.txt output/day02.txt
+all: $(addprefix output/,$(foreach day,$(DAYS),day$(day).txt))
 
 bin/day%: src/Data/Advent/Day%.idr input/day%.txt
 	@mkdir -p bin
