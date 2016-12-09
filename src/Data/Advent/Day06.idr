@@ -39,9 +39,18 @@ namespace PartOne
     main : IO ()
     main = main' decode
 
+namespace PartTwo
+
+    decode : String -> String
+    decode = decode' (<)
+
+    main : IO ()
+    main = main' PartTwo.decode
+
 namespace Main
 
     main : IO ()
-    main = putStr "Part One: " *> PartOne.main
+    main = putStr "Part One: " *> PartOne.main *>
+           putStr "Part Two: " *> PartTwo.main
 
 -- --------------------------------------------------------------------- [ EOF ]
