@@ -1,7 +1,7 @@
 IDRIS ?= idris
 OPTS  ?= -p contrib -p effects -p lightyear -i src
 
-DAYS := 01 02 03 04
+DAYS := 01 02 03 04 06
 
 .PHONY: shell day05
 
