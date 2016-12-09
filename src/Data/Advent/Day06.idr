@@ -31,6 +31,8 @@ decode' f = pack . map (fst . foldr1 go . frequencies') . transpose .
                        Nothing => insert k 1 m
                        Just v  => insert k (S v) $ delete k m
 
+-- ---------------------------------------------------------------- [ Part One ]
+
 namespace PartOne
 
     decode : String -> String
@@ -39,6 +41,8 @@ namespace PartOne
     main : IO ()
     main = main' decode
 
+-- ---------------------------------------------------------------- [ Part Two ]
+
 namespace PartTwo
 
     decode : String -> String
@@ -46,6 +50,8 @@ namespace PartTwo
 
     main : IO ()
     main = main' PartTwo.decode
+
+-- -------------------------------------------------------------------- [ Main ]
 
 namespace Main
 
