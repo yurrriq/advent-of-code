@@ -3,7 +3,7 @@
 -- Description : My solution to the Day 4 puzzle of the 2016 Advent of Code.
 -- Copyright   : Copyright (c) 2016, Eric Bailey
 -- License     : MIT
--- Link        : http://adventofcode.com/2016/day/3
+-- Link        : http://adventofcode.com/2016/day/4
 -- --------------------------------------------------------------------- [ EOH ]
 ||| Day 4: Security Through Obscurity
 module Data.Advent.Day04
