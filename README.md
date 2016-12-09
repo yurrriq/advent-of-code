@@ -9,6 +9,7 @@
 | [Day 3: Squares with Three Sides][p3]        | [Input][i3] | [Idris][]    | [`Data.Advent.Day03`][m3] | [Answers][a3] |
 | [Day 4: Security Through Obscurity][p4]      | [Input][i4] | [Idris][]    | [`Data.Advent.Day04`][m4] | [Answers][a4] |
 | [Day 5: How About a Nice Game of Chess?][p5] | [Input][i5] | [Haskell][]  | [`Data.Advent.Day05`][m5] | [Answers][a5] |
+| [Day 6: Signals and Noise][p6]               | [Input][i6] | [Idris][]    | [`Data.Advent.Day06`][m6] | [Answers][a6] |
 
 <!-- Named Links -->
 [AoC]: http://adventofcode.com/2016
@@ -19,6 +20,7 @@
 [p3]: http://adventofcode.com/2016/day/3
 [p4]: http://adventofcode.com/2016/day/4
 [p5]: http://adventofcode.com/2016/day/5
+[p6]: http://adventofcode.com/2016/day/6
 
 <!-- Input -->
 [i1]: ./input/day01.txt
@@ -26,6 +28,7 @@
 [i3]: ./input/day03.txt
 [i4]: ./input/day04.txt
 [i5]: ./input/day05.txt
+[i6]: ./input/day06.txt
 
 <!-- Languages -->
 [Idris]: https://github.com/yurrriq/advent-of-idris/search?l=idris
@@ -37,6 +40,7 @@
 [m3]: ./src/Data/Advent/Day03.idr
 [m4]: ./src/Data/Advent/Day04.idr
 [m5]: ./src/Data/Advent/Day05.hs
+[m6]: ./src/Data/Advent/Day06.idr
 
 <!-- Output -->
 [a1]: ./output/day01.txt
@@ -44,3 +48,4 @@
 [a3]: ./output/day03.txt
 [a4]: ./output/day04.txt
 [a5]: ./output/day05.txt
+[a6]: ./output/day06.txt
