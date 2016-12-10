@@ -12,9 +12,19 @@ import public Lightyear
 import public Lightyear.Char
 import public Lightyear.Strings
 import public Lightyear.StringFile
+
 %default total
 
--- -------------------------------------------------------------- [ Data Types ]
+-- -------------------------------------------------------------- [ Main Logic ]
+
+%access export
+
+main' : Show b => Parser a -> (a -> b) -> IO ()
+main' p f =
+    either putStrLn (printLn . f)
+           !(run $ parseFile (const show) (const id) p "input/day07.txt")
+
+-- ---------------------------------------------------- [ Part One: Data Types ]
 
 %access public export
 
@@ -33,39 +43,46 @@ Address = List Segment
 Input : Type
 Input = List Address
 
--- ----------------------------------------------------------------- [ Parsers ]
+-- ------------------------------------------------------- [ Part One: Helpers ]
 
-%access export
+%access private
 
 letterExcept : Char -> Parser Char
 letterExcept c = satisfy (\x => x /= c && isAlpha x) <?>
                  "a letter that's not " ++ singleton c
 
+maybeSkipLetter : Parser a -> Parser (Maybe a)
+maybeSkipLetter p = Just <$> p <|> (skip letter *> pure Nothing)
+
+-- ------------------------------------------------------- [ Part One: Parsers ]
+
+%access export
+%default partial
+
+total
 abba : Parser ABBA
 abba = do a  <- letter
           b  <- letterExcept a
-          b' <- char b
-          a' <- char a
-          pure [a,b,b',a'] <?> "an ABBA"
+          char b
+          char a
+          pure [a,b,b,a] <?> "an ABBA"
 
+total
 maybeAbba : Parser (Maybe ABBA)
-maybeAbba = Just <$> abba <|>
-            (skip letter *> pure Nothing) <?> "maybe an ABBA or skip a letter"
+maybeAbba = maybeSkipLetter abba <?> "maybe an ABBA or skip a letter"
 
-partial
 abbas : Parser Sequence
 abbas = catMaybes <$> some maybeAbba <?> "a list of ABBAs"
 
-partial
 hypernetSequence : Parser Sequence
-hypernetSequence =
-    between (char '[') (char ']') abbas <?> "a hypernet sequence"
+hypernetSequence = between (char '[') (char ']') abbas <?> "a hypernet sequence"
 
-partial
 segment : Parser Segment
 segment = liftA2 MkPair abbas (hypernetSequence <|> pure []) <?> "a segment"
 
--- ------------------------------------------------------------------- [ Logic ]
+-- --------------------------------------------------------- [ Part One: Logic ]
+
+%default total
 
 supportsTLS : Address -> Bool
 supportsTLS seg = any (not . isNil . fst) seg &&
@@ -74,29 +91,26 @@ supportsTLS seg = any (not . isNil . fst) seg &&
 supportTLS : Input -> Nat
 supportTLS = List.length . filter id . map supportsTLS
 
-main' : Show a => Parser Input -> (Input -> a) -> IO ()
-main' p f =
-    either putStrLn (printLn . f)
-           !(run $ parseFile (const show) (const id) p "input/day07.txt")
-
--- ---------------------------------------------------------------- [ Examples ]
+-- ------------------------------------------------------ [ Part One: Examples ]
 
 ||| ```idris example
-||| supportTLS <$> parse (some (some segment <* spaces)) examples
+||| map supportsTLS <$> parse (some (some segment <* spaces)) partOneExamples
 ||| ```
-examples : String
-examples = """abba[mnop]qrst
-abcd[bddb]xyyx
-aaaa[qwer]tyui
-ioxxoj[asdfgh]zxcvbn"""
+||| ```idris example
+||| supportTLS <$> parse (some (some segment <* spaces)) partOneExamples
+||| ```
+partOneExamples : String
+partOneExamples =
+    "abba[mnop]qrst\nabcd[bddb]xyyx\naaaa[qwer]tyui\nioxxoj[asdfgh]zxcvbn"
 
--- ---------------------------------------------------------------- [ Part One ]
+-- ---------------------------------------------------------- [ Part One: Main ]
 
 namespace PartOne
 
     partial
     main : IO ()
     main = main' (some (some segment <* spaces)) supportTLS
+
 
 -- -------------------------------------------------------------------- [ Main ]
 
