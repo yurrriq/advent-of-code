@@ -91,7 +91,7 @@ turn R = turnRight
 move : Integer -> Position -> Position
 move n state@(h, _) = applyMor (second (go h)) state
   where
-    go : Heading -> Morphism Coordinates Coordinates
+    go : Heading -> Coordinates ~> Coordinates
     go N = second (arrow (+ n))
     go E = first  (arrow (+ n))
     go S = second (arrow (flip (-) n))
