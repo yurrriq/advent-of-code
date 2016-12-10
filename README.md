@@ -16,34 +16,34 @@
 | [Day 10: Balance Bots][p10]                  |             |              |                           |               |
 
 <!-- Named Links -->
-[AoC]: http://adventofcode.com/2016
+[AoC]: https://adventofcode.com/2016
 
 <!-- Puzzles -->
-[p1]: http://adventofcode.com/2016/day/1
-[p2]: http://adventofcode.com/2016/day/2
-[p3]: http://adventofcode.com/2016/day/3
-[p4]: http://adventofcode.com/2016/day/4
-[p5]: http://adventofcode.com/2016/day/5
-[p6]: http://adventofcode.com/2016/day/6
-[p7]: http://adventofcode.com/2016/day/7
-[p8]: http://adventofcode.com/2016/day/8
-[p9]: http://adventofcode.com/2016/day/9
-[p10]: http://adventofcode.com/2016/day/10
-[p11]: http://adventofcode.com/2016/day/11
-[p12]: http://adventofcode.com/2016/day/12
-[p13]: http://adventofcode.com/2016/day/13
-[p14]: http://adventofcode.com/2016/day/14
-[p15]: http://adventofcode.com/2016/day/15
-[p16]: http://adventofcode.com/2016/day/16
-[p17]: http://adventofcode.com/2016/day/17
-[p18]: http://adventofcode.com/2016/day/18
-[p19]: http://adventofcode.com/2016/day/19
-[p20]: http://adventofcode.com/2016/day/20
-[p21]: http://adventofcode.com/2016/day/21
-[p22]: http://adventofcode.com/2016/day/22
-[p23]: http://adventofcode.com/2016/day/23
-[p24]: http://adventofcode.com/2016/day/24
-[p25]: http://adventofcode.com/2016/day/25
+[p1]: https://adventofcode.com/2016/day/1
+[p2]: https://adventofcode.com/2016/day/2
+[p3]: https://adventofcode.com/2016/day/3
+[p4]: https://adventofcode.com/2016/day/4
+[p5]: https://adventofcode.com/2016/day/5
+[p6]: https://adventofcode.com/2016/day/6
+[p7]: https://adventofcode.com/2016/day/7
+[p8]: https://adventofcode.com/2016/day/8
+[p9]: https://adventofcode.com/2016/day/9
+[p10]: https://adventofcode.com/2016/day/10
+[p11]: https://adventofcode.com/2016/day/11
+[p12]: https://adventofcode.com/2016/day/12
+[p13]: https://adventofcode.com/2016/day/13
+[p14]: https://adventofcode.com/2016/day/14
+[p15]: https://adventofcode.com/2016/day/15
+[p16]: https://adventofcode.com/2016/day/16
+[p17]: https://adventofcode.com/2016/day/17
+[p18]: https://adventofcode.com/2016/day/18
+[p19]: https://adventofcode.com/2016/day/19
+[p20]: https://adventofcode.com/2016/day/20
+[p21]: https://adventofcode.com/2016/day/21
+[p22]: https://adventofcode.com/2016/day/22
+[p23]: https://adventofcode.com/2016/day/23
+[p24]: https://adventofcode.com/2016/day/24
+[p25]: https://adventofcode.com/2016/day/25
 
 <!-- Input -->
 [i1]: ./input/day01.txt
