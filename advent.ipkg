@@ -11,6 +11,7 @@ modules    = Data.Ix
            , Data.Advent.Day04
            , Data.Advent.Day06
            , Data.Advent.Day07
+           , Data.Advent.Day08
 
 -- TODO: tests
 
