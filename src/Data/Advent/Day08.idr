@@ -185,6 +185,9 @@ howManyLit = foldr ((+) . foldr go Z) Z
     go On  = S
     go Off = id
 
+justDoIt : List (Either (Rect w h) (Rotate w h)) -> Screen w h
+justDoIt = foldl (\s => either (flip turnOn s) (flip rotate s)) empty
+
 -- ---------------------------------------------------------------- [ Examples ]
 
 ex1 : Screen 7 3
@@ -215,5 +218,29 @@ prettyExamples = transpose .
                  map (lines . show @{showScreen}) .
                  scanl (\s => either (flip turnOn s) (flip rotate s)) empty <$>
                  examples
+
+-- -------------------------------------------------------------- [ Main Logic ]
+
+%access export
+
+main' : Show b => Parser a -> (a -> b) -> IO ()
+main' p f =
+    either putStrLn (printLn . f)
+           !(run $ parseFile (const show) (const id) p "input/day08.txt")
+
+-- ---------------------------------------------------------------- [ Part One ]
+
+namespace PartOne
+
+    partial main : IO ()
+    main = main' (some (rectOrRotation {w=50} {h=6} <* spaces))
+                 (howManyLit . justDoIt)
+
+-- -------------------------------------------------------------------- [ Main ]
+
+namespace Main
+
+    partial main : IO ()
+    main = putStr "Part One: " *> PartOne.main
 
 -- --------------------------------------------------------------------- [ EOF ]
