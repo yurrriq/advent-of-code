@@ -223,9 +223,9 @@ prettyExamples = transpose .
 
 %access export
 
-main' : Show b => Parser a -> (a -> b) -> IO ()
+main' : Parser a -> (a -> String) -> IO ()
 main' p f =
-    either putStrLn (printLn . f)
+    either putStrLn (putStrLn . f)
            !(run $ parseFile (const show) (const id) p "input/day08.txt")
 
 -- ---------------------------------------------------------------- [ Part One ]
@@ -234,13 +234,22 @@ namespace PartOne
 
     partial main : IO ()
     main = main' (some (rectOrRotation {w=50} {h=6} <* spaces))
-                 (howManyLit . justDoIt)
+                 (show . howManyLit . justDoIt)
+
+-- ---------------------------------------------------------------- [ Part Two ]
+
+namespace PartTwo
+
+    partial main : IO ()
+    main = main' (some (rectOrRotation {w=50} {h=6} <* spaces))
+                 (show @{showScreen} . justDoIt)
 
 -- -------------------------------------------------------------------- [ Main ]
 
 namespace Main
 
     partial main : IO ()
-    main = putStr "Part One: " *> PartOne.main
+    main = putStr   "Part One: " *> PartOne.main *>
+           putStrLn "Part Two:"  *> PartTwo.main
 
 -- --------------------------------------------------------------------- [ EOF ]
