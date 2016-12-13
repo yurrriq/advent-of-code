@@ -2,34 +2,34 @@
 
 *My Idris solutions to the [2016 Advent of Code][AoC].*
 
-| **Puzzle**                                            | **Input**    | **Language** | **Module**                | **Answers**   |
-|-------------------------------------------------------|--------------|--------------|---------------------------|---------------|
-| [Day 1: No Time for a Taxicab][p1]                    | [Input][i1]  | [Idris][]    | [`Data.Advent.Day01`][m1] | [Answers][a1] |
-| [Day 2: Bathroom Security][p2]                        | [Input][i2]  | [Idris][]    | [`Data.Advent.Day02`][m2] | [Answers][a2] |
-| [Day 3: Squares with Three Sides][p3]                 | [Input][i3]  | [Idris][]    | [`Data.Advent.Day03`][m3] | [Answers][a3] |
-| [Day 4: Security Through Obscurity][p4]               | [Input][i4]  | [Idris][]    | [`Data.Advent.Day04`][m4] | [Answers][a4] |
-| [Day 5: How About a Nice Game of Chess?][p5]          | [Input][i5]  | [Haskell][]  | [`Data.Advent.Day05`][m5] | [Answers][a5] |
-| [Day 6: Signals and Noise][p6]                        | [Input][i6]  | [Idris][]    | [`Data.Advent.Day06`][m6] | [Answers][a6] |
-| [Day 7: Internet Protocol Version 7][p7]              | [Input][i7]  | [Idris][]    | [`Data.Advent.Day07`][m7] | [Answers][a7] |
-| [Day 8: Two-Factor Authentication][p8]                | [Input][i8]  | [Idris][]    | [`Data.Advent.Day08`][m8] | [Answers][a8] |
-| [Day 9: Explosives in Cyberspace][p9]                 | [Input][i9]  |              |                           |               |
-| [Day 10: Balance Bots][p10]                           | [Input][i10] |              |                           |               |
-| [Day 11: Radioisotope Thermoelectric Generators][p11] | [Input][i11] |              |                           |               |
-| [Day 12: Leonardo's Monorail][p12]                    | [Input][i12] |              |                           |               |
+| **Puzzle**                                            | **Input**    | **Language** | **Module**                 | **Answers**    |
+|-------------------------------------------------------|--------------|--------------|----------------------------|----------------|
+| [Day 1: No Time for a Taxicab][p01]                   | [Input][i01] | [Idris][]    | [`Data.Advent.Day01`][m01] | [Answers][a01] |
+| [Day 2: Bathroom Security][p02]                       | [Input][i02] | [Idris][]    | [`Data.Advent.Day02`][m02] | [Answers][a02] |
+| [Day 3: Squares with Three Sides][p03]                | [Input][i03] | [Idris][]    | [`Data.Advent.Day03`][m03] | [Answers][a03] |
+| [Day 4: Security Through Obscurity][p04]              | [Input][i04] | [Idris][]    | [`Data.Advent.Day04`][m04] | [Answers][a04] |
+| [Day 5: How About a Nice Game of Chess?][p05]         | [Input][i05] | [Haskell][]  | [`Data.Advent.Day05`][m05] | [Answers][a05] |
+| [Day 6: Signals and Noise][p06]                       | [Input][i06] | [Idris][]    | [`Data.Advent.Day06`][m06] | [Answers][a06] |
+| [Day 7: Internet Protocol Version 7][p07]             | [Input][i07] | [Idris][]    | [`Data.Advent.Day07`][m07] | [Answers][a07] |
+| [Day 8: Two-Factor Authentication][p08]               | [Input][i08] | [Idris][]    | [`Data.Advent.Day08`][m08] | [Answers][a08] |
+| [Day 9: Explosives in Cyberspace][p09]                | [Input][i09] |              |                            |                |
+| [Day 10: Balance Bots][p10]                           | [Input][i10] |              |                            |                |
+| [Day 11: Radioisotope Thermoelectric Generators][p11] | [Input][i11] |              |                            |                |
+| [Day 12: Leonardo's Monorail][p12]                    | [Input][i12] |              |                            |                |
 
 <!-- Named Links -->
 [AoC]: https://adventofcode.com/2016
 
 <!-- Puzzles -->
-[p1]: https://adventofcode.com/2016/day/1
-[p2]: https://adventofcode.com/2016/day/2
-[p3]: https://adventofcode.com/2016/day/3
-[p4]: https://adventofcode.com/2016/day/4
-[p5]: https://adventofcode.com/2016/day/5
-[p6]: https://adventofcode.com/2016/day/6
-[p7]: https://adventofcode.com/2016/day/7
-[p8]: https://adventofcode.com/2016/day/8
-[p9]: https://adventofcode.com/2016/day/9
+[p01]: https://adventofcode.com/2016/day/1
+[p02]: https://adventofcode.com/2016/day/2
+[p03]: https://adventofcode.com/2016/day/3
+[p04]: https://adventofcode.com/2016/day/4
+[p05]: https://adventofcode.com/2016/day/5
+[p06]: https://adventofcode.com/2016/day/6
+[p07]: https://adventofcode.com/2016/day/7
+[p08]: https://adventofcode.com/2016/day/8
+[p09]: https://adventofcode.com/2016/day/9
 [p10]: https://adventofcode.com/2016/day/10
 [p11]: https://adventofcode.com/2016/day/11
 [p12]: https://adventofcode.com/2016/day/12
@@ -48,15 +48,15 @@
 [p25]: https://adventofcode.com/2016/day/25
 
 <!-- Input -->
-[i1]: ./input/day01.txt
-[i2]: ./input/day02.txt
-[i3]: ./input/day03.txt
-[i4]: ./input/day04.txt
-[i5]: ./input/day05.txt
-[i6]: ./input/day06.txt
-[i7]: ./input/day07.txt
-[i8]: ./input/day08.txt
-[i9]: ./input/day09.txt
+[i01]: ./input/day01.txt
+[i02]: ./input/day02.txt
+[i03]: ./input/day03.txt
+[i04]: ./input/day04.txt
+[i05]: ./input/day05.txt
+[i06]: ./input/day06.txt
+[i07]: ./input/day07.txt
+[i08]: ./input/day08.txt
+[i09]: ./input/day09.txt
 [i10]: ./input/day10.txt
 [i11]: ./input/day11.txt
 [i12]: ./input/day12.txt
@@ -79,15 +79,15 @@
 [Haskell]: https://github.com/yurrriq/advent-of-idris/search?l=haskell
 
 <!-- Modules -->
-[m1]: ./src/Data/Advent/Day01.idr
-[m2]: ./src/Data/Advent/Day02.idr
-[m3]: ./src/Data/Advent/Day03.idr
-[m4]: ./src/Data/Advent/Day04.idr
-[m5]: ./src/Data/Advent/Day05.hs
-[m6]: ./src/Data/Advent/Day06.idr
-[m7]: ./src/Data/Advent/Day07.idr
-[m8]: ./src/Data/Advent/Day08.idr
-[m9]: ./src/Data/Advent/Day09.idr
+[m01]: ./src/Data/Advent/Day01.idr
+[m02]: ./src/Data/Advent/Day02.idr
+[m03]: ./src/Data/Advent/Day03.idr
+[m04]: ./src/Data/Advent/Day04.idr
+[m05]: ./src/Data/Advent/Day05.hs
+[m06]: ./src/Data/Advent/Day06.idr
+[m07]: ./src/Data/Advent/Day07.idr
+[m08]: ./src/Data/Advent/Day08.idr
+[m09]: ./src/Data/Advent/Day09.idr
 [m10]: ./src/Data/Advent/Day10.idr
 [m11]: ./src/Data/Advent/Day11.idr
 [m12]: ./src/Data/Advent/Day12.idr
@@ -106,15 +106,15 @@
 [m25]: ./src/Data/Advent/Day25.idr
 
 <!-- Output -->
-[a1]: ./output/day01.txt
-[a2]: ./output/day02.txt
-[a3]: ./output/day03.txt
-[a4]: ./output/day04.txt
-[a5]: ./output/day05.txt
-[a6]: ./output/day06.txt
-[a7]: ./output/day07.txt
-[a8]: ./output/day08.txt
-[a9]: ./output/day09.txt
+[a01]: ./output/day01.txt
+[a02]: ./output/day02.txt
+[a03]: ./output/day03.txt
+[a04]: ./output/day04.txt
+[a05]: ./output/day05.txt
+[a06]: ./output/day06.txt
+[a07]: ./output/day07.txt
+[a08]: ./output/day08.txt
+[a09]: ./output/day09.txt
 [a10]: ./output/day10.txt
 [a11]: ./output/day11.txt
 [a12]: ./output/day12.txt
