@@ -32,22 +32,31 @@ implementation Show Pixel where
     show Off = "."
     show On  = "#"
 
-Screen : Type
-Screen = Vect 3 (Vect 7 Pixel)
+Screen : Nat -> Nat -> Type
+Screen w h = Vect h (Vect w Pixel)
 
-implementation [showScreen] Show Screen where
+implementation [showScreen] Show (Screen w h) where
     show = unlines . toList . map (concatMap show)
 
-data Rect = MkRect (Fin 7) (Fin 3)
+data Rect : Nat -> Nat -> Type where
+     MkRect : Fin w -> Fin h -> Rect w h
 
-implementation Show Rect where
-    show (MkRect w h) = "rect " ++ showFin w ++ "x" ++ showFin h
-      where
-        showFin : Fin n -> String
-        showFin = show . finToNat
+implementation Show (Fin n) where
+    show = show . finToNat
 
-data Rotate = Row (Fin 3) (Fin 7)
-            | Col (Fin 7) (Fin 3)
+-- showFin : Fin n -> String
+-- showFin = show . finToNat
+
+implementation Show (Rect w h) where
+    show (MkRect w h) = "rect " ++ show w ++ "x" ++ show h
+
+data Rotate : Nat -> Nat -> Type where
+     Row : Fin w -> Fin h -> Rotate h w
+     Col : Fin w -> Fin h -> Rotate w h
+
+implementation Show (Rotate xy by) where
+    show (Row y by) = "rotate row y=" ++ show y ++ " by " ++ show by
+    show (Col x by) = "rotate column x=" ++ show x ++ " by " ++ show by
 
 -- ----------------------------------------------------------------- [ Parsers ]
 
@@ -60,9 +69,9 @@ side n = do Just len <- (\m => integerToFin m n) <$> integer
             pure len
 
 partial
-rect : Parser Rect
-rect = liftA2 MkRect (token "rect" *> side 7)
-                     (token "x"    *> side 3)  <?> "rect AxB"
+rect : Parser (Rect w h)
+rect = liftA2 MkRect (token "rect" *> side w)
+                     (token "x"    *> side h)  <?> "rect AxB"
 
 partial
 maybeFin : (n : Nat) -> Parser (Maybe (Fin n))
@@ -73,20 +82,26 @@ maybeFin n = marshal <$> integer <* spaces <?>
     marshal m = integerToFin m n
 
 partial
-row : Parser Rotate
-row = do Just y  <- token "rotate row y=" *> maybeFin 3
-         Just by <- token "by" *> maybeFin 7
-         pure $ Row y by
+row : Parser (Rotate w h)
+row {w} {h} = do Just y  <- token "rotate row y=" *> maybeFin h
+                 Just by <- token "by" *> maybeFin w
+                 pure $ Row y by
 
 partial
-column : Parser Rotate
-column = do Just x  <- token "rotate column x=" *> maybeFin 7
-            Just by <- token "by" *> maybeFin 3
-            pure $ Col x by
+column : Parser (Rotate w h)
+column {w} {h} = do Just x  <- token "rotate column x=" *> maybeFin w
+                    Just by <- token "by" *> maybeFin h
+                    pure $ Col x by
 
 partial
-rotation : Parser Rotate
+rotation : Parser (Rotate w h)
 rotation = row <|> column <?> "a rotation"
+
+partial
+rectOrRotation : Parser (Either (Rect w h) (Rotate w h))
+rectOrRotation {w} {h} = case !(opt (rect {w} {h})) of
+                              Just rec => pure $ Left rec
+                              Nothing  => Right <$> rotation {w} {h}
 
 -- ----------------------------------------------------------------- [ Helpers ]
 
@@ -107,9 +122,9 @@ finToLTE : (f : Fin n) -> LTE (finToNat f) n
 finToLTE FZ               = LTEZero
 finToLTE (FS _) {n = S _} = LTESucc (finToLTE _)
 
-total lemma : (left, right : Nat) -> {auto smaller : LTE left right} ->
+total compositeLemma : (left, right : Nat) -> {auto smaller : LTE left right} ->
   (k : Nat ** right = left + k)
-lemma left right = (right - left ** go left right)
+compositeLemma left right = (right - left ** go left right)
   where
     go : (left, right : Nat) -> {auto smaller : LTE left right} ->
       right = left + (right - left)
@@ -118,9 +133,12 @@ lemma left right = (right - left ** go left right)
         let inductiveHypothesis = go k j {smaller = fromLteSucc smaller} in
             eqSucc j (k + (minus j k)) inductiveHypothesis
 
--- -- ------------------------------------------------------------------- [ Logic ]
+total updateLemma : (prf : n = finToNat by + m) -> n = m + finToNat by
+updateLemma {by} {m} prf = rewrite plusCommutative m (finToNat by) in prf
 
-turnOn : Rect -> Screen -> Screen
+-- -- ---------------------------------------------------------------- [ Logic ]
+
+turnOn : Rect sw sh -> Screen sw sh -> Screen sw sh
 turnOn (MkRect w h) = mapIndexed f
   where
     g : (Pixel, Nat) -> Pixel
@@ -130,27 +148,72 @@ turnOn (MkRect w h) = mapIndexed f
 
 namespace Vect
 
-  -- rotate : (by : Fin n ) -> Vect (finToNat by + m) a -> Vect (finToNat by + m) a
-  -- rotate by = uncurry (++) . splitAt (finToNat by) . reverse
-  rotate : (by : Fin n ) -> Vect (finToNat by + m) a -> (m ** Vect (finToNat by + m) a)
-  rotate by xs {m} = let (ys,zs) = splitAt (finToNat by) (reverse xs) in (m ** ys ++ zs)
+  rotate : (by : Fin n) -> Vect (finToNat by + m) a ->
+           (m ** Vect (m + finToNat by) a)
+  rotate by xs {m} = let (ys,zs) = splitAt (finToNat by) xs in
+                         (m ** zs ++ ys)
 
 updateRow : (by : Fin n) -> (row : Vect n Pixel) -> Vect n Pixel
 updateRow {n} by row =
-    let (m ** prf)    = lemma (finToNat by) n {smaller = finToLTE by}
+    let (m ** prf)    = compositeLemma (finToNat by) n {smaller = finToLTE by}
         (_ ** newRow) = rotate by $ the (Vect (finToNat by + m) _) $
                         rewrite sym prf in row in
-        rewrite prf in newRow
+                        rewrite updateLemma prf in
+                                newRow
+
+namespace Fin
+
+    rotate : Fin n -> Fin n
+    rotate f {n} = let x = (-) n (finToNat f) {smaller = finToLTE f} in
+                       fromMaybe f (natToFin x n) -- HACK
 
 namespace Screen
 
-  empty : Screen
-  empty = replicate 3 (replicate 7 Off)
+  empty : {w, h : Nat} -> Screen w h
+  empty {w} {h} = replicate h (replicate w Off)
 
-  rotate : Rotate -> Screen -> Screen
-  rotate (Row y by) screen = updateAt y (updateRow by) screen
-  rotate (Col x by) screen = let xs = transpose screen
-                                 ys = updateAt x (updateRow by) xs in
-                                 transpose ys
+  rotate : (Rotate w h) -> Screen w h -> Screen w h
+  rotate (Row y by) screen     = updateAt y (updateRow (rotate by)) screen
+  rotate (Col x by) screen {h} = transpose $
+                                 updateAt x (updateRow (rotate by)) $
+                                 transpose screen
+
+howManyLit : Screen w h -> Nat
+howManyLit = foldr ((+) . foldr go Z) Z
+  where
+    go : Pixel -> Nat -> Nat
+    go On  = S
+    go Off = id
+
+-- ---------------------------------------------------------------- [ Examples ]
+
+ex1 : Screen 7 3
+ex1 = turnOn (MkRect 3 2) empty
+
+ex2 : Screen 7 3
+ex2 = rotate (Col 1 1) ex1
+
+ex3 : Screen 7 3
+ex3 = rotate (Row 0 4) ex2
+
+ex4 : Screen 7 3
+ex4 = rotate (Col 1 1) ex3
+
+partial
+examples : Either String (List (Either (Rect 7 3) (Rotate 7 3)))
+examples = parse (some (rectOrRotation <* spaces)) $ unlines [
+             "rect 3x2",
+             "rotate column x=1 by 1",
+             "rotate row y=0 by 4",
+             "rotate column x=1 by 1"
+           ]
+
+||| Convenient representation of Part One examples for the REPL.
+partial
+prettyExamples : Either String (List (List String))
+prettyExamples = transpose .
+                 map (lines . show @{showScreen}) .
+                 scanl (\s => either (flip turnOn s) (flip rotate s)) empty <$>
+                 examples
 
 -- --------------------------------------------------------------------- [ EOF ]
