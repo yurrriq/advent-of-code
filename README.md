@@ -11,7 +11,7 @@
 | [Day 5: How About a Nice Game of Chess?][p5] | [Input][i5] | [Haskell][]  | [`Data.Advent.Day05`][m5] | [Answers][a5] |
 | [Day 6: Signals and Noise][p6]               | [Input][i6] | [Idris][]    | [`Data.Advent.Day06`][m6] | [Answers][a6] |
 | [Day 7: Internet Protocol Version 7][p7]     | [Input][i7] | [Idris][]    | [`Data.Advent.Day07`][m7] | [Answers][a7] |
-| [Day 8: Two-Factor Authentication][p8]       |             |              |                           |               |
+| [Day 8: Two-Factor Authentication][p8]       | [Input][i8] | [Idris][]    | [`Data.Advent.Day08`][m8] | [Answers][a8] |
 | [Day 9: Explosives in Cyberspace][p9]        |             |              |                           |               |
 | [Day 10: Balance Bots][p10]                  |             |              |                           |               |
 
