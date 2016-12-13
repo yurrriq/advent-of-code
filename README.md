@@ -2,18 +2,20 @@
 
 *My Idris solutions to the [2016 Advent of Code][AoC].*
 
-| **Puzzle**                                   | **Input**   | **Language** | **Module**                | **Answers**   |
-|----------------------------------------------|-------------|--------------|---------------------------|---------------|
-| [Day 1: No Time for a Taxicab][p1]           | [Input][i1] | [Idris][]    | [`Data.Advent.Day01`][m1] | [Answers][a1] |
-| [Day 2: Bathroom Security][p2]               | [Input][i2] | [Idris][]    | [`Data.Advent.Day02`][m2] | [Answers][a2] |
-| [Day 3: Squares with Three Sides][p3]        | [Input][i3] | [Idris][]    | [`Data.Advent.Day03`][m3] | [Answers][a3] |
-| [Day 4: Security Through Obscurity][p4]      | [Input][i4] | [Idris][]    | [`Data.Advent.Day04`][m4] | [Answers][a4] |
-| [Day 5: How About a Nice Game of Chess?][p5] | [Input][i5] | [Haskell][]  | [`Data.Advent.Day05`][m5] | [Answers][a5] |
-| [Day 6: Signals and Noise][p6]               | [Input][i6] | [Idris][]    | [`Data.Advent.Day06`][m6] | [Answers][a6] |
-| [Day 7: Internet Protocol Version 7][p7]     | [Input][i7] | [Idris][]    | [`Data.Advent.Day07`][m7] | [Answers][a7] |
-| [Day 8: Two-Factor Authentication][p8]       | [Input][i8] | [Idris][]    | [`Data.Advent.Day08`][m8] | [Answers][a8] |
-| [Day 9: Explosives in Cyberspace][p9]        |             |              |                           |               |
-| [Day 10: Balance Bots][p10]                  |             |              |                           |               |
+| **Puzzle**                                            | **Input**    | **Language** | **Module**                | **Answers**   |
+|-------------------------------------------------------|--------------|--------------|---------------------------|---------------|
+| [Day 1: No Time for a Taxicab][p1]                    | [Input][i1]  | [Idris][]    | [`Data.Advent.Day01`][m1] | [Answers][a1] |
+| [Day 2: Bathroom Security][p2]                        | [Input][i2]  | [Idris][]    | [`Data.Advent.Day02`][m2] | [Answers][a2] |
+| [Day 3: Squares with Three Sides][p3]                 | [Input][i3]  | [Idris][]    | [`Data.Advent.Day03`][m3] | [Answers][a3] |
+| [Day 4: Security Through Obscurity][p4]               | [Input][i4]  | [Idris][]    | [`Data.Advent.Day04`][m4] | [Answers][a4] |
+| [Day 5: How About a Nice Game of Chess?][p5]          | [Input][i5]  | [Haskell][]  | [`Data.Advent.Day05`][m5] | [Answers][a5] |
+| [Day 6: Signals and Noise][p6]                        | [Input][i6]  | [Idris][]    | [`Data.Advent.Day06`][m6] | [Answers][a6] |
+| [Day 7: Internet Protocol Version 7][p7]              | [Input][i7]  | [Idris][]    | [`Data.Advent.Day07`][m7] | [Answers][a7] |
+| [Day 8: Two-Factor Authentication][p8]                | [Input][i8]  | [Idris][]    | [`Data.Advent.Day08`][m8] | [Answers][a8] |
+| [Day 9: Explosives in Cyberspace][p9]                 | [Input][i9]  |              |                           |               |
+| [Day 10: Balance Bots][p10]                           | [Input][i10] |              |                           |               |
+| [Day 11: Radioisotope Thermoelectric Generators][p11] | [Input][i11] |              |                           |               |
+| [Day 12: Leonardo's Monorail][p12]                    | [Input][i12] |              |                           |               |
 
 <!-- Named Links -->
 [AoC]: https://adventofcode.com/2016
