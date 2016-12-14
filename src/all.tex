@@ -1,0 +1,469 @@
+\documentclass[b5paper,twoside]{amsbook}
+\usepackage{lmodern}
+\usepackage{amssymb,amsmath}
+\usepackage{ifxetex,ifluatex}
+\usepackage{fixltx2e} % provides \textsubscript
+\ifnum 0\ifxetex 1\fi\ifluatex 1\fi=0 % if pdftex
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+\else % if luatex or xelatex
+  \ifxetex
+    \usepackage{mathspec}
+  \else
+    \usepackage{fontspec}
+  \fi
+  \defaultfontfeatures{Ligatures=TeX,Scale=MatchLowercase}
+\fi
+% use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+% use microtype if available
+\IfFileExists{microtype.sty}{%
+\usepackage{microtype}
+\UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\usepackage[margin=1in]{geometry}
+\usepackage[unicode=true]{hyperref}
+\hypersetup{
+            pdftitle={Advent of Code 2016},
+            pdfauthor={Eric Bailey},
+            pdfborder={0 0 0},
+            breaklinks=true}
+\urlstyle{same}  % don't use monospace font for urls
+\IfFileExists{parskip.sty}{%
+\usepackage{parskip}
+}{% else
+\setlength{\parindent}{0pt}
+\setlength{\parskip}{6pt plus 2pt minus 1pt}
+}
+\setlength{\emergencystretch}{3em}  % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{5}
+% Redefines (sub)paragraphs to behave more like sections
+\ifx\paragraph\undefined\else
+\let\oldparagraph\paragraph
+\renewcommand{\paragraph}[1]{\oldparagraph{#1}\mbox{}}
+\fi
+\ifx\subparagraph\undefined\else
+\let\oldsubparagraph\subparagraph
+\renewcommand{\subparagraph}[1]{\oldsubparagraph{#1}\mbox{}}
+\fi
+
+% set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+
+\usepackage{minted}
+\renewcommand{\chaptername}{Day}
+
+\title{Advent of Code 2016}
+\author{Eric Bailey}
+\date{Winter 2016}
+
+\begin{document}
+\maketitle
+
+\frontmatter
+
+{
+\setcounter{tocdepth}{2}
+\tableofcontents
+}
+\mainmatter
+
+\chapter{No Time for a Taxicab}\label{no-time-for-a-taxicab}
+
+\href{https://adventofcode.com/2016/day/1}{Link}
+
+Santa's sleigh uses a very high-precision clock to guide its movements,
+and the clock's oscillator is regulated by stars. Unfortunately, the
+stars have been stolen\ldots{} by the Easter Bunny. To save Christmas,
+Santa needs you to retrieve all \textbf{fifty stars} by December 25th.
+
+Collect stars by solving puzzles. Two puzzles will be made available on
+each day in the advent calendar; the second puzzle is unlocked when you
+complete the first. Each puzzle grants \textbf{one star}. Good luck!
+
+You're airdropped near \emph{Easter Bunny Headquarters} in a city
+somewhere. ``Near'', unfortunately, is as close as you can get - the
+instructions on the Easter Bunny Recruiting Document the Elves
+intercepted start here, and nobody had time to work them out further.
+
+The Document indicates that you should start at the given coordinates
+(where you just landed) and face North. Then, follow the provided
+sequence: either turn left (\mintinline[]{idris}{L}) or right
+(\mintinline[]{idris}{R}) 90 degrees, then walk forward the given number
+of blocks, ending at a new intersection.
+
+There's no time to follow such ridiculous instructions on foot, though,
+so you take a moment and work out the destination. Given that you can
+only walk on the
+\href{https://en.wikipedia.org/wiki/Taxicab_geometry}{street grid of the
+city}, how far is the shortest path to the destination?
+
+For example:
+
+\begin{itemize}
+\tightlist
+\item
+  Following \mintinline[]{idris}{R2, L3} leaves you
+  \mintinline[]{idris}{2} blocks East and \mintinline[]{idris}{3} blocks
+  North, or \mintinline[]{idris}{5} blocks away.
+\item
+  \mintinline[]{idris}{R2, R2, R2} leaves you \mintinline[]{idris}{2}
+  blocks due South of your starting position, which is
+  \mintinline[]{idris}{2} blocks away.
+\item
+  \mintinline[]{idris}{R5, L5, R5, R3} leaves you
+  \mintinline[]{idris}{12} blocks away.
+\end{itemize}
+
+\newpage
+
+\section{Module Declaration and
+Imports}\label{module-declaration-and-imports}
+
+\begin{minted}[]{idris}
+||| Day 1: No Time for a Taxicab
+module Data.Advent.Day01
+\end{minted}
+
+For no compelling reason, I like to use
+\href{https://www.haskell.org/arrows/}{arrows}, so import the requisite
+modules.
+
+\begin{minted}[]{idris}
+import Control.Arrow
+import Control.Category
+import Data.Morphisms
+import Data.SortedSet
+\end{minted}
+
+For parsing, use \href{https://github.com/ziman/lightyear}{Lightyear}.
+
+\begin{minted}[]{idris}
+import public Lightyear
+import public Lightyear.Char
+import public Lightyear.Strings
+\end{minted}
+
+\section{Data Types}\label{data-types}
+
+Ensure both the type and data constructors are
+\href{http://docs.idris-lang.org/en/latest/tutorial/modules.html\#meaning-for-data-types}{exported}
+for all the following data types.
+
+\begin{minted}[]{idris}
+%access public export
+\end{minted}
+
+We'll need to keep track of which cardinal direction we're facing, so
+define a data type \mintinline[]{idris}{Heading} to model that. A
+heading is \mintinline[]{idris}{N}orth, \mintinline[]{idris}{E}ast,
+\mintinline[]{idris}{S}outh or \mintinline[]{idris}{W}est.
+
+\begin{minted}[]{idris}
+||| A cardinal heading.
+data Heading = ||| North
+               N
+             | ||| East
+               E
+             | ||| South
+               S
+             | ||| West
+               W
+\end{minted}
+
+As per the \href{no-time-for-a-taxicab}{puzzle description}, the
+instructions will tell us to go \mintinline[]{idris}{L}eft or
+\mintinline[]{idris}{R}ight, so model \mintinline[]{idris}{Direction}s
+accordingly.
+
+\begin{minted}[]{idris}
+||| A direction to walk in, left or right.
+data Direction = ||| Left
+                 L
+               | ||| Right
+                 R
+\end{minted}
+
+For convenience in the REPL, implement the \mintinline[]{idris}{Show}
+\href{http://docs.idris-lang.org/en/latest/tutorial/interfaces.html}{interface}
+for \mintinline[]{idris}{Direction}.
+
+\begin{minted}[]{idris}
+implementation Show Direction where
+    show L = "Left"
+    show R = "Right"
+\end{minted}
+
+\newpage
+
+An \mintinline[]{idris}{Instruction}, e.g. \mintinline[]{idris}{R2}, is
+comprised of a \mintinline[]{idris}{Direction} and a number of blocks to
+walk in that direction.
+
+As such, define an \mintinline[]{idris}{Instruction} as a pair of a
+\mintinline[]{idris}{Direction} and an \mintinline[]{idris}{Integer}.
+
+\begin{minted}[]{idris}
+||| A direction and a number of blocks.
+Instruction : Type
+Instruction = (Direction, Integer)
+\end{minted}
+
+A \mintinline[]{idris}{Position} is a pair of a
+\mintinline[]{idris}{Heading} and \mintinline[]{idris}{Coordinates},
+such that the \mintinline[]{idris}{Heading} represents which cardinal
+direction we're facing and the \mintinline[]{idris}{Coordinates}
+describe where we're at in the
+\href{https://en.wikipedia.org/wiki/Taxicab_geometry}{street grid}.
+
+\begin{minted}[]{idris}
+||| A pair of coordinates on the street grid, `(x, y)`.
+Coordinates : Type
+Coordinates = (Integer, Integer)
+
+||| A heading and coordinates.
+Position : Type
+Position = (Heading, Coordinates)
+\end{minted}
+
+\section{Parsers}\label{parsers}
+
+Ensure the type constructors of the following parsers are
+\href{http://docs.idris-lang.org/en/latest/tutorial/modules.html\#meaning-for-data-types}{exported}.
+
+\begin{minted}[]{idris}
+%access export
+\end{minted}
+
+A \mintinline[]{idris}{Direction} is represented in the input by a
+single character, \mintinline[]{idris}{'L'} or
+\mintinline[]{idris}{'R'}.
+
+\begin{minted}[]{idris}
+direction : Parser Direction
+direction = (char 'L' *> pure L) <|>|
+            (char 'R' *> pure R) <?>
+            "a direction"
+\end{minted}
+
+An \mintinline[]{idris}{Instruction} is represented as a
+\mintinline[]{idris}{Direction} followed immediately by an integer.
+
+\begin{minted}[]{idris}
+||| Parse an instruction, i.e. a direction and
+||| a number of blocks to walk in that direction.
+partial instruction : Parser Instruction
+instruction = [| MkPair direction integer |] <?> "an instruction"
+\end{minted}
+
+The instructions are given as a comma-separated list.
+
+\begin{minted}[]{idris}
+||| Parse a comma-separated list of `Instruction`s.
+partial instructions : Parser (List Instruction)
+instructions = commaSep instruction <* spaces <* eof <?>
+               "a comma-separated instructions (at least one)"
+\end{minted}
+
+\newpage
+
+\section{Logic}\label{logic}
+
+\begin{minted}[]{idris}
+||| Return the new heading after turning right.
+||| @ initial the initial heading
+turnRight : (initial : Heading) -> Heading
+turnRight N = E
+turnRight E = S
+turnRight S = W
+turnRight W = N
+
+||| Return the new heading after turning left.
+||| @ initial the initial heading
+turnLeft : (initial : Heading) -> Heading
+turnLeft N = W
+turnLeft E = N
+turnLeft S = E
+turnLeft W = S
+
+||| Return the new heading after turning
+||| in the direction specifed by a given direction.
+turn : Instruction -> (Position ~> Position)
+turn (dir,_) = first . Mor $ case dir of { L => turnLeft; R => turnRight }
+
+syntax "(~+" [n] ")" = plusN n
+
+||| Add `n` to a given integer. Shorthand: `(~+ n)`
+plusN : Integer -> (Integer ~> Integer)
+plusN = Mor . (+)
+
+syntax "(~-" [n] ")" = plusN n
+
+||| Subtract `n` from a given integer. Shorthand: `(~- n)`
+minusN : (n : Integer) -> (Integer ~> Integer)
+minusN = Mor  . (flip (-))
+
+||| Return a morphism `Position ~> Position` that follows a given instruction,
+||| i.e. maps to the new position after moving the specified number of blocks
+||| with the current heading from the current coordinates.
+move : Instruction -> (Position ~> Position)
+move (_,n) = Mor (second . go) &&& Mor id >>> Mor (uncurry applyMor)
+  where
+    go : Position -> (Coordinates ~> Coordinates)
+    go (N,_) = second (~+ n)
+    go (E,_) = first  (~+ n)
+    go (S,_) = second (~- n)
+    go (W,_) = first  (~- n)
+\end{minted}
+
+\newpage
+
+\begin{minted}[]{idris}
+||| Follow a given instruction and return the new position.
+||| @ instruction the instruction to follow
+||| @ pos the initial position
+follow : (instruction : Instruction) -> (pos : Position) -> Position
+follow ins = applyMor $ turn ins >>> move ins
+
+private distance' : Coordinates -> Integer
+distance' = abs . uncurry (+)
+
+||| Return the distance from coordinates `(0,0)` after following
+||| a given list of instructions, starting facing North.
+||| @ instructions the list of instructions to follow
+distance : (instructions : List Instruction) -> Integer
+distance = distance' . snd . foldl (flip follow) (N, (0, 0))
+\end{minted}
+
+Define a generic main function for both parts of the puzzle that takes a
+function \mintinline[]{idris}{f : List Instruction -> IO ()} and does as
+follows:
+
+\begin{itemize}
+\tightlist
+\item
+  Read the input from \mintinline[]{idris}{input/day01.txt}
+\item
+  Parse a list of instructions from the input
+\item
+  Call \mintinline[]{idris}{f} on the list of instructions
+\item
+  If anything goes wrong, print the error and return
+  \mintinline[]{idris}{()}
+\end{itemize}
+
+\begin{minted}[]{idris}
+private partial main' : (f : List Instruction -> IO ()) -> IO ()
+main' f = do Right str <- readFile "input/day01.txt"
+               | Left err => printLn err
+             case parse instructions str of
+                  Right is => f is
+                  Left err => printLn err
+\end{minted}
+
+\section{Part One}\label{part-one}
+
+\begin{quote}
+  \textit{How many blocks away} is Easter Bunny HQ?
+\end{quote}
+
+To compute the answer to Part One, \mintinline[]{idris}{262}, simply
+call \mintinline[]{idris}{main' (printLn . distance)}, i.e.~compute the
+\mintinline[]{idris}{distance} between the starting and final positions.
+
+\begin{minted}[]{idris}
+namespace PartOne
+\end{minted}
+
+\begin{minted}[]{idris}
+    partial main : IO ()
+    main = main' (printLn . distance)
+\end{minted}
+
+\newpage
+
+\section{Part Two}\label{part-two}
+
+Then, you notice the instructions continue on the back of the Recruiting
+Document. Easter Bunny HQ is actually at the first location you visit
+twice.
+
+For example, if your instructions are
+\mintinline[]{idris}{R8, R4, R4, R8}, the first location you visit twice
+is \mintinline[]{idris}{4} blocks away, due East.
+
+\begin{quote}
+  How many blocks away is the \textit{first location you visit twice}?
+\end{quote}
+
+\begin{minted}[]{idris}
+namespace PartTwo
+\end{minted}
+
+Computing the answer to Part Two, \mintinline[]{idris}{131}, is a bit
+more complicated.
+
+First, define a recursive function \mintinline[]{idris}{partTwo} to
+process a list of instructions and return the distance between the
+starting location and the first location visited twice.
+
+To do that, maintain a sorted set of seen locations and for each block
+walked per each instruction, and short circuit if any location has been
+seen before.
+
+Return \mintinline[]{idris}{Nothing} if given the empty instruction
+list. Otherwise, return \mintinline[]{idris}{Just} the desired distance.
+
+N.B. \mintinline[]{idris}{partTwo} short circuits at the instruction
+level rather than block level, so it's possible a little extra work is
+performed.
+
+\begin{minted}[]{idris}
+    partTwo : (instructions : List Instruction) ->
+              (pos : Position) ->
+              (seen : SortedSet Coordinates) ->
+              Maybe Integer
+    partTwo [] _ _                           = Nothing
+    partTwo ((dir, len) :: is) (h, loc) seen =
+        either (Just . distance')
+               (partTwo is (follow (dir, len) (h, loc)))
+               (foldl go (Right seen) [1..len])
+      where
+        go : Either Coordinates (SortedSet Coordinates) -> Integer ->
+             Either Coordinates (SortedSet Coordinates)
+        go dup@(Left _) _  = dup
+        go (Right seen') n = let (_, loc') = follow (dir, n) (h, loc) in
+                                 if contains loc' seen'
+                                    then Left loc'
+                                    else Right $ insert loc' seen'
+\end{minted}
+
+\begin{minted}[]{idris}
+    partial main : IO ()
+    main = main' $ \is => case partTwo is (N, (0, 0)) empty of
+                               Nothing     => putStrLn "Failed!"
+                               Just answer => printLn answer
+\end{minted}
+
+\newpage
+
+\section{Main}\label{main}
+
+Label and evaluate \mintinline[]{idris}{PartOne.main} and
+\mintinline[]{idris}{PartTwo.main}.
+
+\begin{minted}[]{idris}
+namespace Main
+
+    partial main : IO ()
+    main = putStr "Part One: " *> PartOne.main *>
+           putStr "Part Two: " *> PartTwo.main
+\end{minted}
+
+\(\qed\)
+
+\end{document}
