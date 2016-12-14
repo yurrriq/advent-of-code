@@ -1,5 +1,6 @@
 package advent
 
+opts       = "--total"
 pkgs       = contrib
            , effects
            , lightyear
@@ -9,6 +10,7 @@ modules    = Data.Ix
            , Data.Advent.Day02
            , Data.Advent.Day03
            , Data.Advent.Day04
+           -- NOTE: Day 5 is implemented in Haskell
            , Data.Advent.Day06
            , Data.Advent.Day07
            , Data.Advent.Day08
