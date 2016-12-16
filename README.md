@@ -17,6 +17,8 @@
 | [Day 11: Radioisotope Thermoelectric Generators][p11] | [Input][i11] |              |                            |                |
 | [Day 12: Leonardo's Monorail][p12]                    | [Input][i12] |              |                            |                |
 | [Day 13: A Maze of Twisty Little Cubicles][p13]       | [Input][i13] |              |                            |                |
+| [Day 14: One-Time Pad][p14]                           | [Input][i14] |              |                            |                |
+| [Day 15: Timing is Everything][p15]                   | [Input][i15] |              |                            |                |
 
 <!-- Named Links -->
 [AoC]: https://adventofcode.com/2016
