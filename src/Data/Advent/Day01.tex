@@ -55,6 +55,16 @@ Imports}\label{module-declaration-and-imports}
 module Data.Advent.Day01
 \end{minted}
 
+Import the
+\href{https://github.com/yurrriq/advent-of-idris/blob/master/src/Data/Advent/Day.idr}{generic
+\mintinline[]{idris}{Day} structure}, inspired by
+\href{https://github.com/purcell/adventofcode2016}{Steve Purcell Haskell
+solution}.
+
+\begin{minted}[]{idris}
+import public Data.Advent.Day
+\end{minted}
+
 For no compelling reason, I like to use
 \href{https://www.haskell.org/arrows/}{arrows}, so import the requisite
 modules.
@@ -114,6 +124,8 @@ data Direction = ||| Left
                  R
 \end{minted}
 
+\newpage
+
 For convenience in the REPL, implement the \mintinline[]{idris}{Show}
 \href{http://docs.idris-lang.org/en/latest/tutorial/interfaces.html}{interface}
 for \mintinline[]{idris}{Direction}.
@@ -124,36 +136,42 @@ implementation Show Direction where
     show R = "Right"
 \end{minted}
 
-\newpage
-
 An \mintinline[]{idris}{Instruction}, e.g. \mintinline[]{idris}{R2}, is
 comprised of a \mintinline[]{idris}{Direction} and a number of blocks to
 walk in that direction.
 
-As such, define an \mintinline[]{idris}{Instruction} as a pair of a
-\mintinline[]{idris}{Direction} and an \mintinline[]{idris}{Integer}.
+As such, define an \mintinline[]{idris}{Instruction} as a record
+containing a \mintinline[]{idris}{Direction} and a number of
+\mintinline[]{idris}{Blocks}.
 
 \begin{minted}[]{idris}
+Blocks : Type
+Blocks = Integer
+
 ||| A direction and a number of blocks.
-Instruction : Type
-Instruction = (Direction, Integer)
+record Instruction where
+    constructor MkIns
+    iDir    : Direction
+    iBlocks : Blocks
 \end{minted}
 
-A \mintinline[]{idris}{Position} is a pair of a
-\mintinline[]{idris}{Heading} and \mintinline[]{idris}{Coordinates},
-such that the \mintinline[]{idris}{Heading} represents which cardinal
-direction we're facing and the \mintinline[]{idris}{Coordinates}
-describe where we're at in the
+A \mintinline[]{idris}{Position} is a record containing x and y
+coordinates in the
 \href{https://en.wikipedia.org/wiki/Taxicab_geometry}{street grid}.
 
 \begin{minted}[]{idris}
-||| A pair of coordinates on the street grid, `(x, y)`.
-Coordinates : Type
-Coordinates = (Integer, Integer)
+||| A pair of coordinates on the street grid.
+record Position where
+    constructor MkPos
+    posX, posY : Blocks
 
-||| A heading and coordinates.
-Position : Type
-Position = (Heading, Coordinates)
+implementation Eq Position where
+    (MkPos x1 y1) == (MkPos x2 y2) = x1 == x2 && y1 == y2
+
+implementation Ord Position where
+    compare (MkPos x1 y1) (MkPos x2 y2) with (compare x1 x2)
+      | EQ = compare y1 y2
+      | o  = o
 \end{minted}
 
 \section{Parsers}\label{parsers}
@@ -176,6 +194,8 @@ direction = (char 'L' *> pure L) <|>|
             "a direction"
 \end{minted}
 
+\newpage
+
 An \mintinline[]{idris}{Instruction} is represented as a
 \mintinline[]{idris}{Direction} followed immediately by an integer.
 
@@ -183,7 +203,7 @@ An \mintinline[]{idris}{Instruction} is represented as a
 ||| Parse an instruction, i.e. a direction and
 ||| a number of blocks to walk in that direction.
 partial instruction : Parser Instruction
-instruction = [| MkPair direction integer |] <?> "an instruction"
+instruction = [| MkIns direction integer |] <?> "an instruction"
 \end{minted}
 
 The instructions are given as a comma-separated list.
@@ -191,11 +211,9 @@ The instructions are given as a comma-separated list.
 \begin{minted}[]{idris}
 ||| Parse a comma-separated list of `Instruction`s.
 partial instructions : Parser (List Instruction)
-instructions = commaSep instruction <* spaces <* eof <?>
-               "a comma-separated instructions (at least one)"
+instructions = commaSep instruction <* spaces <?>
+               "a comma-separated list of instructions"
 \end{minted}
-
-\newpage
 
 \section{Logic}\label{logic}
 
@@ -216,79 +234,39 @@ turnLeft E = N
 turnLeft S = E
 turnLeft W = S
 
-||| Return the new heading after turning
-||| in the direction specifed by a given direction.
-turn : Instruction -> (Position ~> Position)
-turn (dir,_) = first . Mor $ case dir of { L => turnLeft; R => turnRight }
+||| Return the new heading after turning in a given direction.
+turn : Heading -> Direction -> Heading
+turn h L = turnLeft  h
+turn h R = turnRight h
 
-syntax "(~+" [n] ")" = plusN n
+||| Return the new position after moving one block with a given heading.
+move : Heading -> (Position -> Position)
+move N = record { posY $= (+ 1) }
+move E = record { posX $= (+ 1) }
+move S = record { posY $= (flip (-) 1) }
+move W = record { posX $= (flip (-) 1) }  
+\end{minted}
 
-||| Add `n` to a given integer. Shorthand: `(~+ n)`
-plusN : Integer -> (Integer ~> Integer)
-plusN = Mor . (+)
-
-syntax "(~-" [n] ")" = plusN n
-
-||| Subtract `n` from a given integer. Shorthand: `(~- n)`
-minusN : (n : Integer) -> (Integer ~> Integer)
-minusN = Mor  . (flip (-))
-
-||| Return a morphism `Position ~> Position` that follows a given instruction,
-||| i.e. maps to the new position after moving the specified number of blocks
-||| with the current heading from the current coordinates.
-move : Instruction -> (Position ~> Position)
-move (_,n) = Mor (second . go) &&& Mor id >>> Mor (uncurry applyMor)
-  where
-    go : Position -> (Coordinates ~> Coordinates)
-    go (N,_) = second (~+ n)
-    go (E,_) = first  (~+ n)
-    go (S,_) = second (~- n)
-    go (W,_) = first  (~- n)
+\begin{minted}[]{idris}
+||| Compute the shortest distance from the initial position and a given one.
+shortestDistance : Position -> Blocks
+shortestDistance (MkPos x y) = abs x + abs y
 \end{minted}
 
 \newpage
 
 \begin{minted}[]{idris}
-||| Follow a given instruction and return the new position.
-||| @ instruction the instruction to follow
-||| @ pos the initial position
-follow : (instruction : Instruction) -> (pos : Position) -> Position
-follow ins = applyMor $ turn ins >>> move ins
-
-private distance' : Coordinates -> Integer
-distance' = abs . uncurry (+)
-
-||| Return the distance from coordinates `(0,0)` after following
-||| a given list of instructions, starting facing North.
-||| @ instructions the list of instructions to follow
-distance : (instructions : List Instruction) -> Integer
-distance = distance' . snd . foldl (flip follow) (N, (0, 0))
-\end{minted}
-
-Define a generic main function for both parts of the puzzle that takes a
-function \mintinline[]{idris}{f : List Instruction -> IO ()} and does as
-follows:
-
-\begin{itemize}
-\tightlist
-\item
-  Read the input from \mintinline[]{idris}{input/day01.txt}
-\item
-  Parse a list of instructions from the input
-\item
-  Call \mintinline[]{idris}{f} on the list of instructions
-\item
-  If anything goes wrong, print the error and return
-  \mintinline[]{idris}{()}
-\end{itemize}
-
-\begin{minted}[]{idris}
-private partial main' : (f : List Instruction -> IO ()) -> IO ()
-main' f = do Right str <- readFile "input/day01.txt"
-               | Left err => printLn err
-             case parse instructions str of
-                  Right is => f is
-                  Left err => printLn err
+||| Return the list of intermediate positions visited
+||| when following a given list of instructions.
+followInstructions : List Instruction -> List Position
+followInstructions is =
+    let directions = drop 1 $ scanl turn N (iDir <$> is)
+        distances  = iBlocks <$> is
+        moves      = concatMap expand (zip directions distances) in
+        scanl (flip move) (MkPos 0 0) moves
+  where
+    expand : (Heading, Blocks) -> List Heading
+    expand (h, n) = replicate (cast n) h
 \end{minted}
 
 \section{Part One}\label{part-one}
@@ -297,20 +275,14 @@ main' f = do Right str <- readFile "input/day01.txt"
   \textit{How many blocks away} is Easter Bunny HQ?
 \end{quote}
 
-To compute the answer to Part One, \mintinline[]{idris}{262}, simply
-call \mintinline[]{idris}{main' (printLn . distance)}, i.e.~compute the
-\mintinline[]{idris}{distance} between the starting and final positions.
+To compute the answer to Part One, \mintinline[]{idris}{262}, follow the
+instructions, get the last position and compute the shortest distance
+from the initial position.
 
 \begin{minted}[]{idris}
-namespace PartOne
+partOne : List Instruction -> Maybe Blocks
+partOne = map shortestDistance . last' . followInstructions
 \end{minted}
-
-\begin{minted}[]{idris}
-    partial main : IO ()
-    main = main' (printLn . distance)
-\end{minted}
-
-\newpage
 
 \section{Part Two}\label{part-two}
 
@@ -326,68 +298,43 @@ is \mintinline[]{idris}{4} blocks away, due East.
   How many blocks away is the \textit{first location you visit twice}?
 \end{quote}
 
-\begin{minted}[]{idris}
-namespace PartTwo
-\end{minted}
-
-Computing the answer to Part Two, \mintinline[]{idris}{131}, is a bit
-more complicated.
-
-First, define a recursive function \mintinline[]{idris}{partTwo} to
-process a list of instructions and return the distance between the
-starting location and the first location visited twice.
-
-To do that, maintain a sorted set of seen locations and for each block
-walked per each instruction, and short circuit if any location has been
-seen before.
-
-Return \mintinline[]{idris}{Nothing} if given the empty instruction
-list. Otherwise, return \mintinline[]{idris}{Just} the desired distance.
-
-N.B. \mintinline[]{idris}{partTwo} short circuits at the instruction
-level rather than block level, so it's possible a little extra work is
-performed.
+First, define a function \mintinline[]{idris}{firstDuplicate} to find
+the first location visited twice in a list of positions. Instead of
+specializing for \mintinline[]{idris}{List Position}, generalize the
+solution to \mintinline[]{idris}{Ord a => List a}.
 
 \begin{minted}[]{idris}
-    partTwo : (instructions : List Instruction) ->
-              (pos : Position) ->
-              (seen : SortedSet Coordinates) ->
-              Maybe Integer
-    partTwo [] _ _                           = Nothing
-    partTwo ((dir, len) :: is) (h, loc) seen =
-        either (Just . distance')
-               (partTwo is (follow (dir, len) (h, loc)))
-               (foldl go (Right seen) [1..len])
-      where
-        go : Either Coordinates (SortedSet Coordinates) -> Integer ->
-             Either Coordinates (SortedSet Coordinates)
-        go dup@(Left _) _  = dup
-        go (Right seen') n = let (_, loc') = follow (dir, n) (h, loc) in
-                                 if contains loc' seen'
-                                    then Left loc'
-                                    else Right $ insert loc' seen'
+||| Return `Just` the first duplicate in a given list.
+||| If there are none, return `Nothing`.
+firstDuplicate : Ord a => List a -> Maybe a
+firstDuplicate = go empty
+  where
+    go : SortedSet a -> List a -> Maybe a
+    go _ []         = Nothing
+    go seen (x::xs) =
+        if contains x seen
+           then Just x
+           else go (insert x seen) xs
 \end{minted}
 
 \begin{minted}[]{idris}
-    partial main : IO ()
-    main = main' $ \is => case partTwo is (N, (0, 0)) empty of
-                               Nothing     => putStrLn "Failed!"
-                               Just answer => printLn answer
+partTwo : List Instruction -> Maybe Blocks
+partTwo = map shortestDistance . firstDuplicate . followInstructions
 \end{minted}
 
 \newpage
 
 \section{Main}\label{main}
 
-Label and evaluate \mintinline[]{idris}{PartOne.main} and
-\mintinline[]{idris}{PartTwo.main}.
+Run the solutions for Day 1.
 
 \begin{minted}[]{idris}
 namespace Main
 
     partial main : IO ()
-    main = putStr "Part One: " *> PartOne.main *>
-           putStr "Part Two: " *> PartTwo.main
+    main = runDay $ MkDay 1 instructions
+           (pure . maybe "Failed!" show . partOne)
+           (pure . maybe "Failed!" show . partTwo)
 \end{minted}
 
 \(\qed\)

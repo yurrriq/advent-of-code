@@ -1,2 +1,2 @@
-Part One: 262
-Part Two: 131
+Day 1: Part One ==> 262
+Day 1: Part Two ==> 131
