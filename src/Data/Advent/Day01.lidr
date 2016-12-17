@@ -186,7 +186,7 @@ The instructions are given as a comma-separated list.
 > plusN : Integer -> (Integer ~> Integer)
 > plusN = Mor . (+)
 >
-> syntax "(~-" [n] ")" = plusN n
+> syntax "(~-" [n] ")" = minusN n
 >
 > ||| Subtract `n` from a given integer. Shorthand: `(~- n)`
 > minusN : (n : Integer) -> (Integer ~> Integer)
