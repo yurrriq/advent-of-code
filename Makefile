@@ -1,5 +1,5 @@
 IDRIS ?= idris
-OPTS  ?= -p contrib -p effects -p lightyear -i src
+OPTS  ?= -X ElabReflection -p contrib -p effects -p lightyear -i src
 
 DAYS := 01 02 03 04 06 07 08 09
 

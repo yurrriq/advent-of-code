@@ -5,6 +5,7 @@
  (makefile-mode
   . ((indent-tabs-mode . t)))
  (idris-mode
-  . ((idris-interpreter-flags . ("-p" "contrib"
+  . ((idris-interpreter-flags . ("-X" "ElabReflection"
+                                 "-p" "contrib"
                                  "-p" "effects"
                                  "-p" "lightyear")))))
