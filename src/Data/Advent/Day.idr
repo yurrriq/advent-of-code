@@ -26,31 +26,27 @@ record Day (i : Type) where
     dayPartOne : i -> IO String
     dayPartTwo : i -> IO String
 
-zeroPad : Nat -> String
-zeroPad n = if n < 10
-               then strCons '0' (show n)
-               else show n
-
-%access private
-
-inputFile : Day i -> String
-inputFile d = "input/day" ++ zeroPad (dayNum d) ++ ".txt"
-
-banner : Day i -> String -> String
-banner d part = "Day " ++ show (dayNum d) ++ ": Part " ++ part ++ " ==> "
-
 %access export
 
 loadDay : Day i -> IO i
 loadDay d = either error pure $
             either (Left . show) (parse (dayParser d <* eof))
-            !(readFile (inputFile d))
+            !(readFile $ "input/day" ++ zeroPad (dayNum d) ++ ".txt")
+  where
+    zeroPad : Nat -> String
+    zeroPad n = if n < 10 then strCons '0' (show n) else show n
 
 runDay : Day i -> IO ()
-runDay d = do input <- loadDay d
-              putStr $ banner d "One"
-              putStrLn !(dayPartOne d input)
-              putStr $ banner d "Two"
-              putStrLn !(dayPartTwo d input)
+runDay d = do args <- getArgs
+              input <- loadDay d
+              when (isNil args || ("one" `elem` args)) $
+                   do putStr $ banner "One"
+                      putStrLn !(dayPartOne d input)
+              when (isNil args || ("two" `elem` args)) $
+                   do putStr $ banner "Two"
+                      putStrLn !(dayPartTwo d input)
+  where
+    banner : String -> String
+    banner part = "Day " ++ show (dayNum d) ++ ": Part " ++ part ++ " ==> "
 
 -- --------------------------------------------------------------------- [ EOF ]

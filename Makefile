@@ -1,5 +1,6 @@
 idris ?= idris
 opts  ?= -X ElabReflection -p contrib -p effects -p lightyear -i src
+parts ?= one two
 
 days := 01 02 03 04 06 07 08 09
 
@@ -17,7 +18,7 @@ bin/day%: src/Data/Advent/Day%.lidr input/day%.txt
 
 output/day%.txt: bin/day%
 	@ mkdir -p output
-	$< >$@
+	$< ${parts} >$@
 
 clean:
 	find . -name '*.ibc' -delete
