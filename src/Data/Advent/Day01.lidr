@@ -46,6 +46,13 @@ For example:
 > ||| Day 1: No Time for a Taxicab
 > module Data.Advent.Day01
 
+Import the [generic `Day`
+structure](https://github.com/yurrriq/advent-of-idris/blob/master/src/Data/Advent/Day.idr),
+inspired by [Steve Purcell Haskell
+solution](https://github.com/purcell/adventofcode2016).
+
+> import public Data.Advent.Day
+
 For no compelling reason, I like to use
 [arrows](https://www.haskell.org/arrows/), so import the requisite modules.
 
@@ -91,6 +98,8 @@ tell us to go `L`eft or `R`ight, so model `Direction`s accordingly.
 >                | ||| Right
 >                  R
 
+\newpage
+
 For convenience in the REPL, implement the `Show`
 [interface](http://docs.idris-lang.org/en/latest/tutorial/interfaces.html) for
 `Direction`.
@@ -99,29 +108,36 @@ For convenience in the REPL, implement the `Show`
 >     show L = "Left"
 >     show R = "Right"
 
-\newpage
-
 An `Instruction`, e.g. `R2`, is comprised of a `Direction` and a number of
 blocks to walk in that direction.
 
-As such, define an `Instruction` as a pair of a `Direction` and an `Integer`.
+As such, define an `Instruction` as a record containing a `Direction` and a
+number of `Blocks`.
 
+> Blocks : Type
+> Blocks = Integer
+>
 > ||| A direction and a number of blocks.
-> Instruction : Type
-> Instruction = (Direction, Integer)
+> record Instruction where
+>     constructor MkIns
+>     iDir    : Direction
+>     iBlocks : Blocks
 
-A `Position` is a pair of a `Heading` and `Coordinates`, such that the `Heading`
-represents which cardinal direction we're facing and the `Coordinates` describe
-where we're at in the [street
+A `Position` is a record containing x and y coordinates in the [street
 grid](https://en.wikipedia.org/wiki/Taxicab_geometry).
 
-> ||| A pair of coordinates on the street grid, `(x, y)`.
-> Coordinates : Type
-> Coordinates = (Integer, Integer)
+> ||| A pair of coordinates on the street grid.
+> record Position where
+>     constructor MkPos
+>     posX, posY : Blocks
 >
-> ||| A heading and coordinates.
-> Position : Type
-> Position = (Heading, Coordinates)
+> implementation Eq Position where
+>     (MkPos x1 y1) == (MkPos x2 y2) = x1 == x2 && y1 == y2
+>
+> implementation Ord Position where
+>     compare (MkPos x1 y1) (MkPos x2 y2) with (compare x1 x2)
+>       | EQ = compare y1 y2
+>       | o  = o
 
 
 == Parsers
@@ -138,6 +154,7 @@ A `Direction` is represented in the input by a single character, `'L'` or `'R'`.
 >             (char 'R' *> pure R) <?>
 >             "a direction"
 
+\newpage
 
 An `Instruction` is represented as a `Direction` followed immediately by an
 integer.
@@ -145,16 +162,14 @@ integer.
 > ||| Parse an instruction, i.e. a direction and
 > ||| a number of blocks to walk in that direction.
 > partial instruction : Parser Instruction
-> instruction = [| MkPair direction integer |] <?> "an instruction"
+> instruction = [| MkIns direction integer |] <?> "an instruction"
 
 The instructions are given as a comma-separated list.
 
 > ||| Parse a comma-separated list of `Instruction`s.
 > partial instructions : Parser (List Instruction)
-> instructions = commaSep instruction <* spaces <* eof <?>
->                "a comma-separated instructions (at least one)"
-
-\newpage
+> instructions = commaSep instruction <* spaces <?>
+>                "a comma-separated list of instructions"
 
 
 == Logic
@@ -175,67 +190,35 @@ The instructions are given as a comma-separated list.
 > turnLeft S = E
 > turnLeft W = S
 >
-> ||| Return the new heading after turning
-> ||| in the direction specifed by a given direction.
-> turn : Instruction -> (Position ~> Position)
-> turn (dir,_) = first . Mor $ case dir of { L => turnLeft; R => turnRight }
+> ||| Return the new heading after turning in a given direction.
+> turn : Heading -> Direction -> Heading
+> turn h L = turnLeft  h
+> turn h R = turnRight h
 >
-> syntax "(~+" [n] ")" = plusN n
->
-> ||| Add `n` to a given integer. Shorthand: `(~+ n)`
-> plusN : Integer -> (Integer ~> Integer)
-> plusN = Mor . (+)
->
-> syntax "(~-" [n] ")" = minusN n
->
-> ||| Subtract `n` from a given integer. Shorthand: `(~- n)`
-> minusN : (n : Integer) -> (Integer ~> Integer)
-> minusN = Mor  . (flip (-))
->
-> ||| Return a morphism `Position ~> Position` that follows a given instruction,
-> ||| i.e. maps to the new position after moving the specified number of blocks
-> ||| with the current heading from the current coordinates.
-> move : Instruction -> (Position ~> Position)
-> move (_,n) = Mor (second . go) &&& Mor id >>> Mor (uncurry applyMor)
->   where
->     go : Position -> (Coordinates ~> Coordinates)
->     go (N,_) = second (~+ n)
->     go (E,_) = first  (~+ n)
->     go (S,_) = second (~- n)
->     go (W,_) = first  (~- n)
+> ||| Return the new position after moving one block with a given heading.
+> move : Heading -> (Position -> Position)
+> move N = record { posY $= (+ 1) }
+> move E = record { posX $= (+ 1) }
+> move S = record { posY $= (flip (-) 1) }
+> move W = record { posX $= (flip (-) 1) }  
+
+> ||| Compute the shortest distance from the initial position and a given one.
+> shortestDistance : Position -> Blocks
+> shortestDistance (MkPos x y) = abs x + abs y
 
 \newpage
 
-> ||| Follow a given instruction and return the new position.
-> ||| @ instruction the instruction to follow
-> ||| @ pos the initial position
-> follow : (instruction : Instruction) -> (pos : Position) -> Position
-> follow ins = applyMor $ turn ins >>> move ins
->
-> private distance' : Coordinates -> Integer
-> distance' = abs . uncurry (+)
->
-> ||| Return the distance from coordinates `(0,0)` after following
-> ||| a given list of instructions, starting facing North.
-> ||| @ instructions the list of instructions to follow
-> distance : (instructions : List Instruction) -> Integer
-> distance = distance' . snd . foldl (flip follow) (N, (0, 0))
-
-Define a generic main function for both parts of the puzzle that
-takes a function `f : List Instruction -> IO ()` and does as follows:
-
-- Read the input from `input/day01.txt`
-- Parse a list of instructions from the input
-- Call `f` on the list of instructions
-- If anything goes wrong, print the error and return `()`
-
-> private partial main' : (f : List Instruction -> IO ()) -> IO ()
-> main' f = do Right str <- readFile "input/day01.txt"
->                | Left err => printLn err
->              case parse instructions str of
->                   Right is => f is
->                   Left err => printLn err
-
+> ||| Return the list of intermediate positions visited
+> ||| when following a given list of instructions.
+> followInstructions : List Instruction -> List Position
+> followInstructions is =
+>     let directions = drop 1 $ scanl turn N (iDir <$> is)
+>         distances  = iBlocks <$> is
+>         moves      = concatMap expand (zip directions distances) in
+>         scanl (flip move) (MkPos 0 0) moves
+>   where
+>     expand : (Heading, Blocks) -> List Heading
+>     expand (h, n) = replicate (cast n) h
 
 == Part One
 
@@ -243,16 +226,11 @@ takes a function `f : List Instruction -> IO ()` and does as follows:
   \textit{How many blocks away} is Easter Bunny HQ?
 \end{quote}
 
-To compute the answer to Part One, `262`, simply call
-`main' (printLn . distance)`, i.e. compute the `distance`
-between the starting and final positions.
+To compute the answer to Part One, `262`, follow the instructions, get the last
+position and compute the shortest distance from the initial position.
 
-> namespace PartOne
-
->     partial main : IO ()
->     main = main' (printLn . distance)
-
-\newpage
+> partOne : List Instruction -> Maybe Blocks
+> partOne = map shortestDistance . last' . followInstructions
 
 
 == Part Two
@@ -267,57 +245,37 @@ visit twice is `4` blocks away, due East.
   How many blocks away is the \textit{first location you visit twice}?
 \end{quote}
 
-> namespace PartTwo
+First, define a function `firstDuplicate` to find the first location visited
+twice in a list of positions. Instead of specializing for `List Position`,
+generalize the solution to `Ord a => List a`.
 
-Computing the answer to Part Two, `131`, is a bit more complicated.
+> ||| Return `Just` the first duplicate in a given list.
+> ||| If there are none, return `Nothing`.
+> firstDuplicate : Ord a => List a -> Maybe a
+> firstDuplicate = go empty
+>   where
+>     go : SortedSet a -> List a -> Maybe a
+>     go _ []         = Nothing
+>     go seen (x::xs) =
+>         if contains x seen
+>            then Just x
+>            else go (insert x seen) xs
 
-First, define a recursive function `partTwo` to process a list of instructions
-and return the distance between the starting location and the first location
-visited twice.
-
-To do that, maintain a sorted set of seen locations and for each block walked
-per each instruction, and short circuit if any location has been seen before.
-
-Return `Nothing` if given the empty instruction list.
-Otherwise, return `Just` the desired distance.
-
-N.B. `partTwo` short circuits at the instruction level rather than block level,
-so it's possible a little extra work is performed.
-
->     partTwo : (instructions : List Instruction) ->
->               (pos : Position) ->
->               (seen : SortedSet Coordinates) ->
->               Maybe Integer
->     partTwo [] _ _                           = Nothing
->     partTwo ((dir, len) :: is) (h, loc) seen =
->         either (Just . distance')
->                (partTwo is (follow (dir, len) (h, loc)))
->                (foldl go (Right seen) [1..len])
->       where
->         go : Either Coordinates (SortedSet Coordinates) -> Integer ->
->              Either Coordinates (SortedSet Coordinates)
->         go dup@(Left _) _  = dup
->         go (Right seen') n = let (_, loc') = follow (dir, n) (h, loc) in
->                                  if contains loc' seen'
->                                     then Left loc'
->                                     else Right $ insert loc' seen'
-
->     partial main : IO ()
->     main = main' $ \is => case partTwo is (N, (0, 0)) empty of
->                                Nothing     => putStrLn "Failed!"
->                                Just answer => printLn answer
+> partTwo : List Instruction -> Maybe Blocks
+> partTwo = map shortestDistance . firstDuplicate . followInstructions
 
 \newpage
 
 
 == Main
 
-Label and evaluate `PartOne.main` and `PartTwo.main`.
+Run the solutions for Day 1.
 
 > namespace Main
 >
 >     partial main : IO ()
->     main = putStr "Part One: " *> PartOne.main *>
->            putStr "Part Two: " *> PartTwo.main
+>     main = runDay $ MkDay 1 instructions
+>            (pure . maybe "Failed!" show . partOne)
+>            (pure . maybe "Failed!" show . partTwo)
 
 $\qed$
