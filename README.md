@@ -12,7 +12,7 @@
 | [Day 6: Signals and Noise][p06]                       | [Input][i06] | [Idris][]    | [`Data.Advent.Day06`][m06] | :star::star2: | [Answers][a06] |
 | [Day 7: Internet Protocol Version 7][p07]             | [Input][i07] | [Idris][]    | [`Data.Advent.Day07`][m07] | :star::star2: | [Answers][a07] |
 | [Day 8: Two-Factor Authentication][p08]               | [Input][i08] | [Idris][]    | [`Data.Advent.Day08`][m08] | :star::star2: | [Answers][a08] |
-| [Day 9: Explosives in Cyberspace][p09]                | [Input][i09] | [Idris][]    | [`Data.Advent.Day09`][m09] | :star:        | [Answers][a09] |
+| [Day 9: Explosives in Cyberspace][p09]                | [Input][i09] | [Idris][]    | [`Data.Advent.Day09`][m09] | :star::star2: | [Answers][a09] |
 | [Day 10: Balance Bots][p10]                           | [Input][i10] |              |                            |               |                |
 | [Day 11: Radioisotope Thermoelectric Generators][p11] | [Input][i11] |              |                            |               |                |
 | [Day 12: Leonardo's Monorail][p12]                    | [Input][i12] |              |                            |               |                |
