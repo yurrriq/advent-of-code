@@ -61,19 +61,16 @@ for all the following data types.
 
 > %access public export
 
-A `Marker` represents the length of character sequence and how many times to
-repeat it.
-
-> data Marker = MkMarker Nat Nat
-
 TODO: describe this
 
-> data Input = Seq (Vect n String)
+> data Block = Seq Nat String (List Block)
 >            | Str String
 
 
 == Parsers
 
+> %access private
+>
 > notSpace : Parser Char
 > notSpace = satisfy (not . isSpace)
 
@@ -81,62 +78,17 @@ Ensure the type constructors of the following parsers are
 [exported](http://docs.idris-lang.org/en/latest/tutorial/modules.html#meaning-for-data-types).
 
 > %access export
-
-> partial marker : Parser Marker
-> marker = do token "("
->             len <- integer
->             token "x"
->             reps <- integer
->             token ")"
->             pure $ MkMarker len reps
-
-> partial seq : (m : Marker) -> Parser Input
-> seq (MkMarker n r) = Seq . Vect.replicate r . pack <$> ntimes n notSpace
-
-> partial markerSeq : Parser Input
-> markerSeq = lexeme $ marker >>= seq
-
-> partial chars : Parser Input
-> chars = Str . pack <$> go
+>
+> partial block : Parser Block
+> block = go <|>| Str . pack <$> some letter <?>
+>         "a repeated sequence or plain string"
 >   where
->     partial go : Parser (List Char)
->     go = do c <- lexeme (satisfy (\x => not (isSpace x) && x /= '('))
->             cs <- go <|> pure []
->             pure (c :: cs)
-
-
-== Logic
-
-> partial decompress : String -> Either String (List Input)
-> decompress = parse $ some (markerSeq <|> chars)
-
-> length' : List Input -> Nat
-> length' []              = Z
-> length' (Seq xs  :: is) = foldr ((+) . length) 0 xs + length' is
-> length' (Str str :: is) = length str + length' is
-
-
-== Examples
-
-> %default partial
-
-> ex1 : Either String Nat
-> ex1 = length' <$> decompress "ADVENT"
-
-> ex2 : Either String Nat
-> ex2 = length' <$> decompress "A(1x5)BC"
-
-> ex3 : Either String Nat
-> ex3 = length' <$> decompress "(3x3)XYZ"
-
-> ex4 : Either String Nat
-> ex4 = length' <$> decompress "A(2x2)BCD(2x2)EFG"
-
-> ex5 : Either String Nat
-> ex5 = length' <$> decompress "(6x1)(1x3)A"
-
-> ex6 : Either String Nat
-> ex6 = length' <$> decompress "X(8x2)(3x3)ABCY"
+>     go = do len  <- char '(' *> integer <* char 'x'
+>             reps <- fromIntegerNat <$> integer <* char ')'
+>             rest <- pack <$> ntimes len notSpace
+>             case parse (some block <* eof) rest of
+>                  Right subBlocks => pure $ Seq reps rest subBlocks
+>                  Left err => fail err
 
 
 == Part One
@@ -146,15 +98,41 @@ Ensure the type constructors of the following parsers are
   Don't count whitespace.
 \end{quote}
 
-> partOne : List Input -> Nat
-> partOne = length'
+> partOne : Block -> Nat
+> partOne (Seq n str _) = n * length str
+> partOne (Str str)     = length str
+>
+> %default partial
+>
+> namespace PartOne
+>
+>     ex : String -> Either String Nat
+>     ex str = sum . map partOne <$> parse (some block <* newline) str
+>
+>     ex1 : Either String Nat
+>     ex1 = ex "ADVENT"
+>
+>     ex2 : Either String Nat
+>     ex2 = ex "A(1x5)BC"
+>
+>     ex3 : Either String Nat
+>     ex3 = ex "(3x3)XYZ"
+>
+>     ex4 : Either String Nat
+>     ex4 = ex "A(2x2)BCD(2x2)EFG"
+>
+>     ex5 : Either String Nat
+>     ex5 = ex "(6x1)(1x3)A"
+>
+>     ex6 : Either String Nat
+>     ex6 = ex "X(8x2)(3x3)ABCY"
 
 
 == Main
 
 > namespace Main
 >
->     partial main : IO ()
->     main = runDay $ MkDay 9 (some (markerSeq <|> chars))
->            (pure . show . partOne)
->            (pure . show . const "Not yet implemented!")
+>     main : IO ()
+>     main = runDay $ MkDay 9 (some block <* newline)
+>            (pure . show . sum . map partOne)
+>            (pure . const "Not yet implemented!")
