@@ -45,12 +45,12 @@ For example:
 > ||| Day 9: Explosives in Cyberspace
 > module Data.Advent.Day09
 
-For parsing, use [Lightyear](https://github.com/ziman/lightyear).
+Import the [generic `Day`
+structure](https://github.com/yurrriq/advent-of-idris/blob/master/src/Data/Advent/Day.idr),
+inspired by [Steve Purcell Haskell
+solution](https://github.com/purcell/adventofcode2016).
 
-> import public Lightyear
-> import public Lightyear.Char
-> import public Lightyear.Strings
-> import public Lightyear.StringFile
+> import public Data.Advent.Day
 
 
 == Data Types
@@ -139,14 +139,6 @@ Ensure the type constructors of the following parsers are
 > ex6 = length' <$> decompress "X(8x2)(3x3)ABCY"
 
 
-== Main Logic
-
-> main' : Show b => Parser a -> (a -> b) -> IO ()
-> main' p f =
->     either putStrLn (printLn . f)
->            !(run $ parseFile (const show) (const id) p "input/day09.txt")
-
-
 == Part One
 
 \begin{quote}
@@ -154,12 +146,8 @@ Ensure the type constructors of the following parsers are
   Don't count whitespace.
 \end{quote}
 
-> %default total
-
-> namespace PartOne
->
->     partial main : IO ()
->     main = main' (some (markerSeq <|> chars)) length'
+> partOne : List Input -> Nat
+> partOne = length'
 
 
 == Main
@@ -167,4 +155,6 @@ Ensure the type constructors of the following parsers are
 > namespace Main
 >
 >     partial main : IO ()
->     main = putStr "Part One: " *> PartOne.main
+>     main = runDay $ MkDay 9 (some (markerSeq <|> chars))
+>            (pure . show . partOne)
+>            (pure . show . const "Not yet implemented!")
