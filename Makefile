@@ -2,7 +2,8 @@ idris ?= idris
 opts  ?= -X ElabReflection -p contrib -p effects -p lightyear -i src
 parts ?= one two
 
-days := 01 02 03 04 06 07 08 09
+idr_days  := 02 03 04 06 07 08 10
+lidr_days := 01 09
 
 .PHONY: shell day05
 
@@ -13,6 +14,10 @@ day05:
 all: $(addprefix output/,$(foreach day,${days},day${day}.txt)) day05
 
 bin/day%: src/Data/Advent/Day%.lidr input/day%.txt
+	@ mkdir -p bin
+	${idris} ${opts} -o $@ $<
+
+bin/day%: src/Data/Advent/Day%.idr input/day%.txt
 	@ mkdir -p bin
 	${idris} ${opts} -o $@ $<
 
