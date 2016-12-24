@@ -1,6 +1,6 @@
 package advent
 
-opts       = "--total"
+opts       = "--total -X ElabReflection"
 pkgs       = contrib
            , effects
            , lightyear
