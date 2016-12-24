@@ -200,7 +200,7 @@ The instructions are given as a comma-separated list.
 > move N = record { posY $= (+ 1) }
 > move E = record { posX $= (+ 1) }
 > move S = record { posY $= (flip (-) 1) }
-> move W = record { posX $= (flip (-) 1) }  
+> move W = record { posX $= (flip (-) 1) }
 
 > ||| Compute the shortest distance from the initial position and a given one.
 > shortestDistance : Position -> Blocks
@@ -279,3 +279,5 @@ Run the solutions for Day 1.
 >            (pure . maybe "Failed!" show . partTwo)
 
 $\qed$
+
+\newpage

@@ -244,7 +244,7 @@ move : Heading -> (Position -> Position)
 move N = record { posY $= (+ 1) }
 move E = record { posX $= (+ 1) }
 move S = record { posY $= (flip (-) 1) }
-move W = record { posX $= (flip (-) 1) }  
+move W = record { posX $= (flip (-) 1) }
 \end{minted}
 
 \begin{minted}[]{idris}
@@ -338,3 +338,5 @@ namespace Main
 \end{minted}
 
 \(\qed\)
+
+\newpage
