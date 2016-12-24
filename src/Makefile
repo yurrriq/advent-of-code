@@ -1,6 +1,8 @@
 PANDOC ?= pandoc
 
-LIDRFILES := Data/Advent/Day01.lidr
+LIDRFILES := \
+Data/Advent/Day01.lidr \
+Data/Advent/Day02.lidr
 
 TEXFILES := $(LIDRFILES:.lidr=.tex)
 

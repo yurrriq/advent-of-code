@@ -1,10 +1,70 @@
--- --------------------------------------------------------------- [ Day02.idr ]
--- Module      : Data.Advent.Day02
--- Description : My solution to the Day 2 puzzle of the 2016 Advent of Code.
--- Copyright   : Copyright (c) 2016, Eric Bailey
--- License     : MIT
--- Link        : http://adventofcode.com/2016/day/2
--- --------------------------------------------------------------------- [ EOH ]
+\chapter{Bathroom Security}\label{bathroom-security}
+
+\href{https://adventofcode.com/2016/day/2}{Link}
+
+You arrive at \emph{Easter Bunny Headquarters} under cover of darkness.
+However, you left in such a rush that you forgot to use the bathroom!
+Fancy office buildings like this one usually have keypad locks on their
+bathrooms, so you search the front desk for the code.
+
+``In order to improve security,'' the document you find says, ``bathroom
+codes will no longer be written down. Instead, please memorize and
+follow the procedure below to access the bathrooms.''
+
+The document goes on to explain that each button to be pressed can be
+found by starting on the previous button and moving to adjacent buttons
+on the keypad: \mintinline[]{idris}{U} moves up, \mintinline[]{idris}{D}
+moves down, \mintinline[]{idris}{L} moves left, and
+\mintinline[]{idris}{R} moves right. Each line of instructions
+corresponds to one button, starting at the previous button (or, for the
+first line, \emph{the ``5'' button}); press whatever button you're on at
+the end of each line. If a move doesn't lead to a button, ignore it.
+
+You can't hold it much longer, so you decide to figure out the code as
+you walk to the bathroom. You picture a keypad like this:
+
+\begin{minted}[]{text}
+1 2 3
+4 5 6
+7 8 9
+\end{minted}
+
+Suppose your instructions are:
+
+\begin{minted}[]{text}
+ULL
+RRDDD
+LURDL
+UUUUD
+\end{minted}
+
+\begin{itemize}
+\tightlist
+\item
+  You start at ``5'' and move up (to ``2''), left (to ``1''), and left
+  (you can't, and stay on ``1''), so the first button is
+  \mintinline[]{idris}{1}.
+\item
+  Starting from the previous button (``1''), you move right twice (to
+  ``3'') and then down three times (stopping at ``9'' after two moves
+  and ignoring the third), ending up with \mintinline[]{idris}{9}.
+\item
+  Continuing from ``9'', you move left, up, right, down, and left,
+  ending with \mintinline[]{idris}{8}.
+\item
+  Finally, you move up four times (stopping at ``2''), then down once,
+  ending with \mintinline[]{idris}{5}.
+\end{itemize}
+
+So, in this example, the bathroom code is \mintinline[]{idris}{1985}.
+
+Your puzzle input is the instructions from the document you found at the
+front desk.
+
+\section{Module Declaration and
+Imports}\label{module-declaration-and-imports}
+
+\begin{minted}[]{idris}
 ||| Day 2: Bathroom Security
 module Data.Advent.Day02
 
@@ -16,9 +76,11 @@ import Data.Vect
 import public Lightyear
 import public Lightyear.Char
 import public Lightyear.Strings
+\end{minted}
 
--- -------------------------------------------------------------- [ Data Types ]
+\section{Data Types}\label{data-types}
 
+\begin{minted}[]{idris}
 %access public export
 
 ||| Up, down, left or right.
@@ -44,9 +106,13 @@ implementation [showDigits] Show (List Digit) where
 ||| A pair of coordinates on the keypad, `(x, y)`.
 Coordinates : Type
 Coordinates = (Fin 3, Fin 3)
+\end{minted}
 
--- ----------------------------------------------------------------- [ Parsers ]
+\newpage
 
+\section{Parsers}\label{parsers}
+
+\begin{minted}[]{idris}
 %access export
 
 up : Parser Instruction
@@ -66,9 +132,15 @@ instruction = up <|> down <|> left <|> right <?> "up, down, left or right"
 
 partial instructions : Parser (List Instruction)
 instructions = some instruction <* (skip endOfLine <|> eof)
+\end{minted}
 
--- ---------------------------------------------------------------- [ Part One ]
+\section{Part One}\label{part-one}
 
+\begin{quote}
+  What is the bathroom code?
+\end{quote}
+
+\begin{minted}[]{idris}
 namespace PartOne
 
   ||| A keypad like this:
@@ -88,7 +160,11 @@ namespace PartOne
   move (x, y) D = (x, succ y)
   move (x, y) L = (pred x, y)
   move (x, y) R = (succ x, y)
+\end{minted}
 
+\newpage
+
+\begin{minted}[]{idris}
   button : Coordinates -> List Instruction -> (Coordinates, Digit)
   button loc@(x, y) [] = (loc, index x (index y keypad))
   button loc (i :: is) = button (move loc i) is
@@ -109,9 +185,55 @@ namespace PartOne
   partial example : String
   example = fromEither $ partOne <$>
             parse (some instructions) "ULL\nRRDDD\nLURDL\nUUUUD"
+\end{minted}
 
--- ---------------------------------------------------------------- [ Part Two ]
+\section{Part Two}\label{part-two}
 
+You finally arrive at the bathroom (it's a several minute walk from the
+lobby so visitors can behold the many fancy conference rooms and water
+coolers on this floor) and go to punch in the code. Much to your
+bladder's dismay, the keypad is not at all like you imagined it.
+Instead, you are confronted with the result of hundreds of man-hours of
+bathroom-keypad-design meetings:
+
+\begin{minted}[]{text}
+    1
+  2 3 4
+5 6 7 8 9
+  A B C
+    D
+\end{minted}
+
+You still start at ``5'' and stop when you're at an edge, but given the
+same instructions as above, the outcome is very different:
+
+\begin{itemize}
+\tightlist
+\item
+  You start at ``5'' and don't move at all (up and left are both edges),
+  ending at \mintinline[]{idris}{5}.
+\item
+  Continuing from ``5'', you move right twice and down three times
+  (through ``6'', ``7'', ``B'', ``D'', ``D''), ending at
+  \mintinline[]{idris}{D}.
+\item
+  Then, from ``D'', you move five more times (through ``D'', ``B'',
+  ``C'', ``C'', ``B''), ending at \mintinline[]{idris}{B}.
+\item
+  Finally, after five more moves, you end at \mintinline[]{idris}{3}.
+\end{itemize}
+
+\newpage
+
+So, given the actual keypad layout, the code would be
+\mintinline[]{idris}{5DB3}.
+
+\begin{quote}
+  Using the same instructions in your puzzle input, what is the correct
+  \textit{bathroom code}?
+\end{quote}
+
+\begin{minted}[]{idris}
 namespace PartTwo
 
   keypad : Vect 5 (n ** Vect n Char)
@@ -125,7 +247,9 @@ namespace PartTwo
   -- NOTE: This will wrap at the bounds, which might be unexpected.
   partial convert : (n : Nat) -> Fin m -> Fin n
   convert (S j) fm {m} =
-      let delta = half $ if S j > m then S j `minus` m else m `minus` S j in
+      let delta = half $ if S j > m
+                            then S j `minus` m
+                            else m `minus` S j in
           the (Fin (S j)) $ fromNat $ finToNat fm `f` delta
     where
       f : Nat -> Nat -> Nat
@@ -148,8 +272,13 @@ namespace PartTwo
              S (S (S (S Z)))     => False
              _                   => True
     canMoveVertically _ _ | _ = True
+\end{minted}
 
-  partial move : (Fin (S k), Fin 5) -> Instruction -> ((n ** Fin n), Fin 5)
+\newpage
+
+\begin{minted}[]{idris}
+  partial move : (Fin (S k), Fin 5) -> Instruction ->
+    ((n ** Fin n), Fin 5)
   move (x, y) U = if canMoveVertically (x, y) U
                      then let n = fst (index (pred y) keypad) in
                               ((n ** convert n x), pred y)
@@ -192,14 +321,15 @@ namespace PartTwo
   partial example : String
   example = fromEither $ partTwo <$>
             parse (some instructions) "ULL\nRRDDD\nLURDL\nUUUUD"
+\end{minted}
 
--- -------------------------------------------------------------------- [ Main ]
+\section{Main}\label{main}
 
+\begin{minted}[]{idris}
 namespace Main
 
   partial main : IO ()
   main = runDay $ MkDay 2 (some instructions)
          (pure . partOne)
          (pure . partTwo)
-
--- --------------------------------------------------------------------- [ EOF ]
+\end{minted}
