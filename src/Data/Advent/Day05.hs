@@ -3,12 +3,12 @@ module Data.Advent.Day05 (
   partTwo
   ) where
 
-import           Crypto.Hash                     (Digest, MD5, hash)
-import           Data.ByteString                 (ByteString)
-import           Data.ByteString.Char8           (pack)
-import           Data.List                       (isPrefixOf)
-import qualified Data.Map.Lazy                   as Map
-import           Data.Monoid                     ((<>))
+import           Crypto.Hash           (Digest, MD5, hash)
+import           Data.ByteString       (ByteString)
+import           Data.ByteString.Char8 (pack)
+import           Data.List             (isPrefixOf)
+import qualified Data.Map.Lazy         as Map
+import           Data.Monoid           ((<>))
 
 type Password = Map.Map Char Char
 

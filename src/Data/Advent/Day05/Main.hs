@@ -1,6 +1,6 @@
 module Main (main) where
 
-import Data.Advent.Day05
+import           Data.Advent.Day05
 
 main :: IO ()
 main = do doorID <- head . words <$> readFile "input/day05.txt"
