@@ -1,5 +1,5 @@
 name: advent-of-code
-version: '0.1.0.0'
+version: '0.1.1.0'
 synopsis: Advent of Code 2018
 author: Eric Bailey
 maintainer: eric@ericb.me
@@ -11,7 +11,6 @@ extra-source-files:
 dependencies:
 - base ^>=4.11
 - bytestring ^>=0.10.8
-- unordered-containers ^>= 0.2.9
 ghc-options:
 - -Wall
 - -Werror
@@ -21,13 +20,21 @@ library:
   source-dirs: src
   exposed-modules:
   - Day01
+  - Day02
   dependencies:
+  - hashable ^>= 1.2
+  - unordered-containers ^>= 0.2.9
   - trifecta >=2
+_executable: &exe
+  ghc-options:
+  - -O2
+  source-dirs: app
+  dependencies:
+  - advent-of-code
 executables:
   day01:
-    ghc-options:
-    - -O2
+    <<: *exe
     main: day01/Main.hs
-    source-dirs: app
-    dependencies:
-    - advent-of-code
+  day02:
+    <<: *exe
+    main: day02/Main.hs
