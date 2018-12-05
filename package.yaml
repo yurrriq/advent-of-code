@@ -1,0 +1,32 @@
+name: advent-of-code
+version: '0.0.1.0'
+synopsis: Advent of Code 2018
+author: Eric Bailey
+maintainer: eric@ericb.me
+github: yurrriq/aoc18
+verbatim:
+  cabal-version: 2.0
+extra-source-files:
+- ChangeLog.md
+dependencies:
+- base ^>=4.11
+- bytestring ^>=0.10.8
+ghc-options:
+- -Wall
+- -Werror
+library:
+  ghc-options:
+  - -fwarn-incomplete-patterns
+  source-dirs: src
+  exposed-modules:
+  - Day01
+  dependencies:
+  - trifecta >=2
+executables:
+  day01:
+    ghc-options:
+    - -O2
+    main: day01/Main.hs
+    source-dirs: app
+    dependencies:
+    - advent-of-code
