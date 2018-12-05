@@ -9,16 +9,15 @@ import           Data.ByteString     (ByteString)
 import           Data.Hashable       (Hashable)
 import qualified Data.HashMap.Strict as HM
 import           Data.List           (find, tails)
-import Data.Maybe (catMaybes)
+import           Data.Maybe          (catMaybes)
 import           Text.Trifecta       (Parser, Result (..), letter, newline,
                                       parseByteString, sepEndBy, some)
+import           Util                (Frequencies, frequencies)
 
 
 type BoxID = String
 
 type Checksum = Integer
-
-type Frequency a = HM.HashMap a Integer
 
 
 partOne :: ByteString -> Maybe Checksum
@@ -45,18 +44,11 @@ boxIDs :: Parser [BoxID]
 boxIDs = boxID `sepEndBy` newline
 
 
-frequencies :: (Eq a, Hashable a) => [a] -> Frequency a
-frequencies = foldr go HM.empty
-  where
-    go :: (Eq a, Hashable a) => a -> Frequency a -> Frequency a
-    go k = HM.insertWith (+) k 1
-
-
-exactlyTwo :: (Eq a, Hashable a) => Frequency a -> Frequency a
+exactlyTwo :: (Eq a, Hashable a) => Frequencies a -> Frequencies a
 exactlyTwo = HM.filter (==2)
 
 
-exactlyThree :: (Eq a, Hashable a) => Frequency a -> Frequency a
+exactlyThree :: (Eq a, Hashable a) => Frequencies a -> Frequencies a
 exactlyThree = HM.filter (==3)
 
 

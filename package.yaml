@@ -1,5 +1,5 @@
 name: advent-of-code
-version: '0.2.1.1'
+version: 0.2.1.2
 synopsis: Advent of Code 2018
 author: Eric Bailey
 maintainer: eric@ericb.me
@@ -22,6 +22,7 @@ library:
   - Day01
   - Day02
   - Day03
+  - Util
   dependencies:
   - hashable ^>= 1.2
   - unordered-containers ^>= 0.2.9
