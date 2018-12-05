@@ -2,14 +2,18 @@
 compiler := default
 
 
-.PHONY: build shell
+.PHONY: build ghci shell
 
 
 build: default.nix
 	nix-$@ --argstr compiler ${compiler}
 
 
-shell:
+ghci: default.nix
+	nix-shell --argstr compiler ${compiler} --command ghci
+
+
+shell: default.nix
 	nix-$@ --argstr compiler ${compiler}
 
 
