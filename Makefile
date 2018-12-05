@@ -19,3 +19,6 @@ shell: default.nix
 
 default.nix: package.yaml
 	cabal2nix --maintainer yurrriq --shell . >$@
+
+output/day%.txt: app/day%/Main.hs src/Day%.hs input/day%.txt
+	$$(nix-build --argstr compiler ${compiler} --no-out-link)/bin/day$* >$@

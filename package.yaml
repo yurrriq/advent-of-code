@@ -1,5 +1,5 @@
 name: advent-of-code
-version: '0.0.1.0'
+version: '0.1.0.0'
 synopsis: Advent of Code 2018
 author: Eric Bailey
 maintainer: eric@ericb.me
@@ -11,6 +11,7 @@ extra-source-files:
 dependencies:
 - base ^>=4.11
 - bytestring ^>=0.10.8
+- unordered-containers ^>= 0.2.9
 ghc-options:
 - -Wall
 - -Werror

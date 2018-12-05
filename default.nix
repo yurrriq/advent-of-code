@@ -4,16 +4,22 @@ let
 
   inherit (nixpkgs) pkgs;
 
-  f = { mkDerivation, base, bytestring, hpack, stdenv, trifecta }:
+  f = { mkDerivation, base, bytestring, hpack, stdenv, trifecta
+      , unordered-containers
+      }:
       mkDerivation {
         pname = "advent-of-code";
-        version = "0.0.1.0";
+        version = "0.1.0.0";
         src = ./.;
         isLibrary = true;
         isExecutable = true;
-        libraryHaskellDepends = [ base bytestring trifecta ];
+        libraryHaskellDepends = [
+          base bytestring trifecta unordered-containers
+        ];
         libraryToolDepends = [ hpack ];
-        executableHaskellDepends = [ base bytestring ];
+        executableHaskellDepends = [
+          base bytestring unordered-containers
+        ];
         preConfigure = "hpack";
         homepage = "https://github.com/yurrriq/aoc18#readme";
         description = "Advent of Code 2018";
