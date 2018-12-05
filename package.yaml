@@ -1,5 +1,5 @@
 name: advent-of-code
-version: '0.2.0.1'
+version: '0.2.1.1'
 synopsis: Advent of Code 2018
 author: Eric Bailey
 maintainer: eric@ericb.me
@@ -21,6 +21,7 @@ library:
   exposed-modules:
   - Day01
   - Day02
+  - Day03
   dependencies:
   - hashable ^>= 1.2
   - unordered-containers ^>= 0.2.9
@@ -38,3 +39,6 @@ executables:
   day02:
     <<: *exe
     main: day02/Main.hs
+  day03:
+    <<: *exe
+    main: day03/Main.hs
