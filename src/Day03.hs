@@ -83,8 +83,8 @@ partOne :: ByteString -> Maybe Int
 partOne input =
     case parseByteString (many claim) mempty input of
       Failure _errDoc -> Nothing
-      Success claims  -> Just . length .
-                         filter (>= 2) . HM.elems .
+      Success claims  -> Just .
+                         HM.size . HM.filter (>= 2) .
                          frequencies . concatMap squaresCovered $
                          claims
 
