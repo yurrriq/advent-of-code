@@ -7,10 +7,11 @@ module Day03 (
 import           Data.ByteString     (ByteString)
 import           Data.Hashable       (Hashable (..))
 import qualified Data.HashMap.Strict as HM
+import           Data.List           (find)
 import           Text.Trifecta       (Parser, Result (..), comma, digit, many,
                                       natural, parseByteString, some, space,
                                       symbol)
-import           Util                (frequencies)
+import           Util                (Frequencies, frequencies)
 
 
 -- ------------------------------------------------------------------  [ Types ]
@@ -72,6 +73,14 @@ size = Size <$> natural <*> (symbol "x" *> natural)
 
 -- ----------------------------------------------------------------- [ Helpers ]
 
+isClaimOverlapping :: Frequencies Point-> Claim -> Bool
+isClaimOverlapping covered = any (isPointOverlapping covered) . squaresCovered
+
+
+isPointOverlapping :: Frequencies Point -> Point -> Bool
+isPointOverlapping covered = maybe False (>1) . flip HM.lookup covered
+
+
 squaresCovered :: Claim -> [Point]
 squaresCovered (Claim _ (Point x0 y0) (Size w h)) =
     [ Point x1 y1 | x1 <- [x0..x0+w-1], y1 <- [y0..y0+h-1] ]
@@ -89,5 +98,10 @@ partOne input =
                          claims
 
 
-partTwo :: ByteString -> Maybe ()
-partTwo = undefined
+partTwo :: ByteString -> Maybe ClaimID
+partTwo input =
+    case parseByteString (many claim) mempty input of
+      Failure _errDoc -> Nothing
+      Success claims  ->
+        let covered = frequencies (concatMap squaresCovered claims) in
+          _id <$> find (not . isClaimOverlapping covered) claims

@@ -9,7 +9,7 @@ let
       }:
       mkDerivation {
         pname = "advent-of-code";
-        version = "0.2.1.2";
+        version = "0.3.0.0";
         src = ./.;
         isLibrary = true;
         isExecutable = true;
