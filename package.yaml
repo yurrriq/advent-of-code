@@ -1,5 +1,5 @@
 name: advent-of-code
-version: 0.4.2.0
+version: 0.5.2.00
 synopsis: Advent of Code 2018
 author: Eric Bailey
 maintainer: eric@ericb.me
@@ -19,15 +19,23 @@ library:
   - -fwarn-incomplete-patterns
   source-dirs: src
   exposed-modules:
+  - Data.Group.Free2
   - Day01
   - Day02
   - Day03
   - Day04
+  - Day05
   - Util
   dependencies:
+  - finite-typelits ^>= 0.1
+  - free-algebras ^>= 0.0.6
   - hashable ^>= 1.2
-  - unordered-containers ^>= 0.2.9
+  - unordered-containers ^>= 0.2
   - trifecta >=2
+  # NOTE: https://github.com/coot/free-algebras/pull/4
+  # TODO: Delete src/Data/Group/Free2.hs
+  - dlist ^>= 0.8
+  - groups ^>= 0.4
 _executable: &exe
   ghc-options:
   - -O2
@@ -47,3 +55,6 @@ executables:
   day04:
     <<: *exe
     main: day04/Main.hs
+  day05:
+    <<: *exe
+    main: day05/Main.hs

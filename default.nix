@@ -4,17 +4,19 @@ let
 
   inherit (nixpkgs) pkgs;
 
-  f = { mkDerivation, base, bytestring, hashable, hpack, stdenv
-      , trifecta, unordered-containers
+  f = { mkDerivation, base, bytestring, dlist, finite-typelits
+      , free-algebras, groups, hashable, hpack, stdenv, trifecta
+      , unordered-containers
       }:
       mkDerivation {
         pname = "advent-of-code";
-        version = "0.4.2.0";
+        version = "0.5.2.0";
         src = ./.;
         isLibrary = true;
         isExecutable = true;
         libraryHaskellDepends = [
-          base bytestring hashable trifecta unordered-containers
+          base bytestring dlist finite-typelits free-algebras groups hashable
+          trifecta unordered-containers
         ];
         libraryToolDepends = [ hpack ];
         executableHaskellDepends = [ base bytestring ];

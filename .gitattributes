@@ -1,1 +1,2 @@
 default.nix linguist-generated=true
+src/Data/Group/Frees.hs linguist-vendored=true

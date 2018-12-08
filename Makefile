@@ -22,3 +22,11 @@ default.nix: package.yaml
 
 output/day%.txt: app/day%/Main.hs src/Day%.hs input/day%.txt
 	$$(nix-build --argstr compiler ${compiler} --no-out-link)/bin/day$* >$@
+
+
+output/day%.txt: app/day%/Main.hs src/Day%.lhs input/day%.txt
+	$$(nix-build --argstr compiler ${compiler} --no-out-link)/bin/day$* >$@
+
+
+src/%.md: src/%.lhs
+	pandoc -f markdown+lhs -t gfm -o $@ $<
