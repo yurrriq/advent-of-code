@@ -1,5 +1,5 @@
 name: advent-of-code
-version: 0.3.0.0
+version: 0.4.1.0
 synopsis: Advent of Code 2018
 author: Eric Bailey
 maintainer: eric@ericb.me
@@ -22,6 +22,7 @@ library:
   - Day01
   - Day02
   - Day03
+  - Day04
   - Util
   dependencies:
   - hashable ^>= 1.2
@@ -43,3 +44,6 @@ executables:
   day03:
     <<: *exe
     main: day03/Main.hs
+  day04:
+    <<: *exe
+    main: day04/Main.hs
