@@ -5,15 +5,15 @@ module Day04 (
 
 
 import           Control.Applicative ((<|>))
+import           Control.Arrow       (first)
 import           Data.ByteString     (ByteString)
 import           Data.Hashable       (Hashable (..))
 import qualified Data.HashMap.Strict as HM
 import           Data.List           (maximumBy, sort)
 import           Data.Ord            (comparing)
-import           Text.Trifecta       (Parser, Result (..), brackets, char,
-                                      colon, many, natural, parseByteString,
-                                      symbol, (<?>))
-import           Util                (frequencies)
+import           Text.Trifecta       (Parser, brackets, char, colon, many,
+                                      natural, symbol, (<?>))
+import           Util                (frequencies, maybeParseByteString)
 
 
 -- ------------------------------------------------------------------- [ Types ]
@@ -116,17 +116,34 @@ sleepiestMinute = maximumBy (comparing snd) .
                   HM.toList . frequencies . concat
 
 
+mostConsistentSleeper :: [Entry] -> Maybe ((Guard, Integer), Integer)
+mostConsistentSleeper = HM.foldrWithKey go Nothing .
+                        HM.map (filter (not . null)) .
+                        napsByGuard
+  where
+    go :: Guard -> [[Integer]] -> Maybe ((Guard, Integer), Integer) ->
+          Maybe ((Guard, Integer), Integer)
+    go _ [] old           = old
+    go guard naps Nothing = Just $ first ((,) guard) (sleepiestMinute naps)
+    go guard naps old@(Just ((_, _), oldTimes)) =
+      let (minute, times) = sleepiestMinute naps in
+          if times > oldTimes then
+            Just ((guard, minute), times)
+          else
+            old
+
+
 -- ------------------------------------------------------------------- [ Parts ]
 
 partOne :: ByteString -> Maybe Integer
-partOne input =
-    case parseByteString (many entry) mempty input of
-      Failure _errDoc -> Nothing
-      Success times ->
-        case sleepiestGuard times of
-          Just (_, (Guard gid, naps)) -> Just (gid * (fst (sleepiestMinute naps)))
-          Nothing                     -> Nothing
+partOne bstr =
+    case sleepiestGuard =<< maybeParseByteString (many entry) bstr of
+      Just (_, (Guard gid, naps)) -> Just (gid * (fst (sleepiestMinute naps)))
+      _                           -> Nothing
 
 
-partTwo :: ByteString -> Maybe ()
-partTwo = undefined
+partTwo :: ByteString -> Maybe Integer
+partTwo bstr =
+    case mostConsistentSleeper =<< maybeParseByteString (many entry) bstr of
+      Just ((Guard gid, minute), _) -> Just (gid * minute)
+      _                             -> Nothing
