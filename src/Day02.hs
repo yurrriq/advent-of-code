@@ -3,7 +3,6 @@ module Day02
   , partTwo
   ) where
 
-
 import           Control.Arrow   ((&&&), (***), (>>>))
 import           Control.Monad   ((>=>))
 import           Data.ByteString (ByteString)
@@ -13,7 +12,6 @@ import           Text.Trifecta   (Parser, letter, newline, sepEndBy, some)
 import           Util            (commonElems, frequencies, hammingSimilar,
                                   maybeParseByteString)
 
-
 type BoxID = String
 
 boxID :: Parser BoxID
@@ -21,7 +19,6 @@ boxID = some letter
 
 boxIDs :: Parser [BoxID]
 boxIDs = boxID `sepEndBy` newline
-
 
 type Checksum = Integer
 
@@ -32,16 +29,8 @@ checksum = fmap frequencies >>>
            product >>>
            fromIntegral
 
-
 partOne :: ByteString -> Maybe Checksum
 partOne = maybeParseByteString boxIDs >=> pure . checksum
-
-
-partTwo :: ByteString -> Maybe String
-partTwo = maybeParseByteString boxIDs >=>
-          correctBoxIDs >=>
-          uncurry commonElems
-
 
 correctBoxIDs :: [BoxID] -> Maybe (BoxID, BoxID)
 correctBoxIDs = listToMaybe . mapMaybe go . tails
@@ -49,3 +38,8 @@ correctBoxIDs = listToMaybe . mapMaybe go . tails
     go :: [BoxID] -> Maybe (BoxID, BoxID)
     go (x:xs@(_:_)) = (,) <$> pure x <*> find (hammingSimilar 1 x) xs
     go _            = Nothing
+
+partTwo :: ByteString -> Maybe String
+partTwo = maybeParseByteString boxIDs >=>
+          correctBoxIDs >=>
+          uncurry commonElems
