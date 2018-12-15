@@ -1,0 +1,60 @@
+\documentclass[nobib]{tufte-book}
+
+\input{preamble.tex}
+
+% \usepackage[xindy,nopostdot]{glossaries}
+% \makeglossaries
+% \input{glossary}
+% \renewcommand*{\glstextformat}[1]{\textsl{#1}}
+
+\hypersetup{
+  pdffitwindow=true,
+  pdfstartview={FitH},
+  pdftitle={Advent of Code 2018}
+  pdfauthor={Eric Bailey <eric@ericb.me>},
+  pdfsubject={My literate Haskell solutions to the puzzles in Advent of Code 2018},
+  pdfkeywords={Haskell, puzzle, Advent of Code, literate programming, noweb},
+  colorlinks=true,
+  linkcolor=ErlangRed,
+  urlcolor=ErlangRed
+}
+
+\title{Advent of Code 2018}
+
+\date{%
+  December 5, 2018
+  \thanks{Last updated \today}
+}
+
+
+\begin{document}
+
+\frontmatter
+
+\maketitle
+
+\tableofcontents
+
+\mainmatter
+
+\foreach \n in {1,...,9}{\include{Day0\n}}
+\foreach \n in {10,...,25}{\include{Day\n}}
+\include{Util}
+
+\backmatter
+
+\newpage
+\chapter{Chunks}
+\nowebchunks
+
+\chapter{Index}
+\nowebindex
+
+% \bibliography{aoc18}
+% \bibliographystyle{plainnat}
+
+\newpage
+\setcounter{tocdepth}{1}
+\listoftodos[To-Do]
+
+\end{document}

@@ -1,0 +1,151 @@
+\chapter{Day 1: Chronal Calibration}
+
+As usual, \href{https://adventofcode.com/2018/1}{Day 1} consists of two parts,
+[[partOne]] and [[partTwo]].
+
+<<Day01.hs>>=
+module Day01
+  ( partOne
+  , partTwo
+  ) where
+
+
+<<Import functions, operators, and types from other modules.>>
+
+<<Define data types to model the puzzle input.>>
+
+<<Define parsers for handling puzzle input.>>
+
+<<Solve parts one and two.>>
+@
+
+\section{Data Types}
+
+\begin{marginfigure}
+  \caption{Computing the end frequency, given a list of frequency changes.}
+  \begin{minted}[gobble=4]{haskell}
+    endFreq :: [FrequencyChange] -> Integer
+    endFreq = getSum . unFrequencyChange . mconcat
+  \end{minted}
+\end{marginfigure}
+
+A frequency change is represented by a (summable) integer.
+
+<<Define data types to model the puzzle input.>>=
+newtype FrequencyChange = FrequencyChange
+  { unFrequencyChange :: Sum Integer}
+  deriving (Eq, Show)
+
+@ %def FrequencyChange
+
+\todor{Describe these instances}
+
+
+Since \hs{findFirstDup} uses \hs{HashSet}s internally, we need to make sure
+\hs{FrequencyChange} is \hs{Hashable}.
+
+<<Define data types to model the puzzle input.>>=
+instance Hashable FrequencyChange where
+    hashWithSalt salt = hashWithSalt salt . getSum . unFrequencyChange
+
+@
+
+<<Define data types to model the puzzle input.>>=
+instance Semigroup FrequencyChange where
+    (FrequencyChange x) <> (FrequencyChange y) =  FrequencyChange (x <> y)
+
+instance Monoid FrequencyChange where
+    mempty = FrequencyChange (Sum 0)
+@
+
+\section{Parsing}
+
+Parsing the puzzle input for Day 1 is easy.  The frequency changes are
+represented by signed integers, e.g.
+
+\begin{minted}[gobble=2]{haskell}
+  parseString frequencyChanges mempty "+1\n-2\n+3" ==
+  Success [Sum {getSum = 1},Sum {getSum = -2},Sum {getSum = 3}]
+\end{minted}
+
+<<Define parsers for handling puzzle input.>>=
+frequencyChanges :: Parser [FrequencyChange]
+frequencyChanges = many (FrequencyChange . Sum <$> integer)
+@ %def frequencyChanges
+
+In practice, we'll use \hs{ByteString}s and the helper function\\
+\hs{maybeParseByteString :: Parser a -> ByteString -> Maybe a},
+to try to parse the puzzle input.
+
+<<Try to parse the input>>=
+maybeParseByteString frequencyChanges
+@
+
+
+\section{Part One}
+
+Computing the answer for Part One is also a cinch. We just need to parse the
+sequence of changes in frequency, then sum them.
+
+
+<<Solve parts one and two.>>=
+partOne :: ByteString -> Maybe Integer
+partOne = fmap (getSum . unFrequencyChange . mconcat) .
+	  <<Try to parse the input>>
+@
+
+\section{Part Two}
+
+<<Solve parts one and two.>>=
+partTwo :: ByteString -> Maybe Integer
+partTwo =
+    <<Try to parse the input>> >=>
+    <<Compute the list of frequencies reached>> >>>
+    <<Find the first duplicate>> >>>
+    <<Unbox the result>>
+@
+
+<<Compute the list of frequencies reached>>=
+scan . cycle
+@
+
+<<Find the first duplicate>>=
+findFirstDup
+@
+
+<<Unbox the result>>=
+fmap (getSum . unFrequencyChange)
+@
+
+
+\section{Imports}
+
+<<Import functions, operators, and types from other modules.>>=
+import           Control.Category ((>>>))
+@
+
+<<Import functions, operators, and types from other modules.>>=
+import           Control.Monad    ((>=>))
+@
+@
+
+
+<<Import functions, operators, and types from other modules.>>=
+import           Data.ByteString  (ByteString)
+@
+
+<<Import functions, operators, and types from other modules.>>=
+import           Data.Hashable    (Hashable (..))
+@
+
+<<Import functions, operators, and types from other modules.>>=
+import           Data.Monoid      (Sum (..))
+@
+
+<<Import functions, operators, and types from other modules.>>=
+import           Text.Trifecta    (Parser, integer, many)
+@
+
+<<Import functions, operators, and types from other modules.>>=
+import           Util             (findFirstDup, maybeParseByteString, scan)
+@

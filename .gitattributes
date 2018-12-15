@@ -1,2 +1,3 @@
 default.nix linguist-generated=true
 src/Data/Group/Frees.hs linguist-vendored=true
+src/noweb.sty linguist-vendored=true

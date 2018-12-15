@@ -1,5 +1,5 @@
 name: advent-of-code
-version: 0.5.2.00
+version: 0.5.2.1
 synopsis: Advent of Code 2018
 author: Eric Bailey
 maintainer: eric@ericb.me
@@ -30,8 +30,8 @@ library:
   - finite-typelits ^>= 0.1
   - free-algebras ^>= 0.0.6
   - hashable ^>= 1.2
-  - unordered-containers ^>= 0.2
   - trifecta >=2
+  - unordered-containers ^>= 0.2
   # NOTE: https://github.com/coot/free-algebras/pull/4
   # TODO: Delete src/Data/Group/Free2.hs
   - dlist ^>= 0.8

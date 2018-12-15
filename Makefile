@@ -1,7 +1,6 @@
 # compiler := ghc862
 compiler := default
 
-
 .PHONY: build ghci shell
 
 

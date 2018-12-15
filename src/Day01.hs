@@ -1,36 +1,39 @@
-module Day01 (
-  partOne,
-  partTwo
+module Day01
+  ( partOne
+  , partTwo
   ) where
 
 
-import           Data.ByteString (ByteString)
-import qualified Data.HashSet    as HS
-import           Text.Trifecta   (Parser, Result (..), integer, many,
-                                  parseByteString)
+import           Control.Category ((>>>))
+import           Control.Monad    ((>=>))
+import           Data.ByteString  (ByteString)
+import           Data.Hashable    (Hashable (..))
+import           Data.Monoid      (Sum (..))
+import           Text.Trifecta    (Parser, integer, many)
+import           Util             (findFirstDup, maybeParseByteString, scan)
 
+newtype FrequencyChange = FrequencyChange
+  { unFrequencyChange :: Sum Integer}
+  deriving (Eq, Show)
 
-frequencyChanges :: Parser [Integer]
-frequencyChanges = many integer
+instance Hashable FrequencyChange where
+    hashWithSalt salt = hashWithSalt salt . getSum . unFrequencyChange
 
+instance Semigroup FrequencyChange where
+    (FrequencyChange x) <> (FrequencyChange y) =  FrequencyChange (x <> y)
+
+instance Monoid FrequencyChange where
+    mempty = FrequencyChange (Sum 0)
+
+frequencyChanges :: Parser [FrequencyChange]
+frequencyChanges = many (FrequencyChange . Sum <$> integer)
 
 partOne :: ByteString -> Maybe Integer
-partOne input =
-    case parseByteString frequencyChanges mempty input of
-         Failure _errDoc -> Nothing
-         Success changes -> Just (sum changes)
-
-
+partOne = fmap (getSum . unFrequencyChange . mconcat) .
+          maybeParseByteString frequencyChanges
 partTwo :: ByteString -> Maybe Integer
-partTwo input =
-    case parseByteString frequencyChanges mempty input of
-      Failure _errDoc -> Nothing
-      Success changes -> findFirstDup HS.empty $ scanl (+) 0 (cycle changes)
-
-
-findFirstDup :: HS.HashSet Integer -> [Integer] -> Maybe Integer
-findFirstDup _ []           = Nothing
-findFirstDup seen (x:xs)    = if HS.member x seen then
-                                Just x
-                              else
-                                findFirstDup (HS.insert x seen) xs
+partTwo =
+    maybeParseByteString frequencyChanges >=>
+    scan . cycle >>>
+    findFirstDup >>>
+    fmap (getSum . unFrequencyChange)

@@ -1,0 +1,2 @@
+$pdf_previewer = q/qpdfview %O %S/;
+push @generated_exts, 'tdo';

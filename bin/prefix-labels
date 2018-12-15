@@ -1,0 +1,5 @@
+#! /usr/bin/env bash
+set -eu
+sed -E \
+    -e "s/^@xref (label|ref|prevdef|nextdef|defitem|useitem|chunkbegin|chunkuse|chunkdefn) (.*)/@xref \1 $1-\2/g" \
+    -e "s/^(@index (isused|isdefined|entryuse|entrydefn|entrybegin)) /\1 $1-/g"
