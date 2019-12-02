@@ -1,0 +1,30 @@
+name: aoc
+version: !include "./VERSION"
+synopsis: My Haskell solutions to Advent of Code problems
+author: Eric Bailey
+maintainer: eric@ericb.me
+license-file: LICENSE
+license: MIT
+github: yurrriq/aoc19
+extra-source-files:
+- CHANGELOG.md
+- LICENSE
+- README.md
+dependencies:
+- base >= 4.12
+ghc-options:
+- -Wall
+- -Werror
+library:
+  ghc-options:
+  - -fwarn-incomplete-patterns
+  source-dirs: src
+  exposed-modules: []
+  dependencies: []
+# executable:
+#   ghc-options:
+#   - -O2
+#   source-dirs: app
+#   main: Main.hs
+#   dependencies:
+#   - aoc
