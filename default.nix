@@ -1,9 +1,9 @@
-{ mkDerivation, base, hpack, stdenv }:
+{ mkDerivation, base, hpack, stdenv, trifecta, vector }:
 mkDerivation {
   pname = "aoc";
-  version = "2019.0.0.1";
+  version = "2019.0.2.0";
   src = ./.;
-  libraryHaskellDepends = [ base ];
+  libraryHaskellDepends = [ base trifecta vector ];
   libraryToolDepends = [ hpack ];
   preConfigure = "hpack";
   homepage = "https://github.com/yurrriq/aoc19#readme";

@@ -5,5 +5,7 @@ let
 in
 
 pkgs.mkShell {
-  buildInputs = project.env.nativeBuildInputs;
+  buildInputs = project.env.nativeBuildInputs ++ [
+    pkgs.gap-full
+  ];
 }
