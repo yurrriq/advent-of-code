@@ -1,7 +1,7 @@
 { mkDerivation, base, hpack, stdenv, trifecta, vector }:
 mkDerivation {
   pname = "aoc";
-  version = "2019.0.2.0";
+  version = "2019.0.2.1";
   src = ./.;
   libraryHaskellDepends = [ base trifecta vector ];
   libraryToolDepends = [ hpack ];

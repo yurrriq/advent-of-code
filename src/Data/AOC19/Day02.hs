@@ -1,5 +1,7 @@
 module Data.AOC19.Day02 where
 
+import           Control.Arrow       (first, (>>>))
+import           Data.List           (find)
 import           Data.Vector         (Vector, fromList, modify, toList, (!))
 import qualified Data.Vector         as V
 import           Data.Vector.Mutable (write)
@@ -16,15 +18,31 @@ partOne :: IO Int
 partOne =
     do res <- parseFromFile program "../../../input/day02.txt"
        case res of
-         Just state -> pure (V.head (runProgram (restoreGravityAssist state)))
          Nothing    -> error "No parse"
+         Just state -> pure (V.head (runProgram (restoreGravityAssist state)))
+
+
+partTwo :: IO Int
+partTwo =
+    do res <- parseFromFile program "../../../input/day02.txt"
+       case res of
+         Nothing    -> error "No parse"
+         Just state ->
+           do let n = V.length state - 1
+              pure . maybe (error "Fail") (first (*100) >>> uncurry (+)) $
+                find (go state) (concatMap (zip [0..n] . repeat) [0..n])
+  where
+    go state (noun, verb) =
+        19690720 == V.head (runProgram (restoreGravityAssist' noun verb state))
 
 
 restoreGravityAssist :: Vector Int -> Vector Int
-restoreGravityAssist = modify go
-  where
-    go v = do write v 1 12
-              write v 2 2
+restoreGravityAssist = restoreGravityAssist' 12 2
+
+
+restoreGravityAssist' :: Int -> Int -> Vector Int -> Vector Int
+restoreGravityAssist' noun verb =
+    modify (\v -> write v 1 noun *> write v 2 verb)
 
 
 runProgram :: Vector Int -> Vector Int
