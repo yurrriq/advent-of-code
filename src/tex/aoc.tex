@@ -1,0 +1,38 @@
+\documentclass[a4paper,nobib,titlepage,xelatex]{tufte-book}
+\input{preamble}
+\title{Advent of Code}
+\date{%
+  December 2, 2019
+  \thanks{Last updated \today}
+}
+\setcounter{tocdepth}{1}
+\begin{document}
+\frontmatter
+\maketitle
+\tableofcontents
+\mainmatter
+\newpage
+\input{allcode}
+
+\backmatter
+\newpage
+%% \chapter*{Chunks}
+\begin{multicols}{2}[\chapter*{Chunks}]
+  \nowebchunks
+\end{multicols}
+
+%% \chapter*{Index}
+%% \begin{multicols}{2}[\chapter*{Index}]
+%%   \nowebindex
+%% \end{multicols}
+
+%% \nocite{*}
+%% \bibliographystyle{plainnat}
+%% \bibliography{aoc}
+
+%% \phantomsection
+%% \printglossaries
+
+\newpage
+\listoftodos[To-Do]
+\end{document}

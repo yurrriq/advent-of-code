@@ -5,7 +5,14 @@ let
 in
 
 pkgs.mkShell {
-  buildInputs = project.env.nativeBuildInputs ++ [
-    pkgs.gap-full
-  ];
+  FONTCONFIG_FILE = pkgs.makeFontsConf {
+    fontDirectories = [ pkgs.iosevka ];
+  };
+  buildInputs = project.env.nativeBuildInputs ++ (with pkgs; [
+    gap-full
+    noweb
+    python36Packages.pygments
+    which
+    xelatex-noweb
+  ]);
 }

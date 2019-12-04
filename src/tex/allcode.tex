@@ -1,0 +1,164 @@
+\nwfilename{src/day/01.nw}\nwbegindocs{0}\newpage% ===> this file was generated automatically by noweave --- better not edit it
+\chapter{Day 1: The Tyranny of the Rocket Equation}
+\todoo{Copy description}
+\marginnote{\url{https://adventofcode.com/2019/day/1}}
+\nwenddocs{}\nwfilename{src/gap/01.nw}\nwbegindocs{0}\section{GAP Solution}
+
+\begin{marginfigure}
+\[
+ \text{fuel} := \text{mass} \backslash 3 - 2
+\]
+\end{marginfigure}
+\nwenddocs{}\nwbegincode{1}\sublabel{NW2oG4gI-3gOu99-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2oG4gI-3gOu99-1}}}\moddef{Day01.g~{\nwtagstyle{}\subpageref{NW2oG4gI-3gOu99-1}}}\endmoddef\nwstartdeflinemarkup\nwprevnextdefs{\relax}{NW2oG4gI-3gOu99-2}\nwenddeflinemarkup
+FuelRequiredModule := function( mass )
+    return Int( Float( mass / 3 ) ) - 2;
+end;;
+
+
+\nwalsodefined{\\{NW2oG4gI-3gOu99-2}\\{NW2oG4gI-3gOu99-3}\\{NW2oG4gI-3gOu99-4}}\nwnotused{Day01.g}\nwendcode{}\nwbegindocs{2}\nwdocspar
+
+\nwenddocs{}\nwbegincode{3}\sublabel{NW2oG4gI-3gOu99-2}\nwmargintag{{\nwtagstyle{}\subpageref{NW2oG4gI-3gOu99-2}}}\moddef{Day01.g~{\nwtagstyle{}\subpageref{NW2oG4gI-3gOu99-1}}}\plusendmoddef\nwstartdeflinemarkup\nwprevnextdefs{NW2oG4gI-3gOu99-1}{NW2oG4gI-3gOu99-3}\nwenddeflinemarkup
+PartOne := function( )
+    local input, line, mass, sum;;
+    sum := 0;
+    input := InputTextFile ( "./input/day01.txt" );
+    line := ReadLine( input );
+    repeat
+        mass := Int( Chomp( line ) );
+        sum := sum + FuelRequiredModule( mass );
+        line := ReadLine( input );
+    until line = fail or IsEndOfStream( input );
+    return sum;
+end;;
+
+
+\nwendcode{}\nwbegindocs{4}\nwdocspar
+
+\nwenddocs{}\nwbegincode{5}\sublabel{NW2oG4gI-3gOu99-3}\nwmargintag{{\nwtagstyle{}\subpageref{NW2oG4gI-3gOu99-3}}}\moddef{Day01.g~{\nwtagstyle{}\subpageref{NW2oG4gI-3gOu99-1}}}\plusendmoddef\nwstartdeflinemarkup\nwprevnextdefs{NW2oG4gI-3gOu99-2}{NW2oG4gI-3gOu99-4}\nwenddeflinemarkup
+TotalFuelRequiredModule := function( mass )
+    local fuel;;
+    fuel := FuelRequiredModule( mass );
+    if IsPosInt( fuel ) then
+        return fuel + TotalFuelRequiredModule( fuel );
+    else
+        return 0;
+    fi;
+end;;
+
+
+\nwendcode{}\nwbegindocs{6}\nwdocspar
+
+\nwenddocs{}\nwbegincode{7}\sublabel{NW2oG4gI-3gOu99-4}\nwmargintag{{\nwtagstyle{}\subpageref{NW2oG4gI-3gOu99-4}}}\moddef{Day01.g~{\nwtagstyle{}\subpageref{NW2oG4gI-3gOu99-1}}}\plusendmoddef\nwstartdeflinemarkup\nwprevnextdefs{NW2oG4gI-3gOu99-3}{\relax}\nwenddeflinemarkup
+PartTwo := function( )
+    local input, line, mass, sum;;
+    sum := 0;
+    input := InputTextFile ( "./input/day01.txt" );
+    line := ReadLine( input );
+    repeat
+        mass := Int( Chomp( line ) );
+        sum := sum + TotalFuelRequiredModule( mass );
+        line := ReadLine( input );
+    until line = fail or IsEndOfStream( input );
+    return sum;
+end;;
+\nwendcode{}\nwbegindocs{8}\nwdocspar
+\nwenddocs{}\nwfilename{src/day/02.nw}\nwbegindocs{0}\newpage
+\chapter{Day 2: 1202 Program Alarm}
+\todoo{Copy description}
+\marginnote{\url{https://adventofcode.com/2019/day/2}}
+\nwenddocs{}\nwfilename{src/haskell/02.nw}\nwbegindocs{0}\section{Haskell Solution}
+
+\nwenddocs{}\nwbegincode{1}\sublabel{NW3cgkjm-1375sF-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW3cgkjm-1375sF-1}}}\moddef{Day02.hs~{\nwtagstyle{}\subpageref{NW3cgkjm-1375sF-1}}}\endmoddef\nwstartdeflinemarkup\nwprevnextdefs{\relax}{NW3cgkjm-1375sF-2}\nwenddeflinemarkup
+module Data.AOC19.Day02 where
+
+import           Control.Arrow       (first, (>>>))
+import           Data.List           (find)
+import           Data.Vector         (Vector, fromList, modify, toList, (!))
+import qualified Data.Vector         as V
+import           Data.Vector.Mutable (write)
+import qualified Data.Vector.Mutable as MV
+import           Text.Trifecta       (Parser, Result (..), comma, natural,
+                                      parseFromFile, parseString, sepBy)
+
+
+\nwalsodefined{\\{NW3cgkjm-1375sF-2}\\{NW3cgkjm-1375sF-3}\\{NW3cgkjm-1375sF-4}\\{NW3cgkjm-1375sF-5}\\{NW3cgkjm-1375sF-6}\\{NW3cgkjm-1375sF-7}\\{NW3cgkjm-1375sF-8}}\nwnotused{Day02.hs}\nwendcode{}\nwbegindocs{2}\nwdocspar
+
+\nwenddocs{}\nwbegincode{3}\sublabel{NW3cgkjm-1375sF-2}\nwmargintag{{\nwtagstyle{}\subpageref{NW3cgkjm-1375sF-2}}}\moddef{Day02.hs~{\nwtagstyle{}\subpageref{NW3cgkjm-1375sF-1}}}\plusendmoddef\nwstartdeflinemarkup\nwprevnextdefs{NW3cgkjm-1375sF-1}{NW3cgkjm-1375sF-3}\nwenddeflinemarkup
+program :: Parser (Vector Int)
+program = fromList . map fromInteger <$> (natural `sepBy` comma)
+
+
+\nwendcode{}\nwbegindocs{4}\nwdocspar
+
+\nwenddocs{}\nwbegincode{5}\sublabel{NW3cgkjm-1375sF-3}\nwmargintag{{\nwtagstyle{}\subpageref{NW3cgkjm-1375sF-3}}}\moddef{Day02.hs~{\nwtagstyle{}\subpageref{NW3cgkjm-1375sF-1}}}\plusendmoddef\nwstartdeflinemarkup\nwprevnextdefs{NW3cgkjm-1375sF-2}{NW3cgkjm-1375sF-4}\nwenddeflinemarkup
+partOne :: IO Int
+partOne =
+    do res <- parseFromFile program "../../../input/day02.txt"
+       case res of
+         Nothing    -> error "No parse"
+         Just state -> pure (V.head (runProgram (restoreGravityAssist state)))
+
+
+\nwendcode{}\nwbegindocs{6}\nwdocspar
+
+\nwenddocs{}\nwbegincode{7}\sublabel{NW3cgkjm-1375sF-4}\nwmargintag{{\nwtagstyle{}\subpageref{NW3cgkjm-1375sF-4}}}\moddef{Day02.hs~{\nwtagstyle{}\subpageref{NW3cgkjm-1375sF-1}}}\plusendmoddef\nwstartdeflinemarkup\nwprevnextdefs{NW3cgkjm-1375sF-3}{NW3cgkjm-1375sF-5}\nwenddeflinemarkup
+partTwo :: IO Int
+partTwo =
+    do res <- parseFromFile program "../../../input/day02.txt"
+       case res of
+         Nothing    -> error "No parse"
+         Just state ->
+           do let n = V.length state - 1
+              pure . maybe (error "Fail") (first (*100) >>> uncurry (+)) $
+                find (go state) (concatMap (zip [0..n] . repeat) [0..n])
+  where
+    go state (noun, verb) =
+        19690720 == V.head (runProgram (restoreGravityAssist' noun verb state))
+
+
+\nwendcode{}\nwbegindocs{8}\nwdocspar
+
+\nwenddocs{}\nwbegincode{9}\sublabel{NW3cgkjm-1375sF-5}\nwmargintag{{\nwtagstyle{}\subpageref{NW3cgkjm-1375sF-5}}}\moddef{Day02.hs~{\nwtagstyle{}\subpageref{NW3cgkjm-1375sF-1}}}\plusendmoddef\nwstartdeflinemarkup\nwprevnextdefs{NW3cgkjm-1375sF-4}{NW3cgkjm-1375sF-6}\nwenddeflinemarkup
+restoreGravityAssist :: Vector Int -> Vector Int
+restoreGravityAssist = restoreGravityAssist' 12 2
+
+
+\nwendcode{}\nwbegindocs{10}\nwdocspar
+
+\nwenddocs{}\nwbegincode{11}\sublabel{NW3cgkjm-1375sF-6}\nwmargintag{{\nwtagstyle{}\subpageref{NW3cgkjm-1375sF-6}}}\moddef{Day02.hs~{\nwtagstyle{}\subpageref{NW3cgkjm-1375sF-1}}}\plusendmoddef\nwstartdeflinemarkup\nwprevnextdefs{NW3cgkjm-1375sF-5}{NW3cgkjm-1375sF-7}\nwenddeflinemarkup
+restoreGravityAssist' :: Int -> Int -> Vector Int -> Vector Int
+restoreGravityAssist' noun verb =
+    modify (\\v -> write v 1 noun *> write v 2 verb)
+
+
+\nwendcode{}\nwbegindocs{12}\nwdocspar
+
+\nwenddocs{}\nwbegincode{13}\sublabel{NW3cgkjm-1375sF-7}\nwmargintag{{\nwtagstyle{}\subpageref{NW3cgkjm-1375sF-7}}}\moddef{Day02.hs~{\nwtagstyle{}\subpageref{NW3cgkjm-1375sF-1}}}\plusendmoddef\nwstartdeflinemarkup\nwprevnextdefs{NW3cgkjm-1375sF-6}{NW3cgkjm-1375sF-8}\nwenddeflinemarkup
+runProgram :: Vector Int -> Vector Int
+runProgram = go 0
+  where
+    go n state
+      | state ! n == 99 = state
+      | otherwise       = go (n + 4) $ step (toList (V.slice n 4 state))
+      where
+        step [1, x, y, dst] = modify (runOp (+) x y dst) state
+        step [2, x, y, dst] = modify (runOp (*) x y dst) state
+        step _              = state
+
+    runOp f x y dst v = write v dst =<< f <$> MV.read v x <*> MV.read v y
+
+
+\nwendcode{}\nwbegindocs{14}\nwdocspar
+
+\nwenddocs{}\nwbegincode{15}\sublabel{NW3cgkjm-1375sF-8}\nwmargintag{{\nwtagstyle{}\subpageref{NW3cgkjm-1375sF-8}}}\moddef{Day02.hs~{\nwtagstyle{}\subpageref{NW3cgkjm-1375sF-1}}}\plusendmoddef\nwstartdeflinemarkup\nwprevnextdefs{NW3cgkjm-1375sF-7}{\relax}\nwenddeflinemarkup
+example1 :: Vector Int
+example1 =
+    case parseString program mempty "1,9,10,3,2,3,11,0,99,30,40,50" of
+      Success prog   -> prog
+      Failure reason -> error (show reason)
+\nwendcode{}\nwbegindocs{16}\nwdocspar
+\nwenddocs{}
+
+\nwixlogsorted{c}{{Day01.g}{NW2oG4gI-3gOu99-1}{\nwixd{NW2oG4gI-3gOu99-1}\nwixd{NW2oG4gI-3gOu99-2}\nwixd{NW2oG4gI-3gOu99-3}\nwixd{NW2oG4gI-3gOu99-4}}}%
+\nwixlogsorted{c}{{Day02.hs}{NW3cgkjm-1375sF-1}{\nwixd{NW3cgkjm-1375sF-1}\nwixd{NW3cgkjm-1375sF-2}\nwixd{NW3cgkjm-1375sF-3}\nwixd{NW3cgkjm-1375sF-4}\nwixd{NW3cgkjm-1375sF-5}\nwixd{NW3cgkjm-1375sF-6}\nwixd{NW3cgkjm-1375sF-7}\nwixd{NW3cgkjm-1375sF-8}}}%
+

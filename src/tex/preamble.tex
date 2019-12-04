@@ -1,0 +1,106 @@
+\usepackage{fontspec}
+%% NOTE: https://tex.stackexchange.com/a/43628/45537
+%% \setmainfont[Mapping=tex-text,Numbers=OldStyle]{Palatino}
+%% \setsansfont[Mapping=tex-text,Numbers=OldStyle,Scale=MatchLowercase]{Gill Sans}
+\setmonofont[Mapping=tex-text,Scale]{Iosevka}
+
+
+%% HACK: https://tex.stackexchange.com/a/200725/45537
+\usepackage{ifxetex}
+\ifxetex
+  \newcommand{\textls}[2][5]{%
+    \begingroup\addfontfeatures{LetterSpace=#1}#2\endgroup
+  }
+  \renewcommand{\allcapsspacing}[1]{\textls[15]{#1}}
+  \renewcommand{\smallcapsspacing}[1]{\textls[10]{#1}}
+  \renewcommand{\allcaps}[1]{\textls[15]{\MakeTextUppercase{#1}}}
+  \renewcommand{\smallcaps}[1]{\smallcapsspacing{\scshape\MakeTextLowercase{#1}}}
+  \renewcommand{\textsc}[1]{\smallcapsspacing{\textsmallcaps{#1}}}
+\fi
+
+
+\usepackage{noweb}
+%% \noweboptions{smallcode,longxref,longchunks,english}
+\noweboptions{smallcode,longxref,hideunuseddefs,noidentxref,nomargintag}
+
+
+\usepackage{color}
+%% NOTE: https://commons.wikimedia.org/wiki/File:Erlang_logo.svg
+\definecolor{ErlangRed}{HTML}{A90533}
+
+
+\usepackage{amsmath,amssymb}
+
+
+\usepackage{braket}
+
+
+\usepackage{mathtools}
+\mathtoolsset{centercolon}
+\DeclarePairedDelimiter{\abs}{|}{|}
+\DeclarePairedDelimiter{\floor}{\lfloor}{\rfloor}
+
+
+%% \usepackage{dirtytalk}
+
+
+\usepackage[english]{fancyref}
+
+
+\usepackage{minted}
+\newmintinline[gap]{gap}{}
+\newmintedfile[inputgap]{gap}{linenos,fontsize=\small}
+\newmintinline[hs]{haskell}{}
+\newmintedfile[inpuths]{haskell}{linenos,fontsize=\small}
+\newmintinline[jay]{j}{}
+\newmintedfile[inputj]{j}{linenos,fontsize=\small}
+
+
+\usepackage{datetime}
+
+
+\usepackage{hyperref}
+\makeatletter
+\hypersetup{
+  pdffitwindow=true,
+  pdfstartview={FitH},
+  pdftitle={Advent of Code},
+  pdfauthor={Eric Bailey <eric@ericb.me>},
+  pdfsubject={My GAP and Haskell solutions to Advent of Code puzzles},
+  pdfkeywords={Advent of Code, GAP, Haskell, puzzles},
+  pdfinfo={
+    CreationDate={D:20191202220000},
+    ModificationDate={D:\pdfdate},
+  },
+  colorlinks=true,
+  linkcolor=ErlangRed,
+  urlcolor=ErlangRed
+}
+\makeatother
+\newcommand{\srclink}[1]{%
+  \href{https://github.com/yurrriq/aoc19/blob/master/#1}{%
+    \mintinline{text}{#1}%
+  }%
+}
+
+
+\usepackage[colorinlistoftodos,prependcaption,textsize=small]{todonotes}
+\newcommand{\todocolor}[3]{%
+  \todo[backgroundcolor=#1!50,bordercolor=#1,linecolor=#1]{#3}%
+  \message{#2: #3}%
+}
+\newcommand{\todor}[1]{\todocolor{red}{FIXME}{#1}}
+\newcommand{\todoo}[1]{\todocolor{orange}{TODO}{#1}}
+
+
+%% \usepackage[xindy,nopostdot]{glossaries}
+%% \usepackage{glossaries-extra}
+%% \makeglossaries
+%% \input{glossary}
+%% \renewcommand*{\glstextformat}[1]{\textsl{#1}}
+
+
+%% \usepackage{tikz}
+
+
+\author{Eric Bailey}

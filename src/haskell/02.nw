@@ -1,3 +1,6 @@
+\section{Haskell Solution}
+
+<<Day02.hs>>=
 module Data.AOC19.Day02 where
 
 import           Control.Arrow       (first, (>>>))
@@ -10,10 +13,16 @@ import           Text.Trifecta       (Parser, Result (..), comma, natural,
                                       parseFromFile, parseString, sepBy)
 
 
+@
+
+<<Day02.hs>>=
 program :: Parser (Vector Int)
 program = fromList . map fromInteger <$> (natural `sepBy` comma)
 
 
+@
+
+<<Day02.hs>>=
 partOne :: IO Int
 partOne =
     do res <- parseFromFile program "../../../input/day02.txt"
@@ -22,6 +31,9 @@ partOne =
          Just state -> pure (V.head (runProgram (restoreGravityAssist state)))
 
 
+@
+
+<<Day02.hs>>=
 partTwo :: IO Int
 partTwo =
     do res <- parseFromFile program "../../../input/day02.txt"
@@ -36,15 +48,24 @@ partTwo =
         19690720 == V.head (runProgram (restoreGravityAssist' noun verb state))
 
 
+@
+
+<<Day02.hs>>=
 restoreGravityAssist :: Vector Int -> Vector Int
 restoreGravityAssist = restoreGravityAssist' 12 2
 
 
+@
+
+<<Day02.hs>>=
 restoreGravityAssist' :: Int -> Int -> Vector Int -> Vector Int
 restoreGravityAssist' noun verb =
     modify (\v -> write v 1 noun *> write v 2 verb)
 
 
+@
+
+<<Day02.hs>>=
 runProgram :: Vector Int -> Vector Int
 runProgram = go 0
   where
@@ -59,8 +80,12 @@ runProgram = go 0
     runOp f x y dst v = write v dst =<< f <$> MV.read v x <*> MV.read v y
 
 
+@
+
+<<Day02.hs>>=
 example1 :: Vector Int
 example1 =
     case parseString program mempty "1,9,10,3,2,3,11,0,99,30,40,50" of
       Success prog   -> prog
       Failure reason -> error (show reason)
+@

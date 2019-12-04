@@ -1,0 +1,60 @@
+\section{GAP Solution}
+
+\begin{marginfigure}
+\[
+ \text{fuel} := \text{mass} \backslash 3 - 2
+\]
+\end{marginfigure}
+<<Day01.g>>=
+FuelRequiredModule := function( mass )
+    return Int( Float( mass / 3 ) ) - 2;
+end;;
+
+
+@
+
+<<Day01.g>>=
+PartOne := function( )
+    local input, line, mass, sum;;
+    sum := 0;
+    input := InputTextFile ( "./input/day01.txt" );
+    line := ReadLine( input );
+    repeat
+        mass := Int( Chomp( line ) );
+        sum := sum + FuelRequiredModule( mass );
+        line := ReadLine( input );
+    until line = fail or IsEndOfStream( input );
+    return sum;
+end;;
+
+
+@
+
+<<Day01.g>>=
+TotalFuelRequiredModule := function( mass )
+    local fuel;;
+    fuel := FuelRequiredModule( mass );
+    if IsPosInt( fuel ) then
+        return fuel + TotalFuelRequiredModule( fuel );
+    else
+        return 0;
+    fi;
+end;;
+
+
+@
+
+<<Day01.g>>=
+PartTwo := function( )
+    local input, line, mass, sum;;
+    sum := 0;
+    input := InputTextFile ( "./input/day01.txt" );
+    line := ReadLine( input );
+    repeat
+        mass := Int( Chomp( line ) );
+        sum := sum + TotalFuelRequiredModule( mass );
+        line := ReadLine( input );
+    until line = fail or IsEndOfStream( input );
+    return sum;
+end;;
+@
