@@ -97,28 +97,26 @@ manhattanDistance = curry $ (distanceOn _x &&& distanceOn _y) >>> uncurry (+)
     distanceOn f = abs . uncurry (subtract `on` f)
 
 
-findCrossings :: [Segment] -> [Segment] -> HS.HashSet Point
-findCrossings =
-    (HS.delete (Point 0 0) .) .
-    HS.intersection `on` (snd . runSegments)
+findCrossings :: [Point] -> [Point] -> HS.HashSet Point
+findCrossings = HS.intersection `on` HS.fromList
 
 
-runSegments :: [Segment] -> (Point, HS.HashSet Point)
-runSegments = foldl go (Point 0 0, HS.empty)
+runSegments :: [Segment] -> [Point]
+runSegments = snd . foldl go (Point 0 0, [])
   where
     go (start, pointses) seg =
-        second (HS.union pointses) (runSegment (start, seg))
+        second (pointses ++) (runSegment (start, seg))
 
 
-runSegment :: (Point, Segment) -> (Point, HS.HashSet Point)
-runSegment (from@(Point x y), Segment D distance) =
-    let to = Point x (y - distance) in (to, HS.fromList (range (to, from)))
-runSegment (from@(Point x y), Segment L distance) =
-    let to = Point (x - distance) y in (to, HS.fromList (range (to, from)))
-runSegment (from@(Point x y), Segment R distance) =
-    let to = Point (x + distance) y in (to, HS.fromList (range (from, to)))
-runSegment (from@(Point x y), Segment U distance) =
-    let to = Point x (y + distance) in (to, HS.fromList (range (from, to)))
+runSegment :: (Point, Segment) -> (Point, [Point])
+runSegment (Point x y, Segment D distance) =
+    let to = Point x (y - distance) in (to, reverse (range (to, Point x (y - 1))))
+runSegment (Point x y, Segment L distance) =
+    let to = Point (x - distance) y in (to, reverse (range (to, Point (x - 1) y)))
+runSegment (Point x y, Segment R distance) =
+    let to = Point (x + distance) y in (to, range (Point (x + 1) y, to))
+runSegment (Point x y, Segment U distance) =
+    let to = Point x (y + distance) in (to, range (Point x (y + 1), to))
 
 
 -- ---------------------------------------------------------------- [ Examples ]
@@ -145,19 +143,36 @@ exampleThree =
 
 
 runExample :: String -> Result Int
-runExample str =
-    do crossings <- uncurry findCrossings <$> parseString wires mempty str
-       pure . distance $ minimumBy (compare `on` distance) crossings
-  where
-    distance = manhattanDistance (Point 0 0)
+runExample = (partOne' <$>) . parseString wires mempty
 
 
 -- ------------------------------------------------------------------- [ Parts ]
 
 partOne :: IO Int
 partOne =
-    do res <- parseFromFile wires "../../../input/day03.txt"
-       let crossings = maybe (error "Fail") (uncurry findCrossings) res
-       pure . distance $ minimumBy (compare `on` distance) crossings
+    maybe (error "Fail") partOne' <$>
+    parseFromFile wires "../../../input/day03.txt"
+
+
+partOne' :: ([Segment], [Segment]) -> Int
+partOne' =
+    distance .
+    minimumBy (compare `on` distance) .
+    (uncurry (findCrossings `on` runSegments))
   where
     distance = manhattanDistance (Point 0 0)
+
+
+partTwo :: IO Int
+partTwo =
+    maybe (error "Fail") partTwo' <$>
+    parseFromFile wires "../../../input/day03.txt"
+
+
+partTwo' :: ([Segment], [Segment]) -> Int
+partTwo' (xs, ys) =
+    minimum $
+    HS.map (\p -> ((+) `on` (+1) . length . takeWhile (/= p)) xs' ys') $
+    findCrossings xs' ys'
+  where
+    (xs', ys') = (runSegments xs, runSegments ys)
