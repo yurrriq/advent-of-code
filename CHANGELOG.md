@@ -15,3 +15,7 @@
 ## 2019.0.4.1 -- 2019-12-05
 
 * Add semi-literate Haskell solutions for Day 4
+
+## 2019.0.4.1 -- 2019-12-05
+
+* Move Noweb sources to `_src/`
