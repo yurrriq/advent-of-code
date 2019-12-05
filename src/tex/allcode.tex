@@ -157,8 +157,95 @@ example1 =
       Success prog   -> prog
       Failure reason -> error (show reason)
 \nwendcode{}\nwbegindocs{16}\nwdocspar
+\nwenddocs{}\nwfilename{src/day/04.nw}\nwbegindocs{0}\newpage
+\chapter{Day 4: Secure Container}
+\todoo{Copy description}
+\marginnote{\url{https://adventofcode.com/2019/day/4}}
+\nwenddocs{}\nwfilename{src/haskell/04.nw}\nwbegindocs{0}\section{Haskell Solution}
+
+\subsection{Input}
+
+My puzzle input was the range \text{236491-713787}, which I converted into a
+list of lists of \hs{digits}.
+
+\nwenddocs{}\nwbegincode{1}\sublabel{NW3eunGr-1GvnV-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW3eunGr-1GvnV-1}}}\moddef{Input~{\nwtagstyle{}\subpageref{NW3eunGr-1GvnV-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW3eunGr-15Rjc8-1}}\nwenddeflinemarkup
+input :: [[Int]]
+input = digits 10 <$> [236491 .. 713787]
+\nwused{\\{NW3eunGr-15Rjc8-1}}\nwendcode{}\nwbegindocs{2}\nwdocspar
+
+
+\subsection{Part One}
+
+For part one, there must be two adjacent digits that are the same, i.e. there
+exists at least one \hs{group} of \hs{length} \hs{>= 2}.
+
+\nwenddocs{}\nwbegincode{3}\sublabel{NW3eunGr-2cQo0j-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW3eunGr-2cQo0j-1}}}\moddef{has a double~{\nwtagstyle{}\subpageref{NW3eunGr-2cQo0j-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW3eunGr-2iOjQS-1}}\nwenddeflinemarkup
+any ((>= 2) . length) . group
+\nwused{\\{NW3eunGr-2iOjQS-1}}\nwendcode{}\nwbegindocs{4}\nwdocspar
+
+It must also be the case that the \hs{digits} never decrease,
+i.e. the password \hs{isSorted}.
+
+\nwenddocs{}\nwbegincode{5}\sublabel{NW3eunGr-2iOjQS-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW3eunGr-2iOjQS-1}}}\moddef{Part One~{\nwtagstyle{}\subpageref{NW3eunGr-2iOjQS-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW3eunGr-15Rjc8-1}}\nwenddeflinemarkup
+partOne :: Int
+partOne = length $ filter isPossiblePassword input
+  where
+    isPossiblePassword :: [Int] -> Bool
+    isPossiblePassword = liftM2 (&&) isSorted hasDouble
+
+    hasDouble :: Eq a => [a] -> Bool
+    hasDouble = \LA{}has a double~{\nwtagstyle{}\subpageref{NW3eunGr-2cQo0j-1}}\RA{}
+\nwused{\\{NW3eunGr-15Rjc8-1}}\nwendcode{}\nwbegindocs{6}\nwdocspar
+
+
+\subsection{Part Two}
+
+For part two, the password still \hs{isSorted}, but must also have a strict
+double, i.e. at least one \hs{group} of \hs{length} \hs{== 2}.
+
+\nwenddocs{}\nwbegincode{7}\sublabel{NW3eunGr-ntEfn-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW3eunGr-ntEfn-1}}}\moddef{has a strict double~{\nwtagstyle{}\subpageref{NW3eunGr-ntEfn-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW3eunGr-4P9qKy-1}}\nwenddeflinemarkup
+any ((== 2) . length) . group
+\nwused{\\{NW3eunGr-4P9qKy-1}}\nwendcode{}\nwbegindocs{8}\nwdocspar
+
+\nwenddocs{}\nwbegincode{9}\sublabel{NW3eunGr-4P9qKy-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW3eunGr-4P9qKy-1}}}\moddef{Part Two~{\nwtagstyle{}\subpageref{NW3eunGr-4P9qKy-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW3eunGr-15Rjc8-1}}\nwenddeflinemarkup
+partTwo :: Int
+partTwo = length $ filter isPossiblePassword input
+  where
+   isPossiblePassword :: [Int] -> Bool
+   isPossiblePassword = liftM2 (&&) isSorted hasDouble
+
+   hasDouble :: Eq a => [a] -> Bool
+   hasDouble = \LA{}has a strict double~{\nwtagstyle{}\subpageref{NW3eunGr-ntEfn-1}}\RA{}
+\nwused{\\{NW3eunGr-15Rjc8-1}}\nwendcode{}\nwbegindocs{10}\nwdocspar
+
+
+\subsection{Full Solution}
+
+\nwenddocs{}\nwbegincode{11}\sublabel{NW3eunGr-15Rjc8-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW3eunGr-15Rjc8-1}}}\moddef{Day04.hs~{\nwtagstyle{}\subpageref{NW3eunGr-15Rjc8-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
+module Data.AOC19.Day04 where
+
+import           Control.Monad     (liftM2)
+import           Data.Digits       (digits)
+import           Data.List         (group)
+import           Data.List.Ordered (isSorted)
+
+
+\LA{}Input~{\nwtagstyle{}\subpageref{NW3eunGr-1GvnV-1}}\RA{}
+
+
+\LA{}Part One~{\nwtagstyle{}\subpageref{NW3eunGr-2iOjQS-1}}\RA{}
+
+
+\LA{}Part Two~{\nwtagstyle{}\subpageref{NW3eunGr-4P9qKy-1}}\RA{}
+\nwnotused{Day04.hs}\nwendcode{}\nwbegindocs{12}\nwdocspar
 \nwenddocs{}
 
 \nwixlogsorted{c}{{Day01.g}{NW2oG4gI-3gOu99-1}{\nwixd{NW2oG4gI-3gOu99-1}\nwixd{NW2oG4gI-3gOu99-2}\nwixd{NW2oG4gI-3gOu99-3}\nwixd{NW2oG4gI-3gOu99-4}}}%
 \nwixlogsorted{c}{{Day02.hs}{NW3cgkjm-1375sF-1}{\nwixd{NW3cgkjm-1375sF-1}\nwixd{NW3cgkjm-1375sF-2}\nwixd{NW3cgkjm-1375sF-3}\nwixd{NW3cgkjm-1375sF-4}\nwixd{NW3cgkjm-1375sF-5}\nwixd{NW3cgkjm-1375sF-6}\nwixd{NW3cgkjm-1375sF-7}\nwixd{NW3cgkjm-1375sF-8}}}%
+\nwixlogsorted{c}{{Day04.hs}{NW3eunGr-15Rjc8-1}{\nwixd{NW3eunGr-15Rjc8-1}}}%
+\nwixlogsorted{c}{{has a double}{NW3eunGr-2cQo0j-1}{\nwixd{NW3eunGr-2cQo0j-1}\nwixu{NW3eunGr-2iOjQS-1}}}%
+\nwixlogsorted{c}{{has a strict double}{NW3eunGr-ntEfn-1}{\nwixd{NW3eunGr-ntEfn-1}\nwixu{NW3eunGr-4P9qKy-1}}}%
+\nwixlogsorted{c}{{Input}{NW3eunGr-1GvnV-1}{\nwixd{NW3eunGr-1GvnV-1}\nwixu{NW3eunGr-15Rjc8-1}}}%
+\nwixlogsorted{c}{{Part One}{NW3eunGr-2iOjQS-1}{\nwixd{NW3eunGr-2iOjQS-1}\nwixu{NW3eunGr-15Rjc8-1}}}%
+\nwixlogsorted{c}{{Part Two}{NW3eunGr-4P9qKy-1}{\nwixd{NW3eunGr-4P9qKy-1}\nwixu{NW3eunGr-15Rjc8-1}}}%
 

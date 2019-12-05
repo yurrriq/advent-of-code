@@ -11,3 +11,7 @@
 ## 2019.0.2.1 -- 2019-12-03
 
 * Add messy Haskell solutions for Day 2
+
+## 2019.0.4.1 -- 2019-12-05
+
+* Add semi-literate Haskell solutions for Day 4

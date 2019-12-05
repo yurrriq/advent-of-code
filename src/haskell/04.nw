@@ -1,0 +1,77 @@
+\section{Haskell Solution}
+
+\subsection{Input}
+
+My puzzle input was the range \text{236491-713787}, which I converted into a
+list of lists of \hs{digits}.
+
+<<Input>>=
+input :: [[Int]]
+input = digits 10 <$> [236491 .. 713787]
+@
+
+
+\subsection{Part One}
+
+For part one, there must be two adjacent digits that are the same, i.e. there
+exists at least one \hs{group} of \hs{length} \hs{>= 2}.
+
+<<has a double>>=
+any ((>= 2) . length) . group
+@
+
+It must also be the case that the \hs{digits} never decrease,
+i.e. the password \hs{isSorted}.
+
+<<Part One>>=
+partOne :: Int
+partOne = length $ filter isPossiblePassword input
+  where
+    isPossiblePassword :: [Int] -> Bool
+    isPossiblePassword = liftM2 (&&) isSorted hasDouble
+
+    hasDouble :: Eq a => [a] -> Bool
+    hasDouble = <<has a double>>
+@
+
+
+\subsection{Part Two}
+
+For part two, the password still \hs{isSorted}, but must also have a strict
+double, i.e. at least one \hs{group} of \hs{length} \hs{== 2}.
+
+<<has a strict double>>=
+any ((== 2) . length) . group
+@
+
+<<Part Two>>=
+partTwo :: Int
+partTwo = length $ filter isPossiblePassword input
+  where
+   isPossiblePassword :: [Int] -> Bool
+   isPossiblePassword = liftM2 (&&) isSorted hasDouble
+
+   hasDouble :: Eq a => [a] -> Bool
+   hasDouble = <<has a strict double>>
+@
+
+
+\subsection{Full Solution}
+
+<<Day04.hs>>=
+module Data.AOC19.Day04 where
+
+import           Control.Monad     (liftM2)
+import           Data.Digits       (digits)
+import           Data.List         (group)
+import           Data.List.Ordered (isSorted)
+
+
+<<Input>>
+
+
+<<Part One>>
+
+
+<<Part Two>>
+@

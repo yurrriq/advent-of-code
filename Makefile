@@ -5,7 +5,8 @@ day_srcs = $(foreach srcdir,day $(2) $(3) $(4),src/${srcdir}/$(1).nw)
 
 NW_SRCS := \
 $(call day_srcs,01, gap) \
-$(call day_srcs,02, haskell)
+$(call day_srcs,02, haskell) \
+$(call day_srcs,04, haskell)
 
 
 GAP_SRCS := $(patsubst src/gap/%.nw,src/Day%.g,$(filter src/gap/%.nw,${NW_SRCS}))

@@ -13,6 +13,8 @@ extra-source-files:
 - input/day*.txt
 dependencies:
 - base >= 4.12
+- data-ordlist
+- digits
 - trifecta
 - vector
 ghc-options:
