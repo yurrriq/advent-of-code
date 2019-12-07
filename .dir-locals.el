@@ -1,7 +1,9 @@
 ;;; Directory Local Variables
 ;;; For more information see (info "(emacs) Directory Variables")
 
-((gap-mode
+((nil
+  (mode . direnv))
+ (gap-mode
   (gap-executable . "gap"))
  (haskell-mode
   (mode . interactive-haskell)))
