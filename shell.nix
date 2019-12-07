@@ -10,6 +10,9 @@ pkgs.mkShell {
   };
   buildInputs = project.env.nativeBuildInputs ++ (with pkgs; [
     gap-full
+    (idrisPackages.with-packages (with idrisPackages; [
+      effects
+    ]))
     noweb
     python36Packages.pygments
     which
