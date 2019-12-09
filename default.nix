@@ -3,13 +3,14 @@
 }:
 mkDerivation {
   pname = "aoc";
-  version = "2019.0.4.1";
+  version = "2019.0.5.0";
   src = ./.;
   libraryHaskellDepends = [
     base data-ordlist digits trifecta vector
   ];
   libraryToolDepends = [ hpack ];
-  preConfigure = "hpack";
+  doHaddock = false;
+  prePatch = "hpack";
   homepage = "https://github.com/yurrriq/aoc19#readme";
   description = "My Haskell solutions to Advent of Code problems";
   license = stdenv.lib.licenses.mit;
