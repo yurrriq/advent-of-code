@@ -23,3 +23,7 @@
 ## 2019.0.5.0 -- 2019-12-10
 
 * Add messy Haskell solution for Day 5, Part One
+
+## 2019.0.5.1 -- 2019-12-10
+
+* Add garbage Haskell solution for Day 5, Part Two

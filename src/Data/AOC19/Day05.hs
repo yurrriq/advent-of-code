@@ -60,11 +60,50 @@ runProgram' n state = step (digitsRev 10 instruction)
          runProgram' (n+2) =<< runInstruction SET params state
     step [4]       = step [4,0,0]
     step [4,0,c]
-      | c == 0 = go PositionMode
-      | c == 1 = go ImmediateMode
+      | c == 0     = go PositionMode
+      | c == 1     = go ImmediateMode
+      | otherwise  = error $ "Invalid instruction: " ++ show instruction
       where
         go mode = runInstruction PRN [mode (state ! (n+1))] state >>=
                   runProgram' (n+2)
+    step [5]       = step [5,0,0,0]
+    step [5,1]     = step [5,1,0,0]
+    step [5,0,1]   = step [5,0,1,0]
+    step [5,0,c,b] =
+      do x <- handleValue (mkValue c (state ! (n+1))) state
+         if x == 0 then
+           runProgram' (n+3) state
+         else
+           handleValue (mkValue b (state ! (n+2))) state >>=
+           flip runProgram' state
+    step [6]       = step [6,0,0,0]
+    step [6,1]     = step [6,1,0,0]
+    step [6,0,1]   = step [6,0,1,0]
+    step [6,0,c,b] =
+      do x <- handleValue (mkValue c (state ! (n+1))) state
+         if x /= 0 then
+           runProgram' (n+3) state
+         else
+           handleValue (mkValue b (state ! (n+2))) state >>=
+           flip runProgram' state
+    step [7]       = step [7,0,0,0]
+    step [7,1]     = step [7,1,0,0]
+    step [7,0,1]   = step [7,0,1,0]
+    step [7,0,c,b] =
+      do x <- handleValue (mkValue c (state ! (n+1))) state
+         y <- handleValue (mkValue b (state ! (n+2))) state
+         let z = ImmediateMode $ if x < y then 1 else 0
+         let dst = PositionMode (state ! (n+3))
+         runProgram' (n+4) =<< runInstruction SET [z,dst] state
+    step [8]       = step [8,0,0,0]
+    step [8,1]     = step [8,1,0,0]
+    step [8,0,1]   = step [8,0,1,0]
+    step [8,0,c,b] =
+      do x <- handleValue (mkValue c (state ! (n+1))) state
+         y <- handleValue (mkValue b (state ! (n+2))) state
+         let z = ImmediateMode $ if x == y then 1 else 0
+         let dst = PositionMode (state ! (n+3))
+         runProgram' (n+4) =<< runInstruction SET [z,dst] state
     step [9,9]     = pure state
     step _         = error $ "Invalid instruction: " ++ show instruction
 
@@ -100,6 +139,14 @@ handleValue (ImmediateMode n) = const (pure n)
 
 partOne :: IO ()
 partOne =
+  do maybeProg <- parseFromFile program "../../../input/day05.txt"
+     case maybeProg of
+       Just prog -> void $ runProgram prog
+       Nothing   -> error "No parse"
+
+
+partTwo :: IO ()
+partTwo =
   do maybeProg <- parseFromFile program "../../../input/day05.txt"
      case maybeProg of
        Just prog -> void $ runProgram prog

@@ -3,7 +3,7 @@
 }:
 mkDerivation {
   pname = "aoc";
-  version = "2019.0.5.0";
+  version = "2019.0.5.1";
   src = ./.;
   libraryHaskellDepends = [
     base data-ordlist digits trifecta vector
