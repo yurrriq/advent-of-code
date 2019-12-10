@@ -27,3 +27,7 @@
 ## 2019.0.5.1 -- 2019-12-10
 
 * Add garbage Haskell solution for Day 5, Part Two
+
+## 2019.0.6.0 -- 2019-12-10
+
+* Add quick and dirty Haskell solution for Day 6, Part One
