@@ -1,8 +1,8 @@
 module Data.AOC19.Day06 where
 
 import           Control.Monad       (void)
+import           Data.HashMap.Strict ((!))
 import qualified Data.HashMap.Strict as HM
-import qualified Data.HashSet        as HS
 import           Text.Trifecta       (Parser, alphaNum, eof, manyTill,
                                       parseFromFile, some, symbol, token)
 
@@ -34,15 +34,24 @@ directOrbits = foldr go HM.empty
    go (Orbit outer inner) = HM.insert outer inner
 
 
-indirectOrbits :: HM.HashMap String String -> HM.HashMap String (HS.HashSet String)
+indirectOrbits :: HM.HashMap String String -> HM.HashMap String [String]
 indirectOrbits dorbs = HM.foldrWithKey go HM.empty dorbs
   where
-    go :: String -> String -> HM.HashMap String (HS.HashSet String) -> HM.HashMap String (HS.HashSet String)
-    go outer inner = HM.insert outer (go' HS.empty (HM.lookup inner dorbs))
+    go :: String -> String -> HM.HashMap String [String] -> HM.HashMap String [String]
+    go outer inner = HM.insert outer (go' [] (HM.lookup inner dorbs))
 
     go' inners Nothing       = inners
-    go' inners (Just inner') = go' (HS.insert inner' inners) (HM.lookup inner' dorbs)
+    go' inners (Just inner') = go' (inner' : inners) (HM.lookup inner' dorbs)
 
+
+minimumOrbitalTransfers :: String -> String -> HM.HashMap String [String] -> Int
+minimumOrbitalTransfers from to iorbs =
+  let froms = reverse (iorbs ! from)
+      tos = reverse (iorbs ! to)
+  in
+     2 +
+     (length (takeWhile (not . flip elem tos) froms)) +
+     (length (takeWhile (not . flip elem froms) tos))
 
 
 partOne :: IO ()
@@ -53,4 +62,15 @@ partOne =
        Just orbs ->
          do let dorbs = directOrbits orbs
             let iorbs = indirectOrbits dorbs
-            print $ HM.size dorbs + sum (HM.map HS.size iorbs)
+            print $ HM.size dorbs + sum (HM.map length iorbs)
+
+
+partTwo :: IO ()
+partTwo =
+  do res <- parseFromFile orbits "../../../input/day06.txt"
+     case res of
+       Nothing -> error "No parse"
+       Just orbs ->
+         do let dorbs = directOrbits orbs
+            let iorbs = indirectOrbits dorbs
+            print $ minimumOrbitalTransfers "YOU" "SAN" iorbs
