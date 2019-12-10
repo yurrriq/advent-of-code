@@ -1,21 +1,64 @@
-module Data.AOC19.Day02 where
+module Data.AOC19.Day05 where
 
-import           Control.Monad       (void)
-import           Data.Digits         (digitsRev)
-import           Data.Vector         (Vector, fromList, modify, slice, toList,
-                                      (!))
-import qualified Data.Vector         as V
-import qualified Data.Vector.Mutable as MV
-import           Text.Trifecta       (Parser, comma, integer, parseFromFile,
-                                      sepBy)
+import           Control.Monad          (liftM2, when)
+import           Control.Monad.IO.Class (liftIO)
+import           Control.Monad.State    (StateT, evalStateT, get, put)
+import           Data.Digits            (digitsRev)
+import           Data.Vector            (Vector, fromList, modify, (!))
+import qualified Data.Vector            as V
+import qualified Data.Vector.Mutable    as MV
+import           System.Environment     (getArgs)
+import           Text.Trifecta          (Parser, comma, integer, parseFromFile,
+                                         sepBy)
 
 
-data OpCode
-  = ADD
-  | MUL
-  | SET
-  | PRN
-  | END
+-- -------------------------------------------------------------------- [ Main ]
+
+main :: IO ()
+main =
+    do fname <- getInputFilename
+       putStr "Part One> "
+       partOne fname
+       putStr "Part Two> "
+       partTwo fname
+
+
+-- ------------------------------------------------------------------- [ Parts ]
+
+partOne :: FilePath -> IO ()
+partOne fname =
+  maybe (error "No parse") evalStack =<< parseFromFile stack fname
+
+
+partTwo :: FilePath -> IO ()
+partTwo = partOne
+
+
+-- ------------------------------------------------------------------- [ Types ]
+
+type Program = StateT ProgramState IO
+
+
+type Stack = Vector Int
+
+
+data ProgramState = ProgramState
+  { _stack   :: Stack
+  , _pointer :: Int
+  }
+  deriving (Eq, Show)
+
+
+data Instruction
+  = Add Value Value Int
+  | Multiply Value Value Int
+  | Set Value Int
+  | Print Value
+  | JumpIfTrue Value Value
+  | JumpIfFalse Value Value
+  | LessThan Value Value Int
+  | Equals Value Value Int
+  | End
   deriving (Eq, Show)
 
 
@@ -25,87 +68,123 @@ data Value
   deriving (Eq, Show)
 
 
-program :: Parser (Vector Int)
-program = fromList . map fromInteger <$> (integer `sepBy` comma)
+-- ------------------------------------------------------------------ [ Parser ]
+
+stack :: Parser (Vector Int)
+stack = fromList . map fromInteger <$> (integer `sepBy` comma)
 
 
-runProgram :: Vector Int -> IO (Vector Int)
-runProgram = runProgram' 0
+-- -------------------------------------------------------- [ Running Programs ]
+-- TODO: ContT
+
+runProgram :: Program ()
+runProgram =
+  do opCode <- nextInt
+     if opCode == 99 then
+       pure ()
+     else
+       do instruction <- getInstruction (normalizeOpCode opCode)
+          runInstruction instruction
+          runProgram
 
 
-runProgram' :: Int -> Vector Int -> IO (Vector Int)
-runProgram' n state = step (digitsRev 10 instruction)
-  where
-    instruction :: Int
-    instruction = state ! n
+getInstruction :: [Int] -> Program Instruction
+getInstruction [1,0,c,b] =
+  Add <$> (mkValue c <$> nextInt) <*> (mkValue b <$> nextInt) <*> nextInt
+getInstruction [2,0,c,b] =
+  Multiply <$> (mkValue c <$> nextInt) <*> (mkValue b <$> nextInt) <*> nextInt
+getInstruction [3,0,0,0] =
+  Set <$> (liftIO (ImmediateMode . read <$> getLine)) <*> nextInt
+getInstruction [4,0,c,0] =
+  Print <$> (mkValue c <$> nextInt)
+getInstruction [5,0,c,b] =
+  JumpIfTrue <$> (mkValue c <$> nextInt) <*> (mkValue b <$> nextInt)
+getInstruction [6,0,c,b] =
+  JumpIfFalse <$> (mkValue c <$> nextInt) <*> (mkValue b <$> nextInt)
+getInstruction [7,0,c,b] =
+  LessThan <$> (mkValue c <$> nextInt) <*> (mkValue b <$> nextInt) <*> nextInt
+getInstruction [8,0,c,b] =
+  Equals <$> (mkValue c <$> nextInt) <*> (mkValue b <$> nextInt) <*> nextInt
+getInstruction _ = error "Invalid instruction"
 
-    step :: [Int] -> IO (Vector Int)
-    step [1]       = step [1,0,0,0]
-    step [1,1]     = step [1,1,0,0]
-    step [1,0,1]   = step [1,0,1,0]
-    step [1,0,c,b] =
-      do let params = zipWith ($) (mkValue <$> [c,b,0]) $
-                      toList (slice (n+1) 3 state)
-         runProgram' (n+4) =<< runInstruction ADD params state
-    step [2]       = step [2,0,0,0]
-    step [2,1]     = step [2,1,0,0]
-    step [2,0,1]   = step [2,0,1,0]
-    step [2,0,c,b] =
-      let params = zipWith ($) (mkValue <$> [c,b,0]) $
-                   toList (slice (n+1) 3 state) in
-        runProgram' (n+4) =<< runInstruction MUL params state
-    step [3] =
-      do vx <- ImmediateMode . read <$> getLine
-         let params = [vx, PositionMode (state ! (n+1))]
-         runProgram' (n+2) =<< runInstruction SET params state
-    step [4]       = step [4,0,0]
-    step [4,0,c]
-      | c == 0     = go PositionMode
-      | c == 1     = go ImmediateMode
-      | otherwise  = error $ "Invalid instruction: " ++ show instruction
-      where
-        go mode = runInstruction PRN [mode (state ! (n+1))] state >>=
-                  runProgram' (n+2)
-    step [5]       = step [5,0,0,0]
-    step [5,1]     = step [5,1,0,0]
-    step [5,0,1]   = step [5,0,1,0]
-    step [5,0,c,b] =
-      do x <- handleValue (mkValue c (state ! (n+1))) state
-         if x == 0 then
-           runProgram' (n+3) state
-         else
-           handleValue (mkValue b (state ! (n+2))) state >>=
-           flip runProgram' state
-    step [6]       = step [6,0,0,0]
-    step [6,1]     = step [6,1,0,0]
-    step [6,0,1]   = step [6,0,1,0]
-    step [6,0,c,b] =
-      do x <- handleValue (mkValue c (state ! (n+1))) state
-         if x /= 0 then
-           runProgram' (n+3) state
-         else
-           handleValue (mkValue b (state ! (n+2))) state >>=
-           flip runProgram' state
-    step [7]       = step [7,0,0,0]
-    step [7,1]     = step [7,1,0,0]
-    step [7,0,1]   = step [7,0,1,0]
-    step [7,0,c,b] =
-      do x <- handleValue (mkValue c (state ! (n+1))) state
-         y <- handleValue (mkValue b (state ! (n+2))) state
-         let z = ImmediateMode $ if x < y then 1 else 0
-         let dst = PositionMode (state ! (n+3))
-         runProgram' (n+4) =<< runInstruction SET [z,dst] state
-    step [8]       = step [8,0,0,0]
-    step [8,1]     = step [8,1,0,0]
-    step [8,0,1]   = step [8,0,1,0]
-    step [8,0,c,b] =
-      do x <- handleValue (mkValue c (state ! (n+1))) state
-         y <- handleValue (mkValue b (state ! (n+2))) state
-         let z = ImmediateMode $ if x == y then 1 else 0
-         let dst = PositionMode (state ! (n+3))
-         runProgram' (n+4) =<< runInstruction SET [z,dst] state
-    step [9,9]     = pure state
-    step _         = error $ "Invalid instruction: " ++ show instruction
+
+runInstruction :: Instruction -> Program ()
+runInstruction (Add vx vy dst) =
+  flip setValue dst =<< (+) <$> handleValue vx <*> handleValue vy
+runInstruction (Multiply vx vy dst) =
+  flip setValue dst =<< (*) <$> handleValue vx <*> handleValue vy
+runInstruction (Set vx dst) =
+  flip setValue dst =<< handleValue vx
+runInstruction (Print vx) =
+  do x <- handleValue vx
+     when (x /= 0) $
+       liftIO $ print x
+runInstruction (JumpIfTrue vx vy) =
+  do x <- handleValue vx
+     when (x /= 0) $
+       do state <- get
+          y <- handleValue vy
+          put $ state { _pointer = y }
+runInstruction (JumpIfFalse vx vy) =
+  do x <- handleValue vx
+     when (x == 0) $
+       do state <- get
+          y <- handleValue vy
+          put $ state { _pointer = y }
+runInstruction (LessThan vx vy dst) =
+  do lt <- (<) <$> handleValue vx <*> handleValue vy
+     if lt then
+       setValue 1 dst
+     else
+       setValue 0 dst
+runInstruction (Equals vx vy dst) =
+  do eq <- (==) <$> handleValue vx <*> handleValue vy
+     if eq then
+       setValue 1 dst
+     else
+       setValue 0 dst
+runInstruction End = pure ()
+
+
+evalStack :: Stack -> IO ()
+evalStack st = evalStateT runProgram (initialState { _stack = st })
+
+
+-- -------------------------------------------------- [ Manipulating the Stack ]
+-- TODO: Lenses
+
+setValue :: Int -> Int -> Program ()
+setValue x dst =
+  do state <- get
+     put $ state { _stack = modify (\v -> MV.write v dst x) (_stack state) }
+
+
+incrementPointer :: Program ()
+incrementPointer =
+  do state <- get
+     put $ state { _pointer = _pointer state + 1 }
+
+
+nextInt :: Program Int
+nextInt =
+  do vx <- liftM2 (!) _stack _pointer <$> get
+     incrementPointer
+     pure vx
+
+
+handleValue :: Value -> Program Int
+handleValue (PositionMode i)  = flip V.indexM i . _stack =<< get
+handleValue (ImmediateMode n) = pure n
+
+
+-- -------------------------------------------------------- [ Helper Functions ]
+
+initialState :: ProgramState
+initialState = ProgramState { _stack = V.empty, _pointer = 0 }
+
+
+normalizeOpCode :: Int -> [Int]
+normalizeOpCode ds = take 4 $ digitsRev 10 ds ++ repeat 0
 
 
 mkValue :: Int -> Int -> Value
@@ -114,40 +193,10 @@ mkValue 1 = ImmediateMode
 mkValue _ = error "Invalid parameter mode"
 
 
-runInstruction :: OpCode -> [Value] -> Vector Int -> IO (Vector Int)
-runInstruction ADD [vx, vy, PositionMode dst] state =
-  do x <- handleValue vx state
-     y <- handleValue vy state
-     pure $ modify (\v -> MV.write v dst (x + y)) state
-runInstruction MUL [vx, vy, PositionMode dst] state =
-  do x <- handleValue vx state
-     y <- handleValue vy state
-     pure $ modify (\v -> MV.write v dst (x * y)) state
-runInstruction SET [vx, PositionMode dst] state =
-  do x <- handleValue vx state
-     pure $ modify (\v -> MV.write v dst x) state
-runInstruction PRN [vx] state =
-  do print =<< handleValue vx state
-     pure state
-runInstruction _ _ _ = fail "Invalid instruction"
-
-
-handleValue :: Value -> Vector Int -> IO Int
-handleValue (PositionMode i)  = flip V.indexM i
-handleValue (ImmediateMode n) = const (pure n)
-
-
-partOne :: IO ()
-partOne =
-  do maybeProg <- parseFromFile program "../../../input/day05.txt"
-     case maybeProg of
-       Just prog -> void $ runProgram prog
-       Nothing   -> error "No parse"
-
-
-partTwo :: IO ()
-partTwo =
-  do maybeProg <- parseFromFile program "../../../input/day05.txt"
-     case maybeProg of
-       Just prog -> void $ runProgram prog
-       Nothing   -> error "No parse"
+getInputFilename :: IO FilePath
+getInputFilename =
+  do args <- getArgs
+     case args of
+       [fname] -> pure fname
+       []      -> error "Must specify input filename"
+       _       -> error "Too many args"

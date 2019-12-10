@@ -35,3 +35,7 @@
 ## 2019.0.6.1 -- 2019-12-10
 
 * Add quick and dirty Haskell solution for Day 6, Part Two
+
+## 2019.0.6.1 -- 2019-12-10
+
+* Rewrite Haskell solution for Day 5
