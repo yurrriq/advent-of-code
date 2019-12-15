@@ -48,3 +48,7 @@
 ## 2019.0.8.0 -- 2109-12-15
 
 * Add quick and dirty Haskell solution for Day 8, Part One
+
+## 2019.0.8.1 -- 2109-12-15
+
+* Add quick and dirty Haskell solution for Day 8, Part Two

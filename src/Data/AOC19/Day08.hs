@@ -6,6 +6,18 @@ import           System.Environment (getArgs)
 import           Text.Trifecta      (Parser, count, digit, many, parseFromFile)
 
 
+data Color
+  = Black
+  | White
+  | Transparent
+  deriving (Eq)
+
+instance Show Color where
+  show Black       = " "
+  show White       = "#"
+  show Transparent = "."
+
+
 type Row = [Char]
 
 
@@ -16,6 +28,8 @@ main :: IO ()
 main =
     do putStr "Part One: "
        partOne =<< getInputFilename
+       putStrLn "Part Two: "
+       partTwo =<< getInputFilename
 
 
 partOne :: FilePath -> IO ()
@@ -27,6 +41,20 @@ partOne fname =
        print $ ones * twos
   where
     numberOf x = sum . fmap (length . filter (== x))
+
+
+partTwo :: FilePath -> IO ()
+partTwo fname =
+    do Just layers <- parseFromFile (image 25 6) fname
+       putStrLn $
+         unlines . map (concatMap show) $
+         foldl go (replicate 6 (replicate 25 Transparent)) layers
+  where
+    go = zipWith (zipWith decodePixel)
+
+    decodePixel Transparent '0' = Black
+    decodePixel Transparent '1' = White
+    decodePixel c _             = c
 
 
 image :: Int -> Int -> Parser [Layer]
