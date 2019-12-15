@@ -30,14 +30,10 @@ partOne :: FilePath -> IO ()
 partOne fname =
   do Just prog <- parseFromFile stack fname
      let ampses = prepareAmps prog <$> permutations [0..4]
-     results <- flip mapM ampses $ \amps ->
+     results <- flip mapM ampses $ \[a,b,c,d,e] ->
        runConduit $
        yield 0 .|
-       (amps !! 0) .|
-       (amps !! 1) .|
-       (amps !! 2) .|
-       (amps !! 3) .|
-       (amps !! 4) .|
+       a .| b .| c .| d .| e .|
        await'
      print (maximum results)
 
