@@ -1,15 +1,16 @@
-{ mkDerivation, base, conduit, data-ordlist, digits, hpack, stdenv
-, trifecta, vector
+{ mkDerivation, base, conduit, data-ordlist, digits, hashable
+, hpack, lens, mtl, stdenv, transformers, trifecta
+, unordered-containers, vector
 }:
 mkDerivation {
   pname = "aoc";
-  version = "2019.0.7.0";
+  version = "2019.0.7.1";
   src = ./.;
   libraryHaskellDepends = [
-    base conduit data-ordlist digits trifecta vector
+    base conduit data-ordlist digits hashable lens mtl transformers
+    trifecta unordered-containers vector
   ];
   libraryToolDepends = [ hpack ];
-  doHaddock = false;
   prePatch = "hpack";
   homepage = "https://github.com/yurrriq/aoc19#readme";
   description = "My Haskell solutions to Advent of Code problems";

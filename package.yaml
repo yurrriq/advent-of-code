@@ -12,12 +12,7 @@ extra-source-files:
 - README.md
 - input/day*.txt
 dependencies:
-- base >= 4.12
-- conduit
-- data-ordlist
-- digits
-- trifecta
-- vector
+- base
 ghc-options:
 - -Wall
 - -Werror
@@ -25,8 +20,24 @@ library:
   ghc-options:
   - -fwarn-incomplete-patterns
   source-dirs: src
-  exposed-modules: []
-  dependencies: []
+  exposed-modules:
+  - Data.AOC19.Day02
+  - Data.AOC19.Day03
+  - Data.AOC19.Day04
+  - Data.AOC19.Day05
+  - Data.AOC19.Day06
+  - Data.AOC19.Day07
+  dependencies:
+  - conduit
+  - data-ordlist
+  - digits
+  - hashable
+  - mtl
+  - lens
+  - transformers
+  - trifecta
+  - unordered-containers
+  - vector
 # executable:
 #   ghc-options:
 #   - -O2
