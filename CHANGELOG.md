@@ -39,3 +39,8 @@
 ## 2019.0.6.1 -- 2019-12-10
 
 * Rewrite Haskell solution for Day 5
+
+## 2019.0.7.0 -- 2019-12-15
+
+* Start wrapping my head around Conduit
+* Add rough Conduit-based solution for Day 7, Part One

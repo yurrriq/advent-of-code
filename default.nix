@@ -1,12 +1,12 @@
-{ mkDerivation, base, data-ordlist, digits, hpack, stdenv, trifecta
-, vector
+{ mkDerivation, base, conduit, data-ordlist, digits, hpack, stdenv
+, trifecta, vector
 }:
 mkDerivation {
   pname = "aoc";
-  version = "2019.0.6.2";
+  version = "2019.0.7.0";
   src = ./.;
   libraryHaskellDepends = [
-    base data-ordlist digits trifecta vector
+    base conduit data-ordlist digits trifecta vector
   ];
   libraryToolDepends = [ hpack ];
   doHaddock = false;
