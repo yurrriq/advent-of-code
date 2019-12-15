@@ -4,7 +4,7 @@
 }:
 mkDerivation {
   pname = "aoc";
-  version = "2019.0.7.2";
+  version = "2019.0.7.3";
   src = ./.;
   libraryHaskellDepends = [
     base conduit data-ordlist digits hashable lens mtl transformers
