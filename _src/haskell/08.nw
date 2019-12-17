@@ -1,0 +1,222 @@
+\section{Haskell solution}
+
+\subsection{Pixels}
+
+
+A pixel can be black, white, or transparent.
+
+<<Define a Pixel data type>>=
+data Pixel
+    = Black
+    | White
+    | Transparent
+  deriving (Enum, Eq)
+@ %def Pixel
+@ %def Black
+@ %def White
+@ %def Transparent
+
+
+Show black pixels as spaces, white ones as hashes, and transparent as dots.
+
+<<Implement \hs{Show} for [[Pixel]]>>=
+instance Show Pixel where
+    show Black       = " "
+    show White       = "#"
+    show Transparent = "."
+@
+
+
+\subsection{Type aliases}
+
+Define a [[Layer]] as a list of [[Row]]s, and a [[Row]] as a list of [[Pixel]]s.
+
+<<Define a few convenient type aliases>>=
+type Image = [Layer]
+type Layer = [Row]
+type Row   = [Pixel]
+@ %def Image
+@ %def Layer
+@ %def Row
+
+
+\subsection{Parsers}
+
+Parse an [[Image]], i.e. one or more [[Layer]]s comprised of \hs{height}
+[[Row]]s of \hs{width} [[Pixel]]s.
+
+<<Parse an image>>=
+image :: Int -> Int -> Parser Image
+image width height = some layer
+  where
+    layer :: Parser Layer
+    layer = count height row
+
+    row :: Parser Row
+    row = count width pixel
+@ %def image
+
+
+Parse an encoded black, white, or transparent pixel.
+
+<<Parse a pixel>>=
+pixel :: Parser Pixel
+pixel =
+    (char '0' *> pure Black <?> "A black pixel") <|>
+    (char '1' *> pure White <?> "A white pixel") <|>
+    (char '2' *> pure Transparent <?> "A transparent pixel")
+@
+
+\subsection{Part One}
+
+<<Part One>>=
+partOne :: FilePath -> IO ()
+partOne fname =
+    do <<Parse a $25 \times 6$ [[image]] from the input>>
+@
+
+
+\todoo{Better/safer binding}
+<<Parse a $25 \times 6$ [[image]] from the input>>=
+Just layers <- parseFromFile (image 25 6) fname
+@
+
+
+Find the \hs{layer} with the fewest zeros\todoo{sp?}, i.e. [[Black]] pixels.
+
+<<Part One>>=
+       let layer = head $ sortBy (compare `on` numberOf Black) layers
+@
+
+
+Return the product of the number of ones ([[White]] pixels) and the number of
+twos ([[Transparent]] pixels) in that \hs{layer}.
+
+<<Part One>>=
+       let ones = numberOf White layer
+       let twos = numberOf Transparent layer
+       print $ ones * twos
+@
+
+
+Return the number of elements equivalent to a given one, in a given list of
+lists of elements of the same type. More specifically, return the number of
+[[Pixel]]s of a given color in a given [[Layer]].
+
+\todoo{There's gotta be a Data.List function for this..}
+
+<<Part One>>=
+  where
+    numberOf :: Eq a => a -> [[a]] -> Int
+    numberOf x = sum . fmap (length . filter (== x))
+@ %def partOne
+
+
+\subsection{Part Two}
+
+<<Part Two>>=
+partTwo :: FilePath -> IO ()
+partTwo fname =
+    do Just layers <- parseFromFile (image 25 6) fname
+       putStrLn $
+         unlines . map (concatMap show) $
+         foldl decodeLayer (transparentLayer 25 6) layers
+  where
+    decodeLayer :: Layer -> Layer -> Layer
+    decodeLayer = zipWith (zipWith decodePixel)
+
+    decodePixel :: Pixel -> Pixel -> Pixel
+    decodePixel Transparent below = below
+    decodePixel above _           = above
+@ %def partTwo
+
+
+\subsection{Miscellaneous}
+
+<<A transparent layer>>=
+transparentLayer :: Int -> Int -> Layer
+transparentLayer width height = replicate height (replicate width Transparent)
+@
+
+\todoo{Pull this out into a utility module}
+<<Handle a single argument as file path to input>>=
+getInputFilename :: IO FilePath
+getInputFilename =
+    do args <- getArgs
+       case args of
+         [fname] -> pure fname
+         []      -> error "Must specify input filename"
+         _       -> error "Too many args"
+@ %def getInputFilename
+
+
+\subsection{Full solution}
+
+<<Day08.hs>>=
+-- ---------------------------------------------------------------- [ Day08.hs ]
+-- TODO: Module doc
+-- --------------------------------------------------------------------- [ EOH ]
+
+module Data.AOC19.Day08
+  ( main
+  , partOne, partTwo
+  ) where
+
+
+import           Control.Applicative ((<|>))
+import           Data.Function       (on)
+import           Data.List           (sortBy)
+import           System.Environment  (getArgs)
+import           Text.Trifecta       (Parser, char, count, parseFromFile, some,
+                                      (<?>))
+
+
+-- ------------------------------------------------------------------- [ Types ]
+
+<<Define a Pixel data type>>
+
+
+<<Implement \hs{Show} for [[Pixel]]>>
+
+
+<<Define a few convenient type aliases>>
+
+
+-- -------------------------------------------------------------------- [ Main ]
+
+main :: IO ()
+main =
+    do putStr "Part One: "
+       partOne =<< getInputFilename
+       putStrLn "Part Two: "
+       partTwo =<< getInputFilename
+
+
+-- ---------------------------------------------------------------- [ Part One ]
+
+<<Part One>>
+
+
+-- ---------------------------------------------------------------- [ Part Two ]
+
+<<Part Two>>
+
+
+-- ----------------------------------------------------------------- [ Parsers ]
+
+<<Parse an image>>
+
+
+<<Parse a pixel>>
+
+
+-- ----------------------------------------------------------------- [ Helpers ]
+
+<<A transparent layer>>
+
+
+<<Handle a single argument as file path to input>>
+
+
+-- --------------------------------------------------------------------- [ EOF ]
+@ %def main

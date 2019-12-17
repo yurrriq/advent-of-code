@@ -91,19 +91,19 @@ program = fromList . map fromInteger <$> (natural `sepBy` comma)
 \nwendcode{}\nwbegindocs{4}\nwdocspar
 
 \nwenddocs{}\nwbegincode{5}\sublabel{NW2qFPgl-1375sF-3}\nwmargintag{{\nwtagstyle{}\subpageref{NW2qFPgl-1375sF-3}}}\moddef{Day02.hs~{\nwtagstyle{}\subpageref{NW2qFPgl-1375sF-1}}}\plusendmoddef\nwstartdeflinemarkup\nwprevnextdefs{NW2qFPgl-1375sF-2}{NW2qFPgl-1375sF-4}\nwenddeflinemarkup
-partOne :: IO Int
-partOne =
+\nwlinkedidentc{partOne}{NW2rm0VH-2iOjQS-4} :: IO Int
+\nwlinkedidentc{partOne}{NW2rm0VH-2iOjQS-4} =
     do res <- parseFromFile program "../../../input/day02.txt"
        case res of
          Nothing    -> error "No parse"
          Just state -> pure (V.head (runProgram (restoreGravityAssist state)))
 
 
-\nwendcode{}\nwbegindocs{6}\nwdocspar
+\nwidentuses{\\{{\nwixident{partOne}}{partOne}}}\nwindexuse{\nwixident{partOne}}{partOne}{NW2qFPgl-1375sF-3}\nwendcode{}\nwbegindocs{6}\nwdocspar
 
 \nwenddocs{}\nwbegincode{7}\sublabel{NW2qFPgl-1375sF-4}\nwmargintag{{\nwtagstyle{}\subpageref{NW2qFPgl-1375sF-4}}}\moddef{Day02.hs~{\nwtagstyle{}\subpageref{NW2qFPgl-1375sF-1}}}\plusendmoddef\nwstartdeflinemarkup\nwprevnextdefs{NW2qFPgl-1375sF-3}{NW2qFPgl-1375sF-5}\nwenddeflinemarkup
-partTwo :: IO Int
-partTwo =
+\nwlinkedidentc{partTwo}{NW2rm0VH-4P9qKy-1} :: IO Int
+\nwlinkedidentc{partTwo}{NW2rm0VH-4P9qKy-1} =
     do res <- parseFromFile program "../../../input/day02.txt"
        case res of
          Nothing    -> error "No parse"
@@ -116,7 +116,7 @@ partTwo =
         19690720 == V.head (runProgram (restoreGravityAssist' noun verb state))
 
 
-\nwendcode{}\nwbegindocs{8}\nwdocspar
+\nwidentuses{\\{{\nwixident{partTwo}}{partTwo}}}\nwindexuse{\nwixident{partTwo}}{partTwo}{NW2qFPgl-1375sF-4}\nwendcode{}\nwbegindocs{8}\nwdocspar
 
 \nwenddocs{}\nwbegincode{9}\sublabel{NW2qFPgl-1375sF-5}\nwmargintag{{\nwtagstyle{}\subpageref{NW2qFPgl-1375sF-5}}}\moddef{Day02.hs~{\nwtagstyle{}\subpageref{NW2qFPgl-1375sF-1}}}\plusendmoddef\nwstartdeflinemarkup\nwprevnextdefs{NW2qFPgl-1375sF-4}{NW2qFPgl-1375sF-6}\nwenddeflinemarkup
 restoreGravityAssist :: Vector Int -> Vector Int
@@ -186,16 +186,16 @@ any ((>= 2) . length) . group
 It must also be the case that the \hs{digits} never decrease,
 i.e. the password \hs{isSorted}.
 
-\nwenddocs{}\nwbegincode{5}\sublabel{NW2njlzM-2iOjQS-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2njlzM-2iOjQS-1}}}\moddef{Part One~{\nwtagstyle{}\subpageref{NW2njlzM-2iOjQS-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2njlzM-15Rjc8-1}}\nwenddeflinemarkup
-partOne :: Int
-partOne = length $ filter isPossiblePassword input
+\nwenddocs{}\nwbegincode{5}\sublabel{NW2njlzM-2iOjQS-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2njlzM-2iOjQS-1}}}\moddef{Part One~{\nwtagstyle{}\subpageref{NW2njlzM-2iOjQS-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2njlzM-15Rjc8-1}\\{NW2rm0VH-19Srvv-1}}\nwprevnextdefs{\relax}{NW2rm0VH-2iOjQS-1}\nwenddeflinemarkup
+\nwlinkedidentc{partOne}{NW2rm0VH-2iOjQS-4} :: Int
+\nwlinkedidentc{partOne}{NW2rm0VH-2iOjQS-4} = length $ filter isPossiblePassword input
   where
     isPossiblePassword :: [Int] -> Bool
     isPossiblePassword = liftM2 (&&) isSorted hasDouble
 
     hasDouble :: Eq a => [a] -> Bool
     hasDouble = \LA{}has a double~{\nwtagstyle{}\subpageref{NW2njlzM-2cQo0j-1}}\RA{}
-\nwused{\\{NW2njlzM-15Rjc8-1}}\nwendcode{}\nwbegindocs{6}\nwdocspar
+\nwalsodefined{\\{NW2rm0VH-2iOjQS-1}\\{NW2rm0VH-2iOjQS-2}\\{NW2rm0VH-2iOjQS-3}\\{NW2rm0VH-2iOjQS-4}}\nwused{\\{NW2njlzM-15Rjc8-1}\\{NW2rm0VH-19Srvv-1}}\nwidentuses{\\{{\nwixident{partOne}}{partOne}}}\nwindexuse{\nwixident{partOne}}{partOne}{NW2njlzM-2iOjQS-1}\nwendcode{}\nwbegindocs{6}\nwdocspar
 
 
 \subsection{Part Two}
@@ -207,16 +207,16 @@ double, i.e. at least one \hs{group} of \hs{length} \hs{== 2}.
 any ((== 2) . length) . group
 \nwused{\\{NW2njlzM-4P9qKy-1}}\nwendcode{}\nwbegindocs{8}\nwdocspar
 
-\nwenddocs{}\nwbegincode{9}\sublabel{NW2njlzM-4P9qKy-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2njlzM-4P9qKy-1}}}\moddef{Part Two~{\nwtagstyle{}\subpageref{NW2njlzM-4P9qKy-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2njlzM-15Rjc8-1}}\nwenddeflinemarkup
-partTwo :: Int
-partTwo = length $ filter isPossiblePassword input
+\nwenddocs{}\nwbegincode{9}\sublabel{NW2njlzM-4P9qKy-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2njlzM-4P9qKy-1}}}\moddef{Part Two~{\nwtagstyle{}\subpageref{NW2njlzM-4P9qKy-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2njlzM-15Rjc8-1}\\{NW2rm0VH-19Srvv-1}}\nwprevnextdefs{\relax}{NW2rm0VH-4P9qKy-1}\nwenddeflinemarkup
+\nwlinkedidentc{partTwo}{NW2rm0VH-4P9qKy-1} :: Int
+\nwlinkedidentc{partTwo}{NW2rm0VH-4P9qKy-1} = length $ filter isPossiblePassword input
   where
    isPossiblePassword :: [Int] -> Bool
    isPossiblePassword = liftM2 (&&) isSorted hasDouble
 
    hasDouble :: Eq a => [a] -> Bool
    hasDouble = \LA{}has a strict double~{\nwtagstyle{}\subpageref{NW2njlzM-ntEfn-1}}\RA{}
-\nwused{\\{NW2njlzM-15Rjc8-1}}\nwendcode{}\nwbegindocs{10}\nwdocspar
+\nwalsodefined{\\{NW2rm0VH-4P9qKy-1}}\nwused{\\{NW2njlzM-15Rjc8-1}\\{NW2rm0VH-19Srvv-1}}\nwidentuses{\\{{\nwixident{partTwo}}{partTwo}}}\nwindexuse{\nwixident{partTwo}}{partTwo}{NW2njlzM-4P9qKy-1}\nwendcode{}\nwbegindocs{10}\nwdocspar
 
 
 \subsection{Full Solution}
@@ -238,14 +238,261 @@ import           Data.List.Ordered (isSorted)
 
 \LA{}Part Two~{\nwtagstyle{}\subpageref{NW2njlzM-4P9qKy-1}}\RA{}
 \nwnotused{Day04.hs}\nwendcode{}\nwbegindocs{12}\nwdocspar
-\nwenddocs{}
+\nwenddocs{}\nwfilename{_src/day/08.nw}\nwbegindocs{0}\newpage
+\chapter{Day 8: }\todor{Add missing title}
+\todoo{Copy description}
+\marginnote{\url{https://adventofcode.com/2019/day/8}}
+\nwenddocs{}\nwfilename{_src/haskell/08.nw}\nwbegindocs{0}\section{Haskell solution}
 
+\subsection{Pixels}
+
+
+A pixel can be black, white, or transparent.
+
+\nwenddocs{}\nwbegincode{1}\sublabel{NW2rm0VH-2M5oYw-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2rm0VH-2M5oYw-1}}}\moddef{Define a Pixel data type~{\nwtagstyle{}\subpageref{NW2rm0VH-2M5oYw-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2rm0VH-19Srvv-1}}\nwenddeflinemarkup
+data \nwlinkedidentc{Pixel}{NW2rm0VH-2M5oYw-1}
+    = \nwlinkedidentc{Black}{NW2rm0VH-2M5oYw-1}
+    | \nwlinkedidentc{White}{NW2rm0VH-2M5oYw-1}
+    | \nwlinkedidentc{Transparent}{NW2rm0VH-2M5oYw-1}
+  deriving (Enum, Eq)
+\nwindexdefn{\nwixident{Pixel}}{Pixel}{NW2rm0VH-2M5oYw-1}\eatline
+\nwindexdefn{\nwixident{Black}}{Black}{NW2rm0VH-2M5oYw-1}\eatline
+\nwindexdefn{\nwixident{White}}{White}{NW2rm0VH-2M5oYw-1}\eatline
+\nwindexdefn{\nwixident{Transparent}}{Transparent}{NW2rm0VH-2M5oYw-1}\eatline
+\nwused{\\{NW2rm0VH-19Srvv-1}}\nwidentdefs{\\{{\nwixident{Black}}{Black}}\\{{\nwixident{Pixel}}{Pixel}}\\{{\nwixident{Transparent}}{Transparent}}\\{{\nwixident{White}}{White}}}\nwendcode{}\nwbegindocs{2}\nwdocspar
+
+Show black pixels as spaces, white ones as hashes, and transparent as dots.
+
+\nwenddocs{}\nwbegincode{3}\sublabel{NW2rm0VH-QyGx2-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2rm0VH-QyGx2-1}}}\moddef{Implement \hs{Show} for \code{}Pixel\edoc{}~{\nwtagstyle{}\subpageref{NW2rm0VH-QyGx2-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2rm0VH-19Srvv-1}}\nwenddeflinemarkup
+instance Show \nwlinkedidentc{Pixel}{NW2rm0VH-2M5oYw-1} where
+    show \nwlinkedidentc{Black}{NW2rm0VH-2M5oYw-1}       = " "
+    show \nwlinkedidentc{White}{NW2rm0VH-2M5oYw-1}       = "#"
+    show \nwlinkedidentc{Transparent}{NW2rm0VH-2M5oYw-1} = "."
+\nwused{\\{NW2rm0VH-19Srvv-1}}\nwidentuses{\\{{\nwixident{Black}}{Black}}\\{{\nwixident{Pixel}}{Pixel}}\\{{\nwixident{Transparent}}{Transparent}}\\{{\nwixident{White}}{White}}}\nwindexuse{\nwixident{Black}}{Black}{NW2rm0VH-QyGx2-1}\nwindexuse{\nwixident{Pixel}}{Pixel}{NW2rm0VH-QyGx2-1}\nwindexuse{\nwixident{Transparent}}{Transparent}{NW2rm0VH-QyGx2-1}\nwindexuse{\nwixident{White}}{White}{NW2rm0VH-QyGx2-1}\nwendcode{}\nwbegindocs{4}\nwdocspar
+
+
+\subsection{Type aliases}
+
+Define a {\Tt{}\nwlinkedidentq{Layer}{NW2rm0VH-LSl4Q-1}\nwendquote} as a list of {\Tt{}\nwlinkedidentq{Row}{NW2rm0VH-LSl4Q-1}\nwendquote}s, and a {\Tt{}\nwlinkedidentq{Row}{NW2rm0VH-LSl4Q-1}\nwendquote} as a list of {\Tt{}\nwlinkedidentq{Pixel}{NW2rm0VH-2M5oYw-1}\nwendquote}s.
+
+\nwenddocs{}\nwbegincode{5}\sublabel{NW2rm0VH-LSl4Q-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2rm0VH-LSl4Q-1}}}\moddef{Define a few convenient type aliases~{\nwtagstyle{}\subpageref{NW2rm0VH-LSl4Q-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2rm0VH-19Srvv-1}}\nwenddeflinemarkup
+type \nwlinkedidentc{Image}{NW2rm0VH-LSl4Q-1} = [\nwlinkedidentc{Layer}{NW2rm0VH-LSl4Q-1}]
+type \nwlinkedidentc{Layer}{NW2rm0VH-LSl4Q-1} = [\nwlinkedidentc{Row}{NW2rm0VH-LSl4Q-1}]
+type \nwlinkedidentc{Row}{NW2rm0VH-LSl4Q-1}   = [\nwlinkedidentc{Pixel}{NW2rm0VH-2M5oYw-1}]
+\nwindexdefn{\nwixident{Image}}{Image}{NW2rm0VH-LSl4Q-1}\eatline
+\nwindexdefn{\nwixident{Layer}}{Layer}{NW2rm0VH-LSl4Q-1}\eatline
+\nwindexdefn{\nwixident{Row}}{Row}{NW2rm0VH-LSl4Q-1}\eatline
+\nwused{\\{NW2rm0VH-19Srvv-1}}\nwidentdefs{\\{{\nwixident{Image}}{Image}}\\{{\nwixident{Layer}}{Layer}}\\{{\nwixident{Row}}{Row}}}\nwidentuses{\\{{\nwixident{Pixel}}{Pixel}}}\nwindexuse{\nwixident{Pixel}}{Pixel}{NW2rm0VH-LSl4Q-1}\nwendcode{}\nwbegindocs{6}\nwdocspar
+
+\subsection{Parsers}
+
+Parse an {\Tt{}\nwlinkedidentq{Image}{NW2rm0VH-LSl4Q-1}\nwendquote}, i.e. one or more {\Tt{}\nwlinkedidentq{Layer}{NW2rm0VH-LSl4Q-1}\nwendquote}s comprised of \hs{height}
+{\Tt{}\nwlinkedidentq{Row}{NW2rm0VH-LSl4Q-1}\nwendquote}s of \hs{width} {\Tt{}\nwlinkedidentq{Pixel}{NW2rm0VH-2M5oYw-1}\nwendquote}s.
+
+\nwenddocs{}\nwbegincode{7}\sublabel{NW2rm0VH-4aeb4o-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2rm0VH-4aeb4o-1}}}\moddef{Parse an image~{\nwtagstyle{}\subpageref{NW2rm0VH-4aeb4o-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2rm0VH-19Srvv-1}}\nwenddeflinemarkup
+\nwlinkedidentc{image}{NW2rm0VH-4aeb4o-1} :: Int -> Int -> Parser \nwlinkedidentc{Image}{NW2rm0VH-LSl4Q-1}
+\nwlinkedidentc{image}{NW2rm0VH-4aeb4o-1} width height = some layer
+  where
+    layer :: Parser \nwlinkedidentc{Layer}{NW2rm0VH-LSl4Q-1}
+    layer = count height row
+
+    row :: Parser \nwlinkedidentc{Row}{NW2rm0VH-LSl4Q-1}
+    row = count width pixel
+\nwindexdefn{\nwixident{image}}{image}{NW2rm0VH-4aeb4o-1}\eatline
+\nwused{\\{NW2rm0VH-19Srvv-1}}\nwidentdefs{\\{{\nwixident{image}}{image}}}\nwidentuses{\\{{\nwixident{Image}}{Image}}\\{{\nwixident{Layer}}{Layer}}\\{{\nwixident{Row}}{Row}}}\nwindexuse{\nwixident{Image}}{Image}{NW2rm0VH-4aeb4o-1}\nwindexuse{\nwixident{Layer}}{Layer}{NW2rm0VH-4aeb4o-1}\nwindexuse{\nwixident{Row}}{Row}{NW2rm0VH-4aeb4o-1}\nwendcode{}\nwbegindocs{8}\nwdocspar
+
+Parse an encoded black, white, or transparent pixel.
+
+\nwenddocs{}\nwbegincode{9}\sublabel{NW2rm0VH-1aCFXy-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2rm0VH-1aCFXy-1}}}\moddef{Parse a pixel~{\nwtagstyle{}\subpageref{NW2rm0VH-1aCFXy-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2rm0VH-19Srvv-1}}\nwenddeflinemarkup
+pixel :: Parser \nwlinkedidentc{Pixel}{NW2rm0VH-2M5oYw-1}
+pixel =
+    (char '0' *> pure \nwlinkedidentc{Black}{NW2rm0VH-2M5oYw-1} <?> "A black pixel") <|>
+    (char '1' *> pure \nwlinkedidentc{White}{NW2rm0VH-2M5oYw-1} <?> "A white pixel") <|>
+    (char '2' *> pure \nwlinkedidentc{Transparent}{NW2rm0VH-2M5oYw-1} <?> "A transparent pixel")
+\nwused{\\{NW2rm0VH-19Srvv-1}}\nwidentuses{\\{{\nwixident{Black}}{Black}}\\{{\nwixident{Pixel}}{Pixel}}\\{{\nwixident{Transparent}}{Transparent}}\\{{\nwixident{White}}{White}}}\nwindexuse{\nwixident{Black}}{Black}{NW2rm0VH-1aCFXy-1}\nwindexuse{\nwixident{Pixel}}{Pixel}{NW2rm0VH-1aCFXy-1}\nwindexuse{\nwixident{Transparent}}{Transparent}{NW2rm0VH-1aCFXy-1}\nwindexuse{\nwixident{White}}{White}{NW2rm0VH-1aCFXy-1}\nwendcode{}\nwbegindocs{10}\nwdocspar
+
+\subsection{Part One}
+
+\nwenddocs{}\nwbegincode{11}\sublabel{NW2rm0VH-2iOjQS-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2rm0VH-2iOjQS-1}}}\moddef{Part One~{\nwtagstyle{}\subpageref{NW2njlzM-2iOjQS-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2njlzM-15Rjc8-1}\\{NW2rm0VH-19Srvv-1}}\nwprevnextdefs{NW2njlzM-2iOjQS-1}{NW2rm0VH-2iOjQS-2}\nwenddeflinemarkup
+\nwlinkedidentc{partOne}{NW2rm0VH-2iOjQS-4} :: FilePath -> IO ()
+\nwlinkedidentc{partOne}{NW2rm0VH-2iOjQS-4} fname =
+    do \LA{}Parse a $25 \times 6$ \code{}image\edoc{} from the input~{\nwtagstyle{}\subpageref{NW2rm0VH-276JRG-1}}\RA{}
+\nwused{\\{NW2njlzM-15Rjc8-1}\\{NW2rm0VH-19Srvv-1}}\nwidentuses{\\{{\nwixident{partOne}}{partOne}}}\nwindexuse{\nwixident{partOne}}{partOne}{NW2rm0VH-2iOjQS-1}\nwendcode{}\nwbegindocs{12}\nwdocspar
+
+
+\todoo{Better/safer binding}
+\nwenddocs{}\nwbegincode{13}\sublabel{NW2rm0VH-276JRG-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2rm0VH-276JRG-1}}}\moddef{Parse a $25 \times 6$ \code{}image\edoc{} from the input~{\nwtagstyle{}\subpageref{NW2rm0VH-276JRG-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2rm0VH-2iOjQS-1}}\nwenddeflinemarkup
+Just layers <- parseFromFile (\nwlinkedidentc{image}{NW2rm0VH-4aeb4o-1} 25 6) fname
+\nwused{\\{NW2rm0VH-2iOjQS-1}}\nwidentuses{\\{{\nwixident{image}}{image}}}\nwindexuse{\nwixident{image}}{image}{NW2rm0VH-276JRG-1}\nwendcode{}\nwbegindocs{14}\nwdocspar
+
+
+Find the \hs{layer} with the fewest zeros\todoo{sp?}, i.e. {\Tt{}\nwlinkedidentq{Black}{NW2rm0VH-2M5oYw-1}\nwendquote} pixels.
+
+\nwenddocs{}\nwbegincode{15}\sublabel{NW2rm0VH-2iOjQS-2}\nwmargintag{{\nwtagstyle{}\subpageref{NW2rm0VH-2iOjQS-2}}}\moddef{Part One~{\nwtagstyle{}\subpageref{NW2njlzM-2iOjQS-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2njlzM-15Rjc8-1}\\{NW2rm0VH-19Srvv-1}}\nwprevnextdefs{NW2rm0VH-2iOjQS-1}{NW2rm0VH-2iOjQS-3}\nwenddeflinemarkup
+       let layer = head $ sortBy (compare `on` numberOf \nwlinkedidentc{Black}{NW2rm0VH-2M5oYw-1}) layers
+\nwused{\\{NW2njlzM-15Rjc8-1}\\{NW2rm0VH-19Srvv-1}}\nwidentuses{\\{{\nwixident{Black}}{Black}}}\nwindexuse{\nwixident{Black}}{Black}{NW2rm0VH-2iOjQS-2}\nwendcode{}\nwbegindocs{16}\nwdocspar
+
+
+Return the product of the number of ones ({\Tt{}\nwlinkedidentq{White}{NW2rm0VH-2M5oYw-1}\nwendquote} pixels) and the number of
+twos ({\Tt{}\nwlinkedidentq{Transparent}{NW2rm0VH-2M5oYw-1}\nwendquote} pixels) in that \hs{layer}.
+
+\nwenddocs{}\nwbegincode{17}\sublabel{NW2rm0VH-2iOjQS-3}\nwmargintag{{\nwtagstyle{}\subpageref{NW2rm0VH-2iOjQS-3}}}\moddef{Part One~{\nwtagstyle{}\subpageref{NW2njlzM-2iOjQS-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2njlzM-15Rjc8-1}\\{NW2rm0VH-19Srvv-1}}\nwprevnextdefs{NW2rm0VH-2iOjQS-2}{NW2rm0VH-2iOjQS-4}\nwenddeflinemarkup
+       let ones = numberOf \nwlinkedidentc{White}{NW2rm0VH-2M5oYw-1} layer
+       let twos = numberOf \nwlinkedidentc{Transparent}{NW2rm0VH-2M5oYw-1} layer
+       print $ ones * twos
+\nwused{\\{NW2njlzM-15Rjc8-1}\\{NW2rm0VH-19Srvv-1}}\nwidentuses{\\{{\nwixident{Transparent}}{Transparent}}\\{{\nwixident{White}}{White}}}\nwindexuse{\nwixident{Transparent}}{Transparent}{NW2rm0VH-2iOjQS-3}\nwindexuse{\nwixident{White}}{White}{NW2rm0VH-2iOjQS-3}\nwendcode{}\nwbegindocs{18}\nwdocspar
+
+
+Return the number of elements equivalent to a given one, in a given list of
+lists of elements of the same type. More specifically, return the number of
+{\Tt{}\nwlinkedidentq{Pixel}{NW2rm0VH-2M5oYw-1}\nwendquote}s of a given color in a given {\Tt{}\nwlinkedidentq{Layer}{NW2rm0VH-LSl4Q-1}\nwendquote}.
+
+\todoo{There's gotta be a Data.List function for this..}
+
+\nwenddocs{}\nwbegincode{19}\sublabel{NW2rm0VH-2iOjQS-4}\nwmargintag{{\nwtagstyle{}\subpageref{NW2rm0VH-2iOjQS-4}}}\moddef{Part One~{\nwtagstyle{}\subpageref{NW2njlzM-2iOjQS-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2njlzM-15Rjc8-1}\\{NW2rm0VH-19Srvv-1}}\nwprevnextdefs{NW2rm0VH-2iOjQS-3}{\relax}\nwenddeflinemarkup
+  where
+    numberOf :: Eq a => a -> [[a]] -> Int
+    numberOf x = sum . fmap (length . filter (== x))
+\nwindexdefn{\nwixident{partOne}}{partOne}{NW2rm0VH-2iOjQS-4}\eatline
+\nwused{\\{NW2njlzM-15Rjc8-1}\\{NW2rm0VH-19Srvv-1}}\nwidentdefs{\\{{\nwixident{partOne}}{partOne}}}\nwendcode{}\nwbegindocs{20}\nwdocspar
+
+\subsection{Part Two}
+
+\nwenddocs{}\nwbegincode{21}\sublabel{NW2rm0VH-4P9qKy-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2rm0VH-4P9qKy-1}}}\moddef{Part Two~{\nwtagstyle{}\subpageref{NW2njlzM-4P9qKy-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2njlzM-15Rjc8-1}\\{NW2rm0VH-19Srvv-1}}\nwprevnextdefs{NW2njlzM-4P9qKy-1}{\relax}\nwenddeflinemarkup
+\nwlinkedidentc{partTwo}{NW2rm0VH-4P9qKy-1} :: FilePath -> IO ()
+\nwlinkedidentc{partTwo}{NW2rm0VH-4P9qKy-1} fname =
+    do Just layers <- parseFromFile (\nwlinkedidentc{image}{NW2rm0VH-4aeb4o-1} 25 6) fname
+       putStrLn $
+         unlines . map (concatMap show) $
+         foldl decodeLayer (transparentLayer 25 6) layers
+  where
+    decodeLayer :: \nwlinkedidentc{Layer}{NW2rm0VH-LSl4Q-1} -> \nwlinkedidentc{Layer}{NW2rm0VH-LSl4Q-1} -> \nwlinkedidentc{Layer}{NW2rm0VH-LSl4Q-1}
+    decodeLayer = zipWith (zipWith decodePixel)
+
+    decodePixel :: \nwlinkedidentc{Pixel}{NW2rm0VH-2M5oYw-1} -> \nwlinkedidentc{Pixel}{NW2rm0VH-2M5oYw-1} -> \nwlinkedidentc{Pixel}{NW2rm0VH-2M5oYw-1}
+    decodePixel \nwlinkedidentc{Transparent}{NW2rm0VH-2M5oYw-1} below = below
+    decodePixel above _           = above
+\nwindexdefn{\nwixident{partTwo}}{partTwo}{NW2rm0VH-4P9qKy-1}\eatline
+\nwused{\\{NW2njlzM-15Rjc8-1}\\{NW2rm0VH-19Srvv-1}}\nwidentdefs{\\{{\nwixident{partTwo}}{partTwo}}}\nwidentuses{\\{{\nwixident{image}}{image}}\\{{\nwixident{Layer}}{Layer}}\\{{\nwixident{Pixel}}{Pixel}}\\{{\nwixident{Transparent}}{Transparent}}}\nwindexuse{\nwixident{image}}{image}{NW2rm0VH-4P9qKy-1}\nwindexuse{\nwixident{Layer}}{Layer}{NW2rm0VH-4P9qKy-1}\nwindexuse{\nwixident{Pixel}}{Pixel}{NW2rm0VH-4P9qKy-1}\nwindexuse{\nwixident{Transparent}}{Transparent}{NW2rm0VH-4P9qKy-1}\nwendcode{}\nwbegindocs{22}\nwdocspar
+
+\subsection{Miscellaneous}
+
+\nwenddocs{}\nwbegincode{23}\sublabel{NW2rm0VH-dIQyV-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2rm0VH-dIQyV-1}}}\moddef{A transparent layer~{\nwtagstyle{}\subpageref{NW2rm0VH-dIQyV-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2rm0VH-19Srvv-1}}\nwenddeflinemarkup
+transparentLayer :: Int -> Int -> \nwlinkedidentc{Layer}{NW2rm0VH-LSl4Q-1}
+transparentLayer width height = replicate height (replicate width \nwlinkedidentc{Transparent}{NW2rm0VH-2M5oYw-1})
+\nwused{\\{NW2rm0VH-19Srvv-1}}\nwidentuses{\\{{\nwixident{Layer}}{Layer}}\\{{\nwixident{Transparent}}{Transparent}}}\nwindexuse{\nwixident{Layer}}{Layer}{NW2rm0VH-dIQyV-1}\nwindexuse{\nwixident{Transparent}}{Transparent}{NW2rm0VH-dIQyV-1}\nwendcode{}\nwbegindocs{24}\nwdocspar
+
+\todoo{Pull this out into a utility module}
+\nwenddocs{}\nwbegincode{25}\sublabel{NW2rm0VH-IVMaj-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2rm0VH-IVMaj-1}}}\moddef{Handle a single argument as file path to input~{\nwtagstyle{}\subpageref{NW2rm0VH-IVMaj-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2rm0VH-19Srvv-1}}\nwenddeflinemarkup
+\nwlinkedidentc{getInputFilename}{NW2rm0VH-IVMaj-1} :: IO FilePath
+\nwlinkedidentc{getInputFilename}{NW2rm0VH-IVMaj-1} =
+    do args <- getArgs
+       case args of
+         [fname] -> pure fname
+         []      -> error "Must specify input filename"
+         _       -> error "Too many args"
+\nwindexdefn{\nwixident{getInputFilename}}{getInputFilename}{NW2rm0VH-IVMaj-1}\eatline
+\nwused{\\{NW2rm0VH-19Srvv-1}}\nwidentdefs{\\{{\nwixident{getInputFilename}}{getInputFilename}}}\nwendcode{}\nwbegindocs{26}\nwdocspar
+
+\subsection{Full solution}
+
+\nwenddocs{}\nwbegincode{27}\sublabel{NW2rm0VH-19Srvv-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2rm0VH-19Srvv-1}}}\moddef{Day08.hs~{\nwtagstyle{}\subpageref{NW2rm0VH-19Srvv-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
+-- ---------------------------------------------------------------- [ Day08.hs ]
+-- TODO: Module doc
+-- --------------------------------------------------------------------- [ EOH ]
+
+module Data.AOC19.Day08
+  ( \nwlinkedidentc{main}{NW2rm0VH-19Srvv-1}
+  , \nwlinkedidentc{partOne}{NW2rm0VH-2iOjQS-4}, \nwlinkedidentc{partTwo}{NW2rm0VH-4P9qKy-1}
+  ) where
+
+
+import           Control.Applicative ((<|>))
+import           Data.Function       (on)
+import           Data.List           (sortBy)
+import           System.Environment  (getArgs)
+import           Text.Trifecta       (Parser, char, count, parseFromFile, some,
+                                      (<?>))
+
+
+-- ------------------------------------------------------------------- [ Types ]
+
+\LA{}Define a Pixel data type~{\nwtagstyle{}\subpageref{NW2rm0VH-2M5oYw-1}}\RA{}
+
+
+\LA{}Implement \hs{Show} for \code{}Pixel\edoc{}~{\nwtagstyle{}\subpageref{NW2rm0VH-QyGx2-1}}\RA{}
+
+
+\LA{}Define a few convenient type aliases~{\nwtagstyle{}\subpageref{NW2rm0VH-LSl4Q-1}}\RA{}
+
+
+-- -------------------------------------------------------------------- [ Main ]
+
+\nwlinkedidentc{main}{NW2rm0VH-19Srvv-1} :: IO ()
+\nwlinkedidentc{main}{NW2rm0VH-19Srvv-1} =
+    do putStr "Part One: "
+       \nwlinkedidentc{partOne}{NW2rm0VH-2iOjQS-4} =<< \nwlinkedidentc{getInputFilename}{NW2rm0VH-IVMaj-1}
+       putStrLn "Part Two: "
+       \nwlinkedidentc{partTwo}{NW2rm0VH-4P9qKy-1} =<< \nwlinkedidentc{getInputFilename}{NW2rm0VH-IVMaj-1}
+
+
+-- ---------------------------------------------------------------- [ Part One ]
+
+\LA{}Part One~{\nwtagstyle{}\subpageref{NW2njlzM-2iOjQS-1}}\RA{}
+
+
+-- ---------------------------------------------------------------- [ Part Two ]
+
+\LA{}Part Two~{\nwtagstyle{}\subpageref{NW2njlzM-4P9qKy-1}}\RA{}
+
+
+-- ----------------------------------------------------------------- [ Parsers ]
+
+\LA{}Parse an image~{\nwtagstyle{}\subpageref{NW2rm0VH-4aeb4o-1}}\RA{}
+
+
+\LA{}Parse a pixel~{\nwtagstyle{}\subpageref{NW2rm0VH-1aCFXy-1}}\RA{}
+
+
+-- ----------------------------------------------------------------- [ Helpers ]
+
+\LA{}A transparent layer~{\nwtagstyle{}\subpageref{NW2rm0VH-dIQyV-1}}\RA{}
+
+
+\LA{}Handle a single argument as file path to input~{\nwtagstyle{}\subpageref{NW2rm0VH-IVMaj-1}}\RA{}
+
+
+-- --------------------------------------------------------------------- [ EOF ]
+\nwindexdefn{\nwixident{main}}{main}{NW2rm0VH-19Srvv-1}\eatline
+\nwnotused{Day08.hs}\nwidentdefs{\\{{\nwixident{main}}{main}}}\nwidentuses{\\{{\nwixident{getInputFilename}}{getInputFilename}}\\{{\nwixident{partOne}}{partOne}}\\{{\nwixident{partTwo}}{partTwo}}}\nwindexuse{\nwixident{getInputFilename}}{getInputFilename}{NW2rm0VH-19Srvv-1}\nwindexuse{\nwixident{partOne}}{partOne}{NW2rm0VH-19Srvv-1}\nwindexuse{\nwixident{partTwo}}{partTwo}{NW2rm0VH-19Srvv-1}\nwendcode{}
+
+\nwixlogsorted{c}{{A transparent layer}{NW2rm0VH-dIQyV-1}{\nwixd{NW2rm0VH-dIQyV-1}\nwixu{NW2rm0VH-19Srvv-1}}}%
 \nwixlogsorted{c}{{Day01.g}{NWCmdvU-3gOu99-1}{\nwixd{NWCmdvU-3gOu99-1}\nwixd{NWCmdvU-3gOu99-2}\nwixd{NWCmdvU-3gOu99-3}\nwixd{NWCmdvU-3gOu99-4}}}%
 \nwixlogsorted{c}{{Day02.hs}{NW2qFPgl-1375sF-1}{\nwixd{NW2qFPgl-1375sF-1}\nwixd{NW2qFPgl-1375sF-2}\nwixd{NW2qFPgl-1375sF-3}\nwixd{NW2qFPgl-1375sF-4}\nwixd{NW2qFPgl-1375sF-5}\nwixd{NW2qFPgl-1375sF-6}\nwixd{NW2qFPgl-1375sF-7}\nwixd{NW2qFPgl-1375sF-8}}}%
 \nwixlogsorted{c}{{Day04.hs}{NW2njlzM-15Rjc8-1}{\nwixd{NW2njlzM-15Rjc8-1}}}%
+\nwixlogsorted{c}{{Day08.hs}{NW2rm0VH-19Srvv-1}{\nwixd{NW2rm0VH-19Srvv-1}}}%
+\nwixlogsorted{c}{{Define a few convenient type aliases}{NW2rm0VH-LSl4Q-1}{\nwixd{NW2rm0VH-LSl4Q-1}\nwixu{NW2rm0VH-19Srvv-1}}}%
+\nwixlogsorted{c}{{Define a Pixel data type}{NW2rm0VH-2M5oYw-1}{\nwixd{NW2rm0VH-2M5oYw-1}\nwixu{NW2rm0VH-19Srvv-1}}}%
+\nwixlogsorted{c}{{Handle a single argument as file path to input}{NW2rm0VH-IVMaj-1}{\nwixd{NW2rm0VH-IVMaj-1}\nwixu{NW2rm0VH-19Srvv-1}}}%
 \nwixlogsorted{c}{{has a double}{NW2njlzM-2cQo0j-1}{\nwixd{NW2njlzM-2cQo0j-1}\nwixu{NW2njlzM-2iOjQS-1}}}%
 \nwixlogsorted{c}{{has a strict double}{NW2njlzM-ntEfn-1}{\nwixd{NW2njlzM-ntEfn-1}\nwixu{NW2njlzM-4P9qKy-1}}}%
+\nwixlogsorted{c}{{Implement \hs{Show} for \code{}Pixel\edoc{}}{NW2rm0VH-QyGx2-1}{\nwixd{NW2rm0VH-QyGx2-1}\nwixu{NW2rm0VH-19Srvv-1}}}%
 \nwixlogsorted{c}{{Input}{NW2njlzM-1GvnV-1}{\nwixd{NW2njlzM-1GvnV-1}\nwixu{NW2njlzM-15Rjc8-1}}}%
-\nwixlogsorted{c}{{Part One}{NW2njlzM-2iOjQS-1}{\nwixd{NW2njlzM-2iOjQS-1}\nwixu{NW2njlzM-15Rjc8-1}}}%
-\nwixlogsorted{c}{{Part Two}{NW2njlzM-4P9qKy-1}{\nwixd{NW2njlzM-4P9qKy-1}\nwixu{NW2njlzM-15Rjc8-1}}}%
+\nwixlogsorted{c}{{Parse a $25 \times 6$ \code{}image\edoc{} from the input}{NW2rm0VH-276JRG-1}{\nwixu{NW2rm0VH-2iOjQS-1}\nwixd{NW2rm0VH-276JRG-1}}}%
+\nwixlogsorted{c}{{Parse a pixel}{NW2rm0VH-1aCFXy-1}{\nwixd{NW2rm0VH-1aCFXy-1}\nwixu{NW2rm0VH-19Srvv-1}}}%
+\nwixlogsorted{c}{{Parse an image}{NW2rm0VH-4aeb4o-1}{\nwixd{NW2rm0VH-4aeb4o-1}\nwixu{NW2rm0VH-19Srvv-1}}}%
+\nwixlogsorted{c}{{Part One}{NW2njlzM-2iOjQS-1}{\nwixd{NW2njlzM-2iOjQS-1}\nwixu{NW2njlzM-15Rjc8-1}\nwixd{NW2rm0VH-2iOjQS-1}\nwixd{NW2rm0VH-2iOjQS-2}\nwixd{NW2rm0VH-2iOjQS-3}\nwixd{NW2rm0VH-2iOjQS-4}\nwixu{NW2rm0VH-19Srvv-1}}}%
+\nwixlogsorted{c}{{Part Two}{NW2njlzM-4P9qKy-1}{\nwixd{NW2njlzM-4P9qKy-1}\nwixu{NW2njlzM-15Rjc8-1}\nwixd{NW2rm0VH-4P9qKy-1}\nwixu{NW2rm0VH-19Srvv-1}}}%
+\nwixlogsorted{i}{{\nwixident{Black}}{Black}}%
+\nwixlogsorted{i}{{\nwixident{getInputFilename}}{getInputFilename}}%
+\nwixlogsorted{i}{{\nwixident{Image}}{Image}}%
+\nwixlogsorted{i}{{\nwixident{image}}{image}}%
+\nwixlogsorted{i}{{\nwixident{Layer}}{Layer}}%
+\nwixlogsorted{i}{{\nwixident{main}}{main}}%
+\nwixlogsorted{i}{{\nwixident{partOne}}{partOne}}%
+\nwixlogsorted{i}{{\nwixident{partTwo}}{partTwo}}%
+\nwixlogsorted{i}{{\nwixident{Pixel}}{Pixel}}%
+\nwixlogsorted{i}{{\nwixident{Row}}{Row}}%
+\nwixlogsorted{i}{{\nwixident{Transparent}}{Transparent}}%
+\nwixlogsorted{i}{{\nwixident{White}}{White}}%
 

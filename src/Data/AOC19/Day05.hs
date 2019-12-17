@@ -1,4 +1,7 @@
-module Data.AOC19.Day05 where
+module Data.AOC19.Day05
+  ( main
+  , partOne, partTwo
+  ) where
 
 import           Control.Monad          (liftM2, when)
 import           Control.Monad.IO.Class (liftIO)
