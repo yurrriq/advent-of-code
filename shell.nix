@@ -10,6 +10,7 @@ pkgs.mkShell {
   };
   buildInputs = project.env.nativeBuildInputs ++ (with pkgs; [
     gap-full
+    haskellPackages.pointfree
     (idrisPackages.with-packages (with idrisPackages; [
       effects
     ]))
