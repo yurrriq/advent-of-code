@@ -29,7 +29,9 @@ library:
   - Data.AOC19.Day07
   - Data.AOC19.Day08
   - Data.AOC19.Day09
+  - Data.AOC19.Day12
   dependencies:
+  - composition
   - conduit
   - data-ordlist
   - digits
