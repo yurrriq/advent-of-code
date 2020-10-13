@@ -30,7 +30,7 @@ all: ${SRCS} ${PDF}
 
 
 .PHONY: build
-build: release.nix default.nix $(wildcard src/**.hs) $(wildcard app/**.hs)
+build: default.nix $(wildcard src/**.hs) $(wildcard app/**.hs)
 	@ nix build -f $<
 
 

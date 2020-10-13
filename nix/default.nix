@@ -1,8 +1,5 @@
-{ sources ? import ./sources.nix }:
-
-import sources.nixpkgs {
+import (import ./sources.nix).nixpkgs {
   overlays = [
-    # (import sources.nur {}).repos.yurrriq.overlays.nur
     (import ./overlay.nix)
   ];
 }

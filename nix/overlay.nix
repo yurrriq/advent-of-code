@@ -1,10 +1,5 @@
 self: super: rec {
 
-  haskellPackages = super.haskellPackages.override {
-    overrides = hself: hsuper: {
-    };
-  };
-
   noweb = super.noweb.override {
     icon-lang = super.icon-lang.override {
       withGraphics = false;

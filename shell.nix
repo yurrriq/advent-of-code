@@ -1,23 +1,40 @@
-{ pkgs ? import ./nix {} }:
-
+{ pkgs ? import ./nix }:
 let
-  project = import ./release.nix { inherit pkgs; };
+  project = import ./. { inherit pkgs; };
 in
-
 pkgs.mkShell {
   FONTCONFIG_FILE = pkgs.makeFontsConf {
     fontDirectories = [ pkgs.iosevka ];
   };
-  buildInputs = project.env.nativeBuildInputs ++ (with pkgs; [
-    gap-full
-    haskellPackages.cabal-install
-    haskellPackages.pointfree
-    (idrisPackages.with-packages (with idrisPackages; [
-      effects
-    ]))
-    noweb
-    python36Packages.pygments
-    which
-    xelatex-noweb
-  ]);
+  buildInputs = with pkgs; (
+    [
+      gap-full
+      (
+        idrisPackages.with-packages
+          (
+            with idrisPackages; [
+              effects
+            ]
+          )
+      )
+      nixpkgs-fmt
+      noweb
+      python36
+      which
+      xelatex-noweb
+    ] ++ (
+      with haskellPackages;
+      [
+        ormolu
+        pointfree
+      ]
+    ) ++ (
+      with python36Packages;
+      [
+        pre-commit
+        pygments
+      ]
+    )
+  )
+  ++ project.env.nativeBuildInputs;
 }
