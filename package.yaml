@@ -10,7 +10,8 @@ extra-source-files:
 - CHANGELOG.md
 - LICENSE
 - README.md
-- input/day*.txt
+- VERSION
+data-files: input/day*.txt
 dependencies:
 - base
 ghc-options:
@@ -20,16 +21,6 @@ library:
   ghc-options:
   - -fwarn-incomplete-patterns
   source-dirs: src
-  exposed-modules:
-  - Data.AOC19.Day02
-  - Data.AOC19.Day03
-  - Data.AOC19.Day04
-  - Data.AOC19.Day05
-  - Data.AOC19.Day06
-  - Data.AOC19.Day07
-  - Data.AOC19.Day08
-  - Data.AOC19.Day09
-  - Data.AOC19.Day12
   dependencies:
   - composition
   - conduit
@@ -42,16 +33,12 @@ library:
   - trifecta
   - unordered-containers
   - vector
-# executable:
-#   ghc-options:
-#   - -O2
-#   source-dirs: app
-#   main: Main.hs
-#   dependencies:
-#   - aoc
 tests:
   aoc-test:
     main: Main.hs
+    ghc-options:
+    - -O0
+    - -threaded
     source-dirs: test
     dependencies:
     - aoc
