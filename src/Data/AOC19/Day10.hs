@@ -1,18 +1,30 @@
+{-# OPTIONS_GHC -Wno-type-defaults #-}
+
 module Data.AOC19.Day10 where
 
 import Control.Applicative ((<|>))
 import Control.Monad (foldM)
 import Data.AOC19.Util (parseInput)
+import Data.Foldable (minimumBy)
 import qualified Data.HashMap.Strict as HM
-import Data.HashMap.Strict (HashMap)
+import Data.HashMap.Strict ((!), HashMap)
 import qualified Data.HashSet as HS
-import Data.List (delete, maximumBy)
+import Data.List (delete, maximumBy, sortBy)
 import Data.Ord (comparing)
 import GHC.Real (Ratio (..))
-import Text.Trifecta
+import Text.Trifecta (Parser, char, newline, sepEndBy, some)
 
 partOne :: IO Int
 partOne = HM.size . snd . bestLocation <$> parseInput grid "input/day10.txt"
+
+partTwo :: IO Int
+partTwo =
+  do
+    asteroidBelt <- parseInput grid "input/day10.txt"
+    let (_from, visible) = bestLocation asteroidBelt
+    let angles = clockwise (HM.keys visible)
+    let (x, y) = vaporize visible angles !! 199
+    pure (x * 100 + y)
 
 data Grid
   = Grid (Int, Int) (HashMap Location (HashMap Angle (HashMap Location Distance)))
@@ -31,7 +43,7 @@ instance Show Grid where
 
 type Location = (Int, Int)
 
-type Angle = Ratio Int
+type Angle = Ratio Integer
 
 type Distance = Double
 
@@ -57,6 +69,37 @@ bestLocation (Grid _ asteroids) = maximumBy go (HM.toList asteroids)
   where
     go (_, xmap) (_, ymap) = comparing HM.size xmap ymap
 
+vaporize :: HashMap Angle (HashMap Location Distance) -> [Angle] -> [Location]
+vaporize visible allAngles = go [] visible allAngles
+  where
+    go :: [Location] -> HashMap Angle (HashMap Location Distance) -> [Angle] -> [Location]
+    go vaporized remaining [] =
+      if all HM.null remaining
+        then reverse vaporized
+        else go vaporized remaining allAngles
+    go vaporized remaining (a : as) =
+      let targets = (remaining ! a)
+       in if HM.null targets
+            then go vaporized remaining as
+            else
+              let (target, _) = minimumBy (comparing snd) (HM.toList targets)
+               in go (target : vaporized) (HM.adjust (HM.delete target) a remaining) as
+
+clockwise :: [Angle] -> [Angle]
+clockwise angles =
+  let (i, ii, iii, iv) = foldl go ([], [], [], []) angles
+   in sortBy (comparing (fromRational)) i
+        ++ sortBy (comparing fromRational) iv
+        ++ sortBy (comparing fromRational) iii
+        ++ sortBy (comparing fromRational) ii
+  where
+    go (i, ii, iii, iv) a@(n :% d)
+      | n <= 0 && d >= 0 = (a : i, ii, iii, iv)
+      | n > 0 && d >= 0 = (i, ii, iii, a : iv)
+      | n >= 0 && d <= 0 = (i, ii, a : iii, iv)
+      | n < 0 && d < 0 = (i, a : ii, iii, iv)
+      | otherwise = error (show a)
+
 gridDetection :: Grid -> Grid
 gridDetection (Grid dimensions asteroids) =
   Grid dimensions (HM.mapWithKey stationDetection asteroids)
@@ -81,8 +124,8 @@ detect (fromX, fromY) detections (toX, toY) = HM.alter go angle detections
                 then 0 :% 1
                 else 0 :% (-1)
             else reduce dY dX
-    dX = toX - fromX
-    dY = toY - fromY
+    dX = fromIntegral (toX - fromX)
+    dY = fromIntegral (toY - fromY)
     reduce x y = (x `quot` d) :% (y `quot` d)
       where
         d = gcd x y
