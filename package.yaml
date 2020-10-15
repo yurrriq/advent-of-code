@@ -29,6 +29,7 @@ library:
   - hashable
   - mtl
   - lens
+  - linear
   - transformers
   - trifecta
   - unordered-containers
