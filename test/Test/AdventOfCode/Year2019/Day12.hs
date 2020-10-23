@@ -1,6 +1,6 @@
-module Test.AOC19.Day12 where
+module Test.AdventOfCode.Year2019.Day12 where
 
-import Data.AOC19.Day12 (partOne, partTwo)
+import AdventOfCode.Year2019.Day12 (partOne, partTwo)
 import Test.Tasty
 import Test.Tasty.HUnit
 

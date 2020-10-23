@@ -1,28 +1,15 @@
--- ---------------------------------------------------------------- [ Day08.hs ]
--- TODO: Module doc
--- --------------------------------------------------------------------- [ EOH ]
-
-module Data.AOC19.Day08
+module AdventOfCode.Year2019.Day08
   ( main,
     partOne,
     partTwo,
   )
 where
 
+import AdventOfCode.Util (parseInput)
 import Control.Applicative ((<|>))
 import Data.Function (on)
 import Data.List (sortBy)
-import System.Environment (getArgs)
-import Text.Trifecta
-  ( (<?>),
-    Parser,
-    char,
-    count,
-    parseFromFile,
-    some,
-  )
-
--- ------------------------------------------------------------------- [ Types ]
+import Text.Trifecta ((<?>), Parser, char, count, some)
 
 data Pixel
   = Black
@@ -41,37 +28,32 @@ type Layer = [Row]
 
 type Row = [Pixel]
 
--- -------------------------------------------------------------------- [ Main ]
-
 main :: IO ()
 main =
   do
+    putStrLn "[2019] Day 8: Space Image Format"
     putStr "Part One: "
-    partOne =<< getInputFilename
+    print =<< partOne
     putStrLn "Part Two: "
-    partTwo =<< getInputFilename
+    putStrLn =<< partTwo
 
--- ---------------------------------------------------------------- [ Part One ]
-
-partOne :: FilePath -> IO ()
-partOne fname =
+partOne :: IO Int
+partOne =
   do
-    Just layers <- parseFromFile (image 25 6) fname
+    layers <- parseInput (image 25 6) "input/2019/day08.txt"
     let layer = head $ sortBy (compare `on` numberOf Black) layers
     let ones = numberOf White layer
     let twos = numberOf Transparent layer
-    print $ ones * twos
+    pure $ ones * twos
   where
     numberOf :: Eq a => a -> [[a]] -> Int
     numberOf x = sum . fmap (length . filter (== x))
 
--- ---------------------------------------------------------------- [ Part Two ]
-
-partTwo :: FilePath -> IO ()
-partTwo fname =
+partTwo :: IO String
+partTwo =
   do
-    Just layers <- parseFromFile (image 25 6) fname
-    putStrLn
+    layers <- parseInput (image 25 6) "input/2019/day08.txt"
+    pure
       $ unlines . map (concatMap show)
       $ foldl decodeLayer (transparentLayer 25 6) layers
   where
@@ -80,8 +62,6 @@ partTwo fname =
     decodePixel :: Pixel -> Pixel -> Pixel
     decodePixel Transparent below = below
     decodePixel above _ = above
-
--- ----------------------------------------------------------------- [ Parsers ]
 
 image :: Int -> Int -> Parser Image
 image width height = some layer
@@ -97,17 +77,5 @@ pixel =
     <|> (char '1' *> pure White <?> "A white pixel")
     <|> (char '2' *> pure Transparent <?> "A transparent pixel")
 
--- ----------------------------------------------------------------- [ Helpers ]
-
 transparentLayer :: Int -> Int -> Layer
 transparentLayer width height = replicate height (replicate width Transparent)
-
-getInputFilename :: IO FilePath
-getInputFilename =
-  do
-    args <- getArgs
-    case args of
-      [fname] -> pure fname
-      [] -> error "Must specify input filename"
-      _ -> error "Too many args"
--- --------------------------------------------------------------------- [ EOF ]

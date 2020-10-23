@@ -1,4 +1,4 @@
-module Data.AOC19.Day02 where
+module AdventOfCode.Year2019.Day02 where
 
 import Control.Arrow ((>>>), first)
 import Data.List (find)
@@ -22,7 +22,7 @@ program = fromList . map fromInteger <$> (natural `sepBy` comma)
 partOne :: IO Int
 partOne =
   do
-    res <- parseFromFile program "../../../input/day02.txt"
+    res <- parseFromFile program "../../../input/2019/day02.txt"
     case res of
       Nothing -> error "No parse"
       Just state -> pure (V.head (runProgram (restoreGravityAssist state)))
@@ -30,7 +30,7 @@ partOne =
 partTwo :: IO Int
 partTwo =
   do
-    res <- parseFromFile program "../../../input/day02.txt"
+    res <- parseFromFile program "../../../input/2019/day02.txt"
     case res of
       Nothing -> error "No parse"
       Just state ->

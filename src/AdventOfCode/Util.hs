@@ -1,7 +1,7 @@
-module Data.AOC19.Util where
+module AdventOfCode.Util where
 
 import Control.Monad.IO.Class (liftIO)
-import Paths_aoc (getDataFileName)
+import Paths_advent_of_code (getDataFileName)
 import Text.Trifecta (Parser, Result (..), parseFromFileEx)
 
 parseInput :: Parser a -> FilePath -> IO a

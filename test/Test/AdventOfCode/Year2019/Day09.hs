@@ -1,9 +1,9 @@
 {-# LANGUAGE OverloadedLists #-}
 
-module Test.AOC19.Day09 where
+module Test.AdventOfCode.Year2019.Day09 where
 
+import AdventOfCode.Year2019.Day09 (await', evalStack)
 import Conduit
-import Data.AOC19.Day09 (await', evalStack)
 import Data.Digits (digits)
 import Data.Vector ((!), fromList)
 import Test.Tasty

@@ -1,4 +1,4 @@
-module Data.AOC19.Day04 where
+module AdventOfCode.Year2019.Day04 where
 
 import Control.Monad (liftM2)
 import Data.Digits (digits)

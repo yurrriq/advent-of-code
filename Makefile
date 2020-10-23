@@ -5,14 +5,13 @@ day_srcs = $(foreach srcdir,day $(2) $(3) $(4),_src/${srcdir}/$(1).nw)
 
 NW_SRCS := \
 $(call day_srcs,01, gap) \
-$(call day_srcs,02, haskell) \
-$(call day_srcs,04, haskell) \
-$(call day_srcs,08, haskell)
+$(call day_srcs,04, haskell/2019) \
+$(call day_srcs,08, haskell/2019)
 
 
 GAP_SRCS := $(patsubst _src/gap/%.nw,src/Day%.g,$(filter _src/gap/%.nw,${NW_SRCS}))
 
-HS_SRCS := $(patsubst _src/haskell/%.nw,src/Data/AOC19/Day%.hs,$(filter _src/haskell/%.nw,${NW_SRCS}))
+HS_SRCS := $(patsubst _src/haskell/2019/%.nw,src/AdventOfCode/Year2019/Day%.hs,$(filter _src/haskell/2019/%.nw,${NW_SRCS}))
 
 SRCS := ${GAP_SRCS} ${HS_SRCS}
 
@@ -57,6 +56,6 @@ src/Day%.g: _src/gap/%.nw
 	notangle -R'$(@F)' $< ${cpif} $@
 
 
-src/Data/AOC19/Day%.hs: _src/haskell/%.nw
+src/AdventOfCode/Year2019/Day%.hs: _src/haskell/2019/%.nw
 	@ mkdir -p $(@D)
 	notangle -R'$(@F)' $< ${cpif} $@

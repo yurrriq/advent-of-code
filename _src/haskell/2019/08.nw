@@ -1,0 +1,183 @@
+\section{Haskell solution}
+
+\subsection{Pixels}
+
+
+A pixel can be black, white, or transparent.
+
+<<Define a Pixel data type>>=
+data Pixel
+  = Black
+  | White
+  | Transparent
+  deriving (Enum, Eq)
+@ %def Pixel
+@ %def Black
+@ %def White
+@ %def Transparent
+
+
+Show black pixels as spaces, white ones as hashes, and transparent as dots.
+
+<<Implement \hs{Show} for [[Pixel]]>>=
+instance Show Pixel where
+  show Black = " "
+  show White = "#"
+  show Transparent = "."
+@
+
+
+\subsection{Type aliases}
+
+Define a [[Layer]] as a list of [[Row]]s, and a [[Row]] as a list of [[Pixel]]s.
+
+<<Define a few convenient type aliases>>=
+type Image = [Layer]
+
+type Layer = [Row]
+
+type Row = [Pixel]
+@ %def Image
+@ %def Layer
+@ %def Row
+
+
+\subsection{Parsers}
+
+Parse an [[Image]], i.e. one or more [[Layer]]s comprised of \hs{height}
+[[Row]]s of \hs{width} [[Pixel]]s.
+
+<<Parse an image>>=
+image :: Int -> Int -> Parser Image
+image width height = some layer
+  where
+    layer :: Parser Layer
+    layer = count height row
+    row :: Parser Row
+    row = count width pixel
+@ %def image
+
+
+Parse an encoded black, white, or transparent pixel.
+
+<<Parse a pixel>>=
+pixel :: Parser Pixel
+pixel =
+  (char '0' *> pure Black <?> "A black pixel")
+    <|> (char '1' *> pure White <?> "A white pixel")
+    <|> (char '2' *> pure Transparent <?> "A transparent pixel")
+@
+
+\subsection{Part One}
+
+<<Part One>>=
+partOne :: IO Int
+partOne =
+  do
+    <<Parse a $25 \times 6$ [[image]] from the input>>
+@
+
+
+<<Parse a $25 \times 6$ [[image]] from the input>>=
+layers <- parseInput (image 25 6) "input/2019/day08.txt"
+@
+
+
+Find the \hs{layer} with the fewest zeros\todoo{sp?}, i.e. [[Black]] pixels.
+
+<<Part One>>=
+    let layer = head $ sortBy (compare `on` numberOf Black) layers
+@
+
+
+Return the product of the number of ones ([[White]] pixels) and the number of
+twos ([[Transparent]] pixels) in that \hs{layer}.
+
+<<Part One>>=
+    let ones = numberOf White layer
+    let twos = numberOf Transparent layer
+    pure $ ones * twos
+@
+
+
+Return the number of elements equivalent to a given one, in a given list of
+lists of elements of the same type. More specifically, return the number of
+[[Pixel]]s of a given color in a given [[Layer]].
+
+\todoo{There's gotta be a Data.List function for this..}
+
+<<Part One>>=
+  where
+    numberOf :: Eq a => a -> [[a]] -> Int
+    numberOf x = sum . fmap (length . filter (== x))
+@ %def partOne
+
+
+\subsection{Part Two}
+
+<<Part Two>>=
+partTwo :: IO String
+partTwo =
+  do
+    layers <- parseInput (image 25 6) "input/2019/day08.txt"
+    pure
+      $ unlines . map (concatMap show)
+      $ foldl decodeLayer (transparentLayer 25 6) layers
+  where
+    decodeLayer :: Layer -> Layer -> Layer
+    decodeLayer = zipWith (zipWith decodePixel)
+    decodePixel :: Pixel -> Pixel -> Pixel
+    decodePixel Transparent below = below
+    decodePixel above _ = above
+@ %def partTwo
+
+
+\subsection{Miscellaneous}
+
+<<A transparent layer>>=
+transparentLayer :: Int -> Int -> Layer
+transparentLayer width height = replicate height (replicate width Transparent)
+@
+
+
+\subsection{Full solution}
+
+<<Day08.hs>>=
+module AdventOfCode.Year2019.Day08
+  ( main,
+    partOne,
+    partTwo,
+  )
+where
+
+import AdventOfCode.Util (parseInput)
+import Control.Applicative ((<|>))
+import Data.Function (on)
+import Data.List (sortBy)
+import Text.Trifecta ((<?>), Parser, char, count, some)
+
+<<Define a Pixel data type>>
+
+<<Implement \hs{Show} for [[Pixel]]>>
+
+<<Define a few convenient type aliases>>
+
+main :: IO ()
+main =
+  do
+    putStrLn "[2019] Day 8: Space Image Format"
+    putStr "Part One: "
+    print =<< partOne
+    putStrLn "Part Two: "
+    putStrLn =<< partTwo
+
+<<Part One>>
+
+<<Part Two>>
+
+<<Parse an image>>
+
+<<Parse a pixel>>
+
+<<A transparent layer>>
+@ %def main

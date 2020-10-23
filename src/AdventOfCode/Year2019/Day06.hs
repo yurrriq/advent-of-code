@@ -1,5 +1,6 @@
-module Data.AOC19.Day06 where
+module AdventOfCode.Year2019.Day06 where
 
+import AdventOfCode.Util (parseInput)
 import Control.Monad (void)
 import Data.HashMap.Strict ((!))
 import qualified Data.HashMap.Strict as HM
@@ -8,7 +9,6 @@ import Text.Trifecta
     alphaNum,
     eof,
     manyTill,
-    parseFromFile,
     some,
     symbol,
     token,
@@ -54,26 +54,27 @@ minimumOrbitalTransfers from to iorbs =
         + (length (takeWhile (not . flip elem tos) froms))
         + (length (takeWhile (not . flip elem froms) tos))
 
-partOne :: IO ()
+partOne :: IO Int
 partOne =
   do
-    res <- parseFromFile orbits "../../../input/day06.txt"
-    case res of
-      Nothing -> error "No parse"
-      Just orbs ->
-        do
-          let dorbs = directOrbits orbs
-          let iorbs = indirectOrbits dorbs
-          print $ HM.size dorbs + sum (HM.map length iorbs)
+    orbs <- parseInput orbits "input/2019/day06.txt"
+    let dorbs = directOrbits orbs
+    let iorbs = indirectOrbits dorbs
+    pure $ HM.size dorbs + sum (HM.map length iorbs)
 
-partTwo :: IO ()
+partTwo :: IO Int
 partTwo =
   do
-    res <- parseFromFile orbits "../../../input/day06.txt"
-    case res of
-      Nothing -> error "No parse"
-      Just orbs ->
-        do
-          let dorbs = directOrbits orbs
-          let iorbs = indirectOrbits dorbs
-          print $ minimumOrbitalTransfers "YOU" "SAN" iorbs
+    orbs <- parseInput orbits "input/2019/day06.txt"
+    let dorbs = directOrbits orbs
+    let iorbs = indirectOrbits dorbs
+    pure $ minimumOrbitalTransfers "YOU" "SAN" iorbs
+
+main :: IO ()
+main =
+  do
+    putStrLn "[2019] Day 6: Universal Orbit Map"
+    putStr "Part One: "
+    print =<< partOne
+    putStr "Part Two: "
+    print =<< partTwo

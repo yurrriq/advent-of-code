@@ -1,7 +1,7 @@
-module Data.AOC19.Day12 where
+module AdventOfCode.Year2019.Day12 where
 
+import AdventOfCode.Util (parseInput)
 import Control.Arrow ((&&&), (>>>), second)
-import Data.AOC19.Util (parseInput)
 import Data.Function (on)
 import Linear.V3 (V3 (..))
 import Text.Trifecta (Parser, angles, between, integer, some, string)
@@ -13,7 +13,7 @@ partTwo :: IO Int
 partTwo = foldr lcm 1 . fmap period . traverse transpose <$> parseMoons
 
 parseMoons :: IO [Pair]
-parseMoons = fmap mkPair <$> parseInput (some dimensions) "input/day12.txt"
+parseMoons = fmap mkPair <$> parseInput (some dimensions) "input/2019/day12.txt"
 
 type Pair = (Dimensions, Dimensions)
 

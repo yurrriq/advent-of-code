@@ -1,4 +1,4 @@
-module Data.AOC19.Day09
+module AdventOfCode.Year2019.Day09
   ( main,
     partOne,
     evalStack,

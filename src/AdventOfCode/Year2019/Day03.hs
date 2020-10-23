@@ -1,4 +1,4 @@
-module Data.AOC19.Day03 where
+module AdventOfCode.Year2019.Day03 where
 
 import Control.Applicative ((<|>))
 import Control.Arrow ((&&&), second)
@@ -132,7 +132,7 @@ runExample = (partOne' <$>) . parseString wires mempty
 partOne :: IO Int
 partOne =
   maybe (error "Fail") partOne'
-    <$> parseFromFile wires "../../../input/day03.txt"
+    <$> parseFromFile wires "../../../input/2019/day03.txt"
 
 partOne' :: ([Segment], [Segment]) -> Int
 partOne' =
@@ -145,7 +145,7 @@ partOne' =
 partTwo :: IO Int
 partTwo =
   maybe (error "Fail") partTwo'
-    <$> parseFromFile wires "../../../input/day03.txt"
+    <$> parseFromFile wires "../../../input/2019/day03.txt"
 
 partTwo' :: ([Segment], [Segment]) -> Int
 partTwo' (xs, ys) =

@@ -1,17 +1,18 @@
-name: aoc
+name: advent-of-code
 version: !include "./VERSION"
 synopsis: My Haskell solutions to Advent of Code problems
 author: Eric Bailey
 maintainer: eric@ericb.me
 license-file: LICENSE
 license: MIT
-github: yurrriq/aoc19
+github: yurrriq/advent-of-code
 extra-source-files:
 - CHANGELOG.md
 - LICENSE
 - README.md
 - VERSION
-data-files: input/day*.txt
+data-files:
+- input/2019/day*.txt
 dependencies:
 - base
 ghc-options:
@@ -34,15 +35,40 @@ library:
   - trifecta
   - unordered-containers
   - vector
+_executable: &executable
+  ghc-options:
+  - -O0
+  - -threaded
+  other-modules: []
+  source-dirs: src
+executables:
+  aoc-2019-day06:
+    <<: *executable
+    main: AdventOfCode.Year2019.Day06
+    other-modules:
+    - AdventOfCode.Util
+    - Paths_advent_of_code
+    dependencies:
+    - trifecta
+    - unordered-containers
+  aoc-2019-day08:
+    <<: *executable
+    main: AdventOfCode.Year2019.Day08
+    other-modules:
+    - AdventOfCode.Util
+    - Paths_advent_of_code
+    dependencies:
+    - trifecta
+    - unordered-containers
 tests:
-  aoc-test:
+  advent-of-code-test:
     main: Main.hs
     ghc-options:
     - -O0
     - -threaded
     source-dirs: test
     dependencies:
-    - aoc
+    - advent-of-code
     - conduit
     - digits
     - tasty
