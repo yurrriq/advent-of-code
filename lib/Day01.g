@@ -31,7 +31,7 @@ end;;
 PartTwo := function( )
     local input, line, mass, sum;;
     sum := 0;
-    input := InputTextFile ( "./input/day01.txt" );
+    input := InputTextFile ( "./input/2019/day01.txt" );
     line := ReadLine( input );
     repeat
         mass := Int( Chomp( line ) );
