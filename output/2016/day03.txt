@@ -1,0 +1,2 @@
+Day 3: Part One ==> 862
+Day 3: Part Two ==> 1577

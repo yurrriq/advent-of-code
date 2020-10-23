@@ -1,0 +1,27 @@
+package advent
+
+opts       = "--total -X ElabReflection"
+pkgs       = contrib
+           , effects
+           , lightyear
+sourcedir  = src
+modules    = Data.Ix
+           , Data.Advent.Day01
+           , Data.Advent.Day02
+           , Data.Advent.Day03
+           , Data.Advent.Day04
+           -- NOTE: Day 5 is implemented in Haskell
+           , Data.Advent.Day06
+           , Data.Advent.Day07
+           , Data.Advent.Day08
+
+-- TODO: tests
+
+brief      = "Solutions to the 2016 Advent of Code."
+readme     = README.md
+license    = MIT
+author     = Eric Bailey
+
+homepage   = https://github.com/yurrriq/advent-of-idiris
+sourceloc  = git://git@github.com:yurrriq/advent-of-idris.git
+bugtracker = https://github.com/yurrriq/advent-of-idris/issues
