@@ -15,6 +15,7 @@ data-files:
 - input/2019/day*.txt
 dependencies:
 - base
+- bytestring
 ghc-options:
 - -Wall
 - -Werror
@@ -27,10 +28,15 @@ library:
   - conduit
   - data-ordlist
   - digits
+  - dlist
+  - finite-typelits
+  - free-algebras
+  - groups
   - hashable
-  - mtl
+  - hashable
   - lens
   - linear
+  - mtl
   - transformers
   - trifecta
   - unordered-containers
@@ -42,6 +48,39 @@ _executable: &executable
   other-modules: []
   source-dirs: src
 executables:
+  aoc-2018-day01:
+    <<: *executable
+    main: day01/Main.hs
+    source-dirs: app
+    dependencies:
+    - advent-of-code
+    - hashable
+    - trifecta
+    - unordered-containers
+  aoc-2018-day02:
+    <<: *executable
+    main: day02/Main.hs
+    source-dirs: app
+    dependencies:
+    - advent-of-code
+  aoc-2018-day03:
+    <<: *executable
+    main: day03/Main.hs
+    source-dirs: app
+    dependencies:
+    - advent-of-code
+  aoc-2018-day04:
+    <<: *executable
+    main: day04/Main.hs
+    source-dirs: app
+    dependencies:
+    - advent-of-code
+  aoc-2018-day05:
+    <<: *executable
+    main: day04/Main.hs
+    source-dirs: app
+    dependencies:
+    - advent-of-code
   aoc-2019-day06:
     <<: *executable
     main: AdventOfCode.Year2019.Day06

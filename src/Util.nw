@@ -1,0 +1,157 @@
+\chapter{Common Utilities}
+
+\section{Language extensions}
+
+\hs{LambdaCase}\todor{Add link re: LambdaCase} is one of my favorite extensions.
+
+<<Util.hs>>=
+{-# LANGUAGE LambdaCase #-}
+@
+
+\section{Module outline}\todoo{Consider some prose here}
+
+<<Util.hs>>=
+module Util
+  ( Frequencies, frequencies
+  , maybeParseByteString
+  , commonElems
+  , findFirstDup
+  , hammingDistance, hammingSimilar
+  , scan
+  ) where
+
+<<Import functions, operators, and types from other modules.>>
+
+<<Computing frequencies>>
+
+<<Parsing puzzle input>>
+
+<<Manipulating lists>>
+@
+
+\section{Computing frequencies of elements in a list}
+
+\todor{Describe the Frequencies type alias}
+
+<<Computing frequencies>>=
+type Frequencies a = HM.HashMap a Integer
+@ %def Frequencies
+
+Define a function \hs{frequencies} to compute the \hs{Frequencies} of elements
+in a given list.
+
+<<Computing frequencies>>=
+frequencies :: (Eq a, Hashable a) => [a] -> Frequencies a
+@
+
+Starting with the empty map, perform a right-associative fold of the list, using
+the binary operator \hs{go}.
+
+<<Computing frequencies>>=
+frequencies = foldr go HM.empty
+  where
+    go :: (Eq a, Hashable a) => a -> Frequencies a -> Frequencies a
+@
+
+Given a key \hs{k} and map of known frequencies, increment the associated
+frequency count by \hs{1}, or set it to \hs{1} if no such mapping exists.
+
+<<Computing frequencies>>=
+    go k = HM.insertWith (+) k 1
+@
+
+\section{Parsing puzzle input}
+
+\todor{Describe the general parsing strategy}
+
+<<Parsing puzzle input>>=
+maybeParseByteString :: Parser a -> ByteString -> Maybe a
+maybeParseByteString p = parseByteString p mempty >>> \case
+  Failure _   -> Nothing
+  Success res -> Just res
+@ %def maybeParseByteString
+
+
+\section{Manipulating lists}
+
+\todor{Describe commonElems}
+<<Manipulating lists>>=
+commonElems :: (Eq a) => [a] -> [a] -> Maybe [a]
+commonElems (x:xs) (y:ys) | x == y    = Just [x] <> recur
+                          | otherwise = recur
+  where recur = commonElems xs ys
+commonElems _ _                       = Nothing
+@ %def commonElems
+
+\todor{Describe hammingDistance, incl. design choices}
+<<Manipulating lists>>=
+hammingDistance :: Eq a => [a] -> [a] -> Maybe Integer
+hammingDistance (x:xs) (y:ys) | x /= y    = (+1) <$> recur
+                              | otherwise = recur
+  where recur = hammingDistance xs ys
+hammingDistance [] []                     = Just 0
+hammingDistance _ _                       = Nothing
+@ %def hammingDistance
+
+\todor{Describe hammingSimilar}
+<<Manipulating lists>>=
+hammingSimilar :: Eq a => Integer -> [a] -> [a] -> Bool
+hammingSimilar n xs = maybe False (<= n) . hammingDistance xs
+@ %def hammingSimilar
+
+Define a function to find the first duplicated element of a list, if such an
+element exists.
+
+<<Manipulating lists>>=
+findFirstDup :: (Eq a, Hashable a) => [a] -> Maybe a
+@ %def findFirstDup
+
+Recurse over the list until either the end or a duplicate is found.
+
+<<Manipulating lists>>=
+findFirstDup = go HS.empty
+  where
+@
+
+If the list is empty, we've found \hs{Nothing}.
+
+<<Manipulating lists>>=
+    go _ []        = Nothing
+@
+
+If we've seen \hs{x} before, we've \hs{Just} found a duplicate.
+
+<<Manipulating lists>>=
+    go seen (x:xs) | x `HS.member` seen = Just x
+@
+
+Otherwise, insert \hs{x} into the set of elements we've \hs{seen} and carry on
+searching the rest of the list.
+
+<<Manipulating lists>>=
+                   | otherwise          = go (HS.insert x seen) xs
+@
+
+Compute a list of successive reduced values, using the monodial operation, from
+the left, starting with the monoidal idendity.
+
+\[
+  (b_{k})_{k=0}^{\length{a}},\ b_{0} = e\ \text{and}\ b_{k+1} = b_{k} a_{k}
+\]
+\todoo{Improve this. Consider group theory notation.}
+
+<<Manipulating lists>>=
+scan :: Monoid m => [m] -> [m]
+scan = scanl mappend mempty
+@ %def scan
+
+\section{Imports}
+
+<<Import functions, operators, and types from other modules.>>=
+import           Control.Category    ((>>>))
+import           Data.ByteString     (ByteString)
+import           Data.Hashable       (Hashable (..))
+import qualified Data.HashMap.Strict as HM
+import qualified Data.HashSet        as HS
+import           Text.Trifecta       (Parser, Result (..), parseByteString)
+@

@@ -1,4 +1,5 @@
-/default.nix linguist-generated
+/_src/tex/allcode.tex linguist-generated
 /nix/sources.json linguist-generated
 /nix/sources.nix linguist-generated
-/_src/tex/allcode.tex linguist-generated
+/src/Data/Group/Frees.hs linguist-vendored=true
+/src/noweb.sty linguist-vendored=true
