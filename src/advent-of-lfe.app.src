@@ -1,0 +1,15 @@
+{application, 'advent-of-lfe',
+ [{description, "My LFE solutions to the Advent of Code problems."},
+  {vsn, "0.1.0"},
+  {registered, []},
+  {mod, {}},
+  {applications, [kernel, stdlib]},
+  {env,
+   [{'source-uri',
+     "https://github.com/yurrriq/advent-of-lfe/blob/master/{filepath}#L{line}"}]},
+  {modules, []},
+
+  {contributors, []},
+  {licenses, []},
+  {links, []}
+ ]}.
