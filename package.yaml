@@ -12,6 +12,7 @@ extra-source-files:
 - README.md
 - VERSION
 data-files:
+- input/2015/day*.txt
 - input/2019/day*.txt
 dependencies:
 - base
@@ -48,6 +49,19 @@ _executable: &executable
   other-modules: []
   source-dirs: src
 executables:
+  aoc-2015-day06:
+    <<: *executable
+    main: AdventOfCode.Year2015.Day06
+    other-modules:
+    - AdventOfCode.Util
+    - AdventOfCode.Year2015.Day06.Parsers
+    - AdventOfCode.Year2015.Day06.Types
+    - Paths_advent_of_code
+    dependencies:
+    - containers
+    - linear
+    - trifecta
+    - transformers
   aoc-2018-day01:
     <<: *executable
     main: day01/Main.hs
