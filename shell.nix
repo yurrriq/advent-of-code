@@ -19,6 +19,7 @@ pkgs.mkShell {
       )
       nixpkgs-fmt
       noweb
+      picat
       python36
       which
       xelatex-noweb
