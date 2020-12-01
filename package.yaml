@@ -113,6 +113,15 @@ executables:
     dependencies:
     - trifecta
     - unordered-containers
+  aoc-2020-day01:
+    <<: *executable
+    main: AdventOfCode.Year2020.Day01
+    other-modules:
+    - AdventOfCode.Util
+    - Paths_advent_of_code
+    dependencies:
+    - trifecta
+    - unordered-containers
 tests:
   advent-of-code-test:
     main: Main.hs
