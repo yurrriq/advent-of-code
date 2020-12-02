@@ -6,8 +6,11 @@ module AdventOfCode.Year2020.Day01
 where
 
 import AdventOfCode.Util (parseInput)
-import Data.List (tails)
+import Data.Group (Group, invert)
+import Data.List (find)
+import Data.Maybe (mapMaybe)
 import Data.Maybe (listToMaybe)
+import Data.Monoid (Sum (..), getSum)
 import Text.Trifecta (Parser, natural, some)
 
 main :: IO ()
@@ -20,25 +23,17 @@ main =
     print $ partTwo entries
 
 partOne :: [Int] -> Maybe Int
-partOne entries =
-  product
-    <$> listToMaybe
-      [ [x, y]
-        | (x : ys) <- tails entries,
-          y <- ys,
-          x + y == 2020
-      ]
+partOne = fmap (getSum . product) . knapsack 2 2020 . map Sum
 
 partTwo :: [Int] -> Maybe Int
-partTwo entries =
-  product
-    <$> listToMaybe
-      [ [x, y, z]
-        | (x : ys) <- tails entries,
-          (y : zs) <- tails ys,
-          z <- zs,
-          x + y + z == 2020
-      ]
+partTwo = fmap (getSum . product) . knapsack 3 2020 . map Sum
+
+knapsack :: (Eq a, Ord a, Group a) => Int -> a -> [a] -> Maybe [a]
+knapsack 0 _ _ = Nothing
+knapsack 1 goal xs = pure <$> find (== goal) xs
+knapsack n goal xs =
+  listToMaybe . flip mapMaybe xs $ \x ->
+    (x :) <$> knapsack (pred n) (goal <> invert x) (filter (> x) xs)
 
 posInt :: Parser Int
 posInt = fromInteger <$> natural

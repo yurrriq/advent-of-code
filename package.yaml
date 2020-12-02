@@ -120,6 +120,7 @@ executables:
     - AdventOfCode.Util
     - Paths_advent_of_code
     dependencies:
+    - groups
     - trifecta
     - unordered-containers
   aoc-2020-day02:
