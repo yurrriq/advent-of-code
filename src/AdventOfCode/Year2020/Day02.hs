@@ -10,6 +10,8 @@ import Control.Monad (void)
 import Data.Ix (inRange)
 import Text.Trifecta (Parser, char, lower, natural, newline, sepEndBy, some, symbol)
 
+infixr 2 `xor`
+
 data PasswordPolicy
   = PP (Int, Int) Char
   deriving (Eq, Show)
@@ -17,32 +19,40 @@ data PasswordPolicy
 main :: IO ()
 main =
   do
-    validations <- parseInput (((,) <$> passwordPolicy <*> some lower) `sepEndBy` newline) "input/2020/day02.txt"
+    validations <- parseInput (passwordValidation `sepEndBy` newline) "input/2020/day02.txt"
     putStr "Part One: "
     print $ partOne validations
     putStr "Part Two: "
     print $ partTwo validations
 
 partOne :: [(PasswordPolicy, String)] -> Int
-partOne = length . filter (uncurry isValid)
+partOne = count (uncurry isValid)
   where
     isValid (PP allowedOccurrences letter) password =
-      inRange allowedOccurrences (length (filter (== letter) password))
+      inRange allowedOccurrences (count (== letter) password)
 
 partTwo :: [(PasswordPolicy, String)] -> Int
-partTwo = length . filter (uncurry isValid)
+partTwo = count (uncurry isValid)
   where
     isValid (PP (n, m) letter) password =
-      (password !! pred n == letter)
-        `xor` (password !! pred m == letter)
-    xor p q = (p || q) && not (p && q)
+      password !! pred n == letter `xor` password !! pred m == letter
+
+passwordValidation :: Parser (PasswordPolicy, String)
+passwordValidation = (,) <$> passwordPolicy <*> some lower
 
 passwordPolicy :: Parser PasswordPolicy
 passwordPolicy =
   do
-    minOccurrences <- fromInteger <$> natural
-    void $ char '-'
-    maxOccurrences <- fromInteger <$> natural
+    range <- (,) <$> (posInt <* char '-') <*> posInt
     letter <- lower
     void $ symbol ":"
-    pure (PP (minOccurrences, maxOccurrences) letter)
+    pure (PP range letter)
+
+posInt :: Parser Int
+posInt = fromInteger <$> natural
+
+count :: (a -> Bool) -> [a] -> Int
+count p = length . filter p
+
+xor :: Bool -> Bool -> Bool
+xor p q = (p || q) && not (p && q)
