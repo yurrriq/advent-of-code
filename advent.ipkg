@@ -18,7 +18,7 @@ modules    = Data.Ix
 -- TODO: tests
 
 brief      = "Solutions to the 2016 Advent of Code."
-readme     = README.md
+-- readme     = README.md
 license    = MIT
 author     = Eric Bailey
 

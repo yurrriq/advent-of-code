@@ -7,9 +7,7 @@ license-file: LICENSE
 license: MIT
 github: yurrriq/advent-of-code
 extra-source-files:
-- CHANGELOG.md
 - LICENSE
-- README.md
 - VERSION
 data-files:
 - input/*/day*.txt
