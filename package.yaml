@@ -72,6 +72,10 @@ executables:
     - containers
     - linear
     - transformers
+  aoc-2015-day10:
+    <<: *executable
+    main: AdventOfCode.Year2015.Day10
+    other-modules: []
   aoc-2016-day05:
     <<: *executable
     main: AdventOfCode.Year2016.Day05
