@@ -18,6 +18,7 @@ pkgs.mkShell {
           )
       )
       nixpkgs-fmt
+      niv
       noweb
       picat
       python36
@@ -30,7 +31,7 @@ pkgs.mkShell {
         pointfree
       ]
     ) ++ (
-      with python36Packages;
+      with python3Packages;
       [
         pre-commit
         pygments
