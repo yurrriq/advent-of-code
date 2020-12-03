@@ -158,6 +158,26 @@ executables:
   aoc-2020-day02:
     <<: *executable
     main: AdventOfCode.Year2020.Day02
+  aoc-2020-day03:
+    <<: *executable
+    main: AdventOfCode.Year2020.Day03
+    dependencies:
+    - vector
+_benchmark: &benchmark
+  ghc-options:
+  - -threaded
+  - -rtsopts
+  - -with-rtsopts=-N
+  - -O2
+  source-dirs: bench
+  dependencies:
+    - advent-of-code
+    - criterion
+benchmarks:
+  aoc-2020-day03-bench:
+    <<: *benchmark
+    main: Bench.hs
+    source-dirs: bench/AdventOfCode/Year2020/Day03
 tests:
   advent-of-code-test:
     main: Main.hs
