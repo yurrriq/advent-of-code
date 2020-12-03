@@ -1,27 +1,20 @@
-module Day04
-  ( partOne,
+module AdventOfCode.Year2018.Day04
+  ( main,
+    partOne,
     partTwo,
   )
 where
 
+import AdventOfCode.Input (parseInput)
+import AdventOfCode.TH (inputFilePath)
+import AdventOfCode.Util (frequencies)
 import Control.Applicative ((<|>))
 import Control.Arrow (first)
-import Data.ByteString (ByteString)
 import qualified Data.HashMap.Strict as HM
 import Data.Hashable (Hashable (..))
 import Data.List (maximumBy, sort)
 import Data.Ord (comparing)
-import Text.Trifecta
-  ( (<?>),
-    Parser,
-    brackets,
-    char,
-    colon,
-    many,
-    natural,
-    symbol,
-  )
-import Util (frequencies, maybeParseByteString)
+import Text.Trifecta ((<?>), Parser, brackets, char, colon, many, natural, symbol)
 
 -- ------------------------------------------------------------------- [ Types ]
 
@@ -143,14 +136,22 @@ mostConsistentSleeper =
 
 -- ------------------------------------------------------------------- [ Parts ]
 
-partOne :: ByteString -> Maybe Integer
-partOne bstr =
-  case sleepiestGuard =<< maybeParseByteString (many entry) bstr of
+partOne :: [Entry] -> Maybe Integer
+partOne entries =
+  case sleepiestGuard entries of
     Just (_, (Guard gid, naps)) -> Just (gid * (fst (sleepiestMinute naps)))
     _ -> Nothing
 
-partTwo :: ByteString -> Maybe Integer
-partTwo bstr =
-  case mostConsistentSleeper =<< maybeParseByteString (many entry) bstr of
+partTwo :: [Entry] -> Maybe Integer
+partTwo entries =
+  case mostConsistentSleeper entries of
     Just ((Guard gid, minute), _) -> Just (gid * minute)
     _ -> Nothing
+
+main :: IO ()
+main = do
+  input <- parseInput (many entry) $(inputFilePath)
+  putStr "Part One: "
+  putStrLn $ maybe "failed!" show (partOne input)
+  putStr "Part Two: "
+  putStrLn $ maybe "failed!" show (partTwo input)

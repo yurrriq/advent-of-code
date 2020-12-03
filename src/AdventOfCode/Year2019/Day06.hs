@@ -1,6 +1,7 @@
 module AdventOfCode.Year2019.Day06 where
 
-import AdventOfCode.Util (parseInput)
+import AdventOfCode.Input (parseInput)
+import AdventOfCode.TH (inputFilePath)
 import Control.Monad (void)
 import Data.HashMap.Strict ((!))
 import qualified Data.HashMap.Strict as HM
@@ -54,27 +55,24 @@ minimumOrbitalTransfers from to iorbs =
         + (length (takeWhile (not . flip elem tos) froms))
         + (length (takeWhile (not . flip elem froms) tos))
 
-partOne :: IO Int
-partOne =
-  do
-    orbs <- parseInput orbits "input/2019/day06.txt"
-    let dorbs = directOrbits orbs
-    let iorbs = indirectOrbits dorbs
-    pure $ HM.size dorbs + sum (HM.map length iorbs)
+partOne :: [Orbit] -> Int
+partOne orbs = HM.size dorbs + sum (HM.map length iorbs)
+  where
+    dorbs = directOrbits orbs
+    iorbs = indirectOrbits dorbs
 
-partTwo :: IO Int
-partTwo =
-  do
-    orbs <- parseInput orbits "input/2019/day06.txt"
-    let dorbs = directOrbits orbs
-    let iorbs = indirectOrbits dorbs
-    pure $ minimumOrbitalTransfers "YOU" "SAN" iorbs
+partTwo :: [Orbit] -> Int
+partTwo orbs = minimumOrbitalTransfers "YOU" "SAN" iorbs
+  where
+    dorbs = directOrbits orbs
+    iorbs = indirectOrbits dorbs
 
 main :: IO ()
 main =
   do
     putStrLn "[2019] Day 6: Universal Orbit Map"
+    input <- parseInput orbits $(inputFilePath)
     putStr "Part One: "
-    print =<< partOne
+    print (partOne input)
     putStr "Part Two: "
-    print =<< partTwo
+    print (partTwo input)

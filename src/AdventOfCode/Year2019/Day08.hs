@@ -5,7 +5,8 @@ module AdventOfCode.Year2019.Day08
   )
 where
 
-import AdventOfCode.Util (parseInput)
+import AdventOfCode.Input (parseInput)
+import AdventOfCode.TH (inputFilePath)
 import Control.Applicative ((<|>))
 import Data.Function (on)
 import Data.List (sortBy)
@@ -32,30 +33,23 @@ main :: IO ()
 main =
   do
     putStrLn "[2019] Day 8: Space Image Format"
+    layers <- parseInput (image 25 6) $(inputFilePath)
     putStr "Part One: "
-    print =<< partOne
+    print (partOne layers)
     putStrLn "Part Two: "
-    putStrLn =<< partTwo
+    putStrLn (partTwo layers)
 
-partOne :: IO Int
-partOne =
-  do
-    layers <- parseInput (image 25 6) "input/2019/day08.txt"
-    let layer = head $ sortBy (compare `on` numberOf Black) layers
-    let ones = numberOf White layer
-    let twos = numberOf Transparent layer
-    pure $ ones * twos
+partOne :: Image -> Int
+partOne layers = numberOf White layer * numberOf Transparent layer
   where
+    layer = head $ sortBy (compare `on` numberOf Black) layers
     numberOf :: Eq a => a -> [[a]] -> Int
     numberOf x = sum . fmap (length . filter (== x))
 
-partTwo :: IO String
-partTwo =
-  do
-    layers <- parseInput (image 25 6) "input/2019/day08.txt"
-    pure
-      $ unlines . map (concatMap show)
-      $ foldl decodeLayer (transparentLayer 25 6) layers
+partTwo :: Image -> String
+partTwo layers =
+  unlines . map (concatMap show) $
+    foldl decodeLayer (transparentLayer 25 6) layers
   where
     decodeLayer :: Layer -> Layer -> Layer
     decodeLayer = zipWith (zipWith decodePixel)

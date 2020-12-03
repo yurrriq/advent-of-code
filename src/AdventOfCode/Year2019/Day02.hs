@@ -1,45 +1,37 @@
 module AdventOfCode.Year2019.Day02 where
 
+import AdventOfCode.Input (parseInput)
+import AdventOfCode.TH (inputFilePath)
 import Control.Arrow ((>>>), first)
 import Data.List (find)
 import Data.Vector ((!), Vector, fromList, modify, toList)
 import qualified Data.Vector as V
 import Data.Vector.Mutable (write)
 import qualified Data.Vector.Mutable as MV
-import Text.Trifecta
-  ( Parser,
-    Result (..),
-    comma,
-    natural,
-    parseFromFile,
-    parseString,
-    sepBy,
-  )
+import Text.Trifecta (Parser, Result (..), comma, natural, parseString, sepBy)
 
 program :: Parser (Vector Int)
 program = fromList . map fromInteger <$> (natural `sepBy` comma)
 
-partOne :: IO Int
-partOne =
+main :: IO ()
+main =
   do
-    res <- parseFromFile program "../../../input/2019/day02.txt"
-    case res of
-      Nothing -> error "No parse"
-      Just state -> pure (V.head (runProgram (restoreGravityAssist state)))
+    state <- parseInput program $(inputFilePath)
+    putStr "Part One: "
+    print $ partOne state
+    putStr "Part Two: "
+    print $ partTwo state
 
-partTwo :: IO Int
-partTwo =
-  do
-    res <- parseFromFile program "../../../input/2019/day02.txt"
-    case res of
-      Nothing -> error "No parse"
-      Just state ->
-        do
-          let n = V.length state - 1
-          pure . maybe (error "Fail") (first (* 100) >>> uncurry (+)) $
-            find (go state) (concatMap (zip [0 .. n] . repeat) [0 .. n])
+partOne :: Vector Int -> Int
+partOne state = V.head (runProgram (restoreGravityAssist state))
+
+partTwo :: Vector Int -> Int
+partTwo state =
+  maybe (error "Fail") (first (* 100) >>> uncurry (+)) $
+    find go (concatMap (zip [0 .. n] . repeat) [0 .. n])
   where
-    go state (noun, verb) =
+    n = V.length state - 1
+    go (noun, verb) =
       19690720 == V.head (runProgram (restoreGravityAssist' noun verb state))
 
 restoreGravityAssist :: Vector Int -> Vector Int

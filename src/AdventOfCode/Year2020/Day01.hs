@@ -5,7 +5,8 @@ module AdventOfCode.Year2020.Day01
   )
 where
 
-import AdventOfCode.Util (parseInput)
+import AdventOfCode.Input (parseInput)
+import AdventOfCode.TH (inputFilePath)
 import Data.Group (Group, invert)
 import Data.List (find)
 import Data.Maybe (mapMaybe)
@@ -16,7 +17,7 @@ import Text.Trifecta (Parser, natural, some)
 main :: IO ()
 main =
   do
-    entries <- parseInput (some posInt) "input/2020/day01.txt"
+    entries <- parseInput (some posInt) $(inputFilePath)
     putStr "Part One: "
     print $ partOne entries
     putStr "Part Two: "

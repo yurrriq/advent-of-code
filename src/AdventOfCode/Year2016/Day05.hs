@@ -1,9 +1,11 @@
-module Data.Advent.Day05
-  ( partOne,
+module AdventOfCode.Year2016.Day05
+  ( main,
+    partOne,
     partTwo,
   )
 where
 
+import AdventOfCode.TH (inputFilePath)
 import Crypto.Hash (Digest, MD5, hash)
 import Data.ByteString (ByteString)
 import Data.ByteString.Char8 (pack)
@@ -12,6 +14,14 @@ import qualified Data.Map.Lazy as Map
 import Data.Monoid ((<>))
 
 type Password = Map.Map Char Char
+
+main :: IO ()
+main = do
+  doorID <- head . words <$> readFile $(inputFilePath)
+  putStr "Part One: "
+  putStrLn (partOne doorID)
+  putStr "Part Two: "
+  putStrLn (partTwo doorID)
 
 partOne :: String -> String
 partOne doorID =

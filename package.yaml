@@ -12,11 +12,17 @@ extra-source-files:
 - README.md
 - VERSION
 data-files:
-- input/2015/day*.txt
-- input/2019/day*.txt
+- input/*/day*.txt
 dependencies:
 - base
 - bytestring
+- hashable
+- unordered-containers
+- split
+- template-haskell
+- trifecta
+default-extensions:
+- TemplateHaskell
 ghc-options:
 - -Wall
 - -Werror
@@ -27,6 +33,8 @@ library:
   dependencies:
   - composition
   - conduit
+  - containers
+  - cryptonite
   - data-ordlist
   - digits
   - dlist
@@ -39,20 +47,25 @@ library:
   - linear
   - mtl
   - transformers
-  - trifecta
   - unordered-containers
   - vector
 _executable: &executable
   ghc-options:
   - -O0
   - -threaded
-  other-modules: []
+  other-modules:
+  - AdventOfCode.Input
+  - AdventOfCode.TH
+  - AdventOfCode.Util
+  - Paths_advent_of_code
   source-dirs: src
 executables:
   aoc-2015-day06:
     <<: *executable
     main: AdventOfCode.Year2015.Day06
     other-modules:
+    - AdventOfCode.Input
+    - AdventOfCode.TH
     - AdventOfCode.Util
     - AdventOfCode.Year2015.Day06.Parsers
     - AdventOfCode.Year2015.Day06.Types
@@ -60,78 +73,93 @@ executables:
     dependencies:
     - containers
     - linear
-    - trifecta
     - transformers
+  aoc-2016-day05:
+    <<: *executable
+    main: AdventOfCode.Year2016.Day05
+    dependencies:
+    - containers
+    - cryptonite
   aoc-2018-day01:
     <<: *executable
-    main: day01/Main.hs
-    source-dirs: app
-    dependencies:
-    - advent-of-code
-    - hashable
-    - trifecta
-    - unordered-containers
+    main: AdventOfCode.Year2018.Day01
   aoc-2018-day02:
     <<: *executable
-    main: day02/Main.hs
-    source-dirs: app
-    dependencies:
-    - advent-of-code
+    main: AdventOfCode.Year2018.Day02
   aoc-2018-day03:
     <<: *executable
-    main: day03/Main.hs
-    source-dirs: app
-    dependencies:
-    - advent-of-code
+    main: AdventOfCode.Year2018.Day03
   aoc-2018-day04:
     <<: *executable
-    main: day04/Main.hs
-    source-dirs: app
-    dependencies:
-    - advent-of-code
+    main: AdventOfCode.Year2018.Day04
   aoc-2018-day05:
     <<: *executable
-    main: day04/Main.hs
-    source-dirs: app
+    main: AdventOfCode.Year2018.Day05
     dependencies:
-    - advent-of-code
+    - finite-typelits
+    - free-algebras
+    - groups
+  aoc-2019-day02:
+    <<: *executable
+    main: AdventOfCode.Year2019.Day02
+    dependencies:
+    - vector
+  aoc-2019-day03:
+    <<: *executable
+    main: AdventOfCode.Year2019.Day03
+  aoc-2019-day04:
+    <<: *executable
+    main: AdventOfCode.Year2019.Day04
+    dependencies:
+    - data-ordlist
+    - digits
+  aoc-2019-day05:
+    <<: *executable
+    main: AdventOfCode.Year2019.Day05
+    dependencies:
+    - digits
+    - mtl
+    - vector
   aoc-2019-day06:
     <<: *executable
     main: AdventOfCode.Year2019.Day06
-    other-modules:
-    - AdventOfCode.Util
-    - Paths_advent_of_code
+  aoc-2019-day07:
+    <<: *executable
+    main: AdventOfCode.Year2019.Day07
     dependencies:
-    - trifecta
-    - unordered-containers
+    - conduit
+    - digits
+    - mtl
+    - transformers
+    - vector
   aoc-2019-day08:
     <<: *executable
     main: AdventOfCode.Year2019.Day08
-    other-modules:
-    - AdventOfCode.Util
-    - Paths_advent_of_code
+  aoc-2019-day09:
+    <<: *executable
+    main: AdventOfCode.Year2019.Day09
     dependencies:
-    - trifecta
-    - unordered-containers
+    - conduit
+    - digits
+    - mtl
+    - transformers
+    - vector
+  aoc-2019-day10:
+    <<: *executable
+    main: AdventOfCode.Year2019.Day10
+  aoc-2019-day12:
+    <<: *executable
+    main: AdventOfCode.Year2019.Day12
+    dependencies:
+    - linear
   aoc-2020-day01:
     <<: *executable
     main: AdventOfCode.Year2020.Day01
-    other-modules:
-    - AdventOfCode.Util
-    - Paths_advent_of_code
     dependencies:
     - groups
-    - trifecta
-    - unordered-containers
   aoc-2020-day02:
     <<: *executable
     main: AdventOfCode.Year2020.Day02
-    other-modules:
-    - AdventOfCode.Util
-    - Paths_advent_of_code
-    dependencies:
-    - trifecta
-    - unordered-containers
 tests:
   advent-of-code-test:
     main: Main.hs

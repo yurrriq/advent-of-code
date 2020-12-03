@@ -1,19 +1,36 @@
-module AdventOfCode.Year2019.Day12 where
+module AdventOfCode.Year2019.Day12
+  ( main,
+    getInput,
+    partOne,
+    partTwo,
+  )
+where
 
-import AdventOfCode.Util (parseInput)
+import AdventOfCode.Input (parseInput)
+import AdventOfCode.TH (inputFilePath)
 import Control.Arrow ((&&&), (>>>), second)
 import Data.Function (on)
 import Linear.V3 (V3 (..))
 import Text.Trifecta (Parser, angles, between, integer, some, string)
 
-partOne :: IO Int
-partOne = sum . fmap totalEnergy . (!! 1000) . iterate step <$> parseMoons
+main :: IO ()
+main =
+  do
+    putStrLn "[2019] Day 12: The N-Body Problem"
+    input <- getInput
+    putStr "Part One: "
+    print (partOne input)
+    putStr "Part Two: "
+    print (partTwo input)
 
-partTwo :: IO Int
-partTwo = foldr lcm 1 . fmap period . traverse transpose <$> parseMoons
+getInput :: IO [Pair]
+getInput = fmap mkPair <$> parseInput (some dimensions) $(inputFilePath)
 
-parseMoons :: IO [Pair]
-parseMoons = fmap mkPair <$> parseInput (some dimensions) "input/2019/day12.txt"
+partOne :: [Pair] -> Int
+partOne = sum . fmap totalEnergy . (!! 1000) . iterate step
+
+partTwo :: [Pair] -> Int
+partTwo = foldr lcm 1 . fmap period . traverse transpose
 
 type Pair = (Dimensions, Dimensions)
 

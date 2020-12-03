@@ -5,7 +5,8 @@ module AdventOfCode.Year2020.Day02
   )
 where
 
-import AdventOfCode.Util (parseInput)
+import AdventOfCode.Input (parseInput)
+import AdventOfCode.TH (inputFilePath)
 import Control.Monad (void)
 import Data.Ix (inRange)
 import Text.Trifecta (Parser, char, lower, natural, newline, sepEndBy, some, symbol)
@@ -19,7 +20,7 @@ data PasswordPolicy
 main :: IO ()
 main =
   do
-    validations <- parseInput (passwordValidation `sepEndBy` newline) "input/2020/day02.txt"
+    validations <- parseInput (passwordValidation `sepEndBy` newline) $(inputFilePath)
     putStr "Part One: "
     print $ partOne validations
     putStr "Part Two: "

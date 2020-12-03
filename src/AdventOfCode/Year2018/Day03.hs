@@ -1,26 +1,17 @@
-module Day03
-  ( partOne,
+module AdventOfCode.Year2018.Day03
+  ( main,
+    partOne,
     partTwo,
   )
 where
 
-import Data.ByteString (ByteString)
+import AdventOfCode.Input (parseInput)
+import AdventOfCode.TH (inputFilePath)
+import AdventOfCode.Util (Frequencies, frequencies)
 import qualified Data.HashMap.Strict as HM
 import Data.Hashable (Hashable (..))
 import Data.List (find)
-import Text.Trifecta
-  ( Parser,
-    Result (..),
-    comma,
-    digit,
-    many,
-    natural,
-    parseByteString,
-    some,
-    space,
-    symbol,
-  )
-import Util (Frequencies, frequencies)
+import Text.Trifecta (Parser, comma, digit, many, natural, some, space, symbol)
 
 -- ------------------------------------------------------------------  [ Types ]
 
@@ -87,22 +78,22 @@ squaresCovered (Claim _ (Point x0 y0) (Size w h)) =
 
 -- ------------------------------------------------------------------- [ Parts ]
 
-partOne :: ByteString -> Maybe Int
-partOne input =
-  case parseByteString (many claim) mempty input of
-    Failure _errDoc -> Nothing
-    Success claims ->
-      Just
-        . HM.size
-        . HM.filter (>= 2)
-        . frequencies
-        . concatMap squaresCovered
-        $ claims
+partOne :: [Claim] -> Int
+partOne =
+  HM.size
+    . HM.filter (>= 2)
+    . frequencies
+    . concatMap squaresCovered
 
-partTwo :: ByteString -> Maybe ClaimID
-partTwo input =
-  case parseByteString (many claim) mempty input of
-    Failure _errDoc -> Nothing
-    Success claims ->
-      let covered = frequencies (concatMap squaresCovered claims)
-       in _id <$> find (not . isClaimOverlapping covered) claims
+partTwo :: [Claim] -> Maybe ClaimID
+partTwo claims = _id <$> find (not . isClaimOverlapping covered) claims
+  where
+    covered = frequencies (concatMap squaresCovered claims)
+
+main :: IO ()
+main = do
+  input <- parseInput (many claim) $(inputFilePath)
+  putStr "Part One: "
+  print (partOne input)
+  putStr "Part Two: "
+  putStrLn $ maybe "failed!" id (partTwo input)

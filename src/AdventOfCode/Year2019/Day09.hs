@@ -7,6 +7,8 @@ module AdventOfCode.Year2019.Day09
   )
 where
 
+import AdventOfCode.Input (parseInput)
+import AdventOfCode.TH (inputFilePath)
 import Conduit
 import Control.Monad (liftM2, when)
 import Control.Monad.State (get, lift, put)
@@ -21,31 +23,21 @@ import Data.Vector
   )
 import qualified Data.Vector as V
 import qualified Data.Vector.Mutable as MV
-import System.Environment (getArgs)
-import Text.Trifecta
-  ( Parser,
-    comma,
-    integer,
-    parseFromFile,
-    sepBy,
-  )
+import Text.Trifecta (Parser, comma, integer, sepBy)
 
 -- -------------------------------------------------------------------- [ Main ]
 
 main :: IO ()
 main =
   do
+    input <- parseInput stack $(inputFilePath)
     putStr "Part One: "
-    partOne =<< getInputFilename
+    print =<< partOne input
 
 -- ------------------------------------------------------------------- [ Parts ]
 
-partOne :: FilePath -> IO ()
-partOne fname =
-  do
-    Just input <- parseFromFile stack fname
-    boost <- runConduit $ yield 1 .| evalStack input .| sinkList
-    print boost
+partOne :: Vector Int -> IO [Int]
+partOne input = runConduit $ yield 1 .| evalStack input .| sinkList
 
 -- ------------------------------------------------------------------- [ Types ]
 
@@ -260,15 +252,6 @@ mkValue 0 = PositionMode
 mkValue 1 = ImmediateMode
 mkValue 2 = RelativeMode
 mkValue _ = error "Invalid parameter mode"
-
-getInputFilename :: IO FilePath
-getInputFilename =
-  do
-    args <- getArgs
-    case args of
-      [fname] -> pure fname
-      [] -> error "Must specify input filename"
-      _ -> error "Too many args"
 
 await' :: Monad m => ConduitT i o m i
 await' = maybe (error "Missing input") pure =<< await

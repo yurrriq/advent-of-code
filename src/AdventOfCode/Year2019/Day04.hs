@@ -5,19 +5,25 @@ import Data.Digits (digits)
 import Data.List (group)
 import Data.List.Ordered (isSorted)
 
-input :: [[Int]]
-input = digits 10 <$> [236491 .. 713787]
+main :: IO ()
+main =
+  do
+    let input = digits 10 <$> [236491 .. 713787]
+    putStr "Part One: "
+    print $ partOne input
+    putStr "Part Two: "
+    print $ partTwo input
 
-partOne :: Int
-partOne = length $ filter isPossiblePassword input
+partOne :: [[Int]] -> Int
+partOne = length . filter isPossiblePassword
   where
     isPossiblePassword :: [Int] -> Bool
     isPossiblePassword = liftM2 (&&) isSorted hasDouble
     hasDouble :: Eq a => [a] -> Bool
     hasDouble = any ((>= 2) . length) . group
 
-partTwo :: Int
-partTwo = length $ filter isPossiblePassword input
+partTwo :: [[Int]] -> Int
+partTwo = length . filter isPossiblePassword
   where
     isPossiblePassword :: [Int] -> Bool
     isPossiblePassword = liftM2 (&&) isSorted hasDouble

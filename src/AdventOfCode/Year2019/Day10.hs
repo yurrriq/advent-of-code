@@ -2,7 +2,8 @@
 
 module AdventOfCode.Year2019.Day10 where
 
-import AdventOfCode.Util (parseInput)
+import AdventOfCode.Input (parseInput)
+import AdventOfCode.TH (inputFilePath)
 import Control.Applicative ((<|>))
 import Control.Monad (foldM)
 import Data.Foldable (minimumBy)
@@ -14,17 +15,28 @@ import Data.Ord (comparing)
 import GHC.Real (Ratio (..))
 import Text.Trifecta (Parser, char, newline, sepEndBy, some)
 
-partOne :: IO Int
-partOne = HM.size . snd . bestLocation <$> parseInput grid "input/2019/day10.txt"
-
-partTwo :: IO Int
-partTwo =
+main :: IO ()
+main =
   do
-    asteroidBelt <- parseInput grid "input/2019/day10.txt"
-    let (_from, visible) = bestLocation asteroidBelt
-    let angles = clockwise (HM.keys visible)
-    let (x, y) = vaporize visible angles !! 199
-    pure (x * 100 + y)
+    putStrLn "[2019] Day 10: Monitoring Station"
+    input <- getInput
+    putStr "Part One: "
+    print (partOne input)
+    putStr "Part Two: "
+    print (partTwo input)
+
+getInput :: IO Grid
+getInput = parseInput grid $(inputFilePath)
+
+partOne :: Grid -> Int
+partOne = HM.size . snd . bestLocation
+
+partTwo :: Grid -> Int
+partTwo asteroidBelt = (x * 100 + y)
+  where
+    (_from, visible) = bestLocation asteroidBelt
+    angles = clockwise (HM.keys visible)
+    (x, y) = vaporize visible angles !! 199
 
 data Grid
   = Grid (Int, Int) (HashMap Location (HashMap Angle (HashMap Location Distance)))

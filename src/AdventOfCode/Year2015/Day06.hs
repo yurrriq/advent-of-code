@@ -3,7 +3,8 @@
 
 module AdventOfCode.Year2015.Day06 where
 
-import AdventOfCode.Util (parseInput)
+import AdventOfCode.Input (parseInput)
+import AdventOfCode.TH (inputFilePath)
 import AdventOfCode.Year2015.Day06.Parsers
 import AdventOfCode.Year2015.Day06.Types
 import Control.Monad (forM_, mapM_)
@@ -17,7 +18,7 @@ import Text.Trifecta (some)
 main :: IO ()
 main =
   do
-    instructions <- parseInput (some instruction) "input/2015/day06.txt"
+    instructions <- parseInput (some instruction) $(inputFilePath)
     putStr "Part One: "
     print $ partOne instructions
     putStr "Part Two: "

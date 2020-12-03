@@ -1,5 +1,7 @@
 module AdventOfCode.Year2019.Day07 where
 
+import AdventOfCode.Input (parseInput)
+import AdventOfCode.TH (inputFilePath)
 import Control.Monad (liftM2, mapM, when)
 import Control.Monad.State (get, lift, put)
 import Control.Monad.Trans.State.Strict (StateT, execStateT)
@@ -7,37 +9,25 @@ import Data.Conduit
 import Data.Conduit.Lift (evalStateC)
 import Data.Digits (digitsRev)
 import Data.List (permutations)
-import Data.Vector
-  ( (!),
-    Vector,
-    fromList,
-    modify,
-  )
+import Data.Vector ((!), Vector, fromList, modify)
 import qualified Data.Vector as V
 import qualified Data.Vector.Mutable as MV
-import System.Environment (getArgs)
-import Text.Trifecta
-  ( Parser,
-    comma,
-    integer,
-    parseFromFile,
-    sepBy,
-  )
+import Text.Trifecta (Parser, comma, integer, sepBy)
 
 -- -------------------------------------------------------------------- [ Main ]
 
 main :: IO ()
 main =
   do
+    input <- parseInput stack $(inputFilePath)
     putStr "Part One: "
-    partOne =<< getInputFilename
+    partOne input
 
 -- ------------------------------------------------------------------- [ Parts ]
 
-partOne :: FilePath -> IO ()
-partOne fname =
+partOne :: Vector Int -> IO ()
+partOne prog =
   do
-    Just prog <- parseFromFile stack fname
     let ampses = prepareAmps prog <$> permutations [0 .. 4]
     results <- flip mapM ampses $ \[a, b, c, d, e] ->
       runConduit $
@@ -229,15 +219,6 @@ mkValue :: Int -> Int -> Value
 mkValue 0 = PositionMode
 mkValue 1 = ImmediateMode
 mkValue _ = error "Invalid parameter mode"
-
-getInputFilename :: IO FilePath
-getInputFilename =
-  do
-    args <- getArgs
-    case args of
-      [fname] -> pure fname
-      [] -> error "Must specify input filename"
-      _ -> error "Too many args"
 
 prepareAmps :: Stack -> [Int] -> [ConduitM Int Int IO ()]
 prepareAmps = zipWith ($) . repeat . flip prepareAmp

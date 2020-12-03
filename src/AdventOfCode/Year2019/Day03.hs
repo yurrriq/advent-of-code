@@ -1,5 +1,7 @@
 module AdventOfCode.Year2019.Day03 where
 
+import AdventOfCode.Input (parseInput)
+import AdventOfCode.TH (inputFilePath)
 import Control.Applicative ((<|>))
 import Control.Arrow ((&&&), second)
 import Control.Category ((>>>))
@@ -125,32 +127,31 @@ exampleThree =
     \ U98,R91,D20,R16,D67,R40,U7,R15,U6,R7"
 
 runExample :: String -> Result Int
-runExample = (partOne' <$>) . parseString wires mempty
+runExample = fmap partOne . parseString wires mempty
 
 -- ------------------------------------------------------------------- [ Parts ]
 
-partOne :: IO Int
+partOne :: ([Segment], [Segment]) -> Int
 partOne =
-  maybe (error "Fail") partOne'
-    <$> parseFromFile wires "../../../input/2019/day03.txt"
-
-partOne' :: ([Segment], [Segment]) -> Int
-partOne' =
   distance
     . minimumBy (compare `on` distance)
     . (uncurry (findCrossings `on` runSegments))
   where
     distance = manhattanDistance (Point 0 0)
 
-partTwo :: IO Int
-partTwo =
-  maybe (error "Fail") partTwo'
-    <$> parseFromFile wires "../../../input/2019/day03.txt"
-
-partTwo' :: ([Segment], [Segment]) -> Int
-partTwo' (xs, ys) =
+partTwo :: ([Segment], [Segment]) -> Int
+partTwo (xs, ys) =
   minimum
     $ HS.map (\p -> ((+) `on` (+ 1) . length . takeWhile (/= p)) xs' ys')
     $ findCrossings xs' ys'
   where
     (xs', ys') = (runSegments xs, runSegments ys)
+
+main :: IO ()
+main =
+  do
+    input <- parseInput wires $(inputFilePath)
+    putStr "Part One: "
+    print $ partOne input
+    putStr "Part Two: "
+    print $ partTwo input

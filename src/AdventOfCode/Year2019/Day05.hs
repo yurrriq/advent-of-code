@@ -5,6 +5,8 @@ module AdventOfCode.Year2019.Day05
   )
 where
 
+import AdventOfCode.Input (parseInput)
+import AdventOfCode.TH (inputFilePath)
 import Control.Monad (liftM2, when)
 import Control.Monad.IO.Class (liftIO)
 import Control.Monad.State (StateT, evalStateT, get, put)
@@ -12,33 +14,25 @@ import Data.Digits (digitsRev)
 import Data.Vector ((!), Vector, fromList, modify)
 import qualified Data.Vector as V
 import qualified Data.Vector.Mutable as MV
-import System.Environment (getArgs)
-import Text.Trifecta
-  ( Parser,
-    comma,
-    integer,
-    parseFromFile,
-    sepBy,
-  )
+import Text.Trifecta (Parser, comma, integer, sepBy)
 
 -- -------------------------------------------------------------------- [ Main ]
 
 main :: IO ()
 main =
   do
-    fname <- getInputFilename
+    input <- parseInput stack $(inputFilePath)
     putStr "Part One> "
-    partOne fname
+    partOne input
     putStr "Part Two> "
-    partTwo fname
+    partTwo input
 
 -- ------------------------------------------------------------------- [ Parts ]
 
-partOne :: FilePath -> IO ()
-partOne fname =
-  maybe (error "No parse") evalStack =<< parseFromFile stack fname
+partOne :: Vector Int -> IO ()
+partOne = evalStack
 
-partTwo :: FilePath -> IO ()
+partTwo :: Vector Int -> IO ()
 partTwo = partOne
 
 -- ------------------------------------------------------------------- [ Types ]
@@ -193,12 +187,3 @@ mkValue :: Int -> Int -> Value
 mkValue 0 = PositionMode
 mkValue 1 = ImmediateMode
 mkValue _ = error "Invalid parameter mode"
-
-getInputFilename :: IO FilePath
-getInputFilename =
-  do
-    args <- getArgs
-    case args of
-      [fname] -> pure fname
-      [] -> error "Must specify input filename"
-      _ -> error "Too many args"
