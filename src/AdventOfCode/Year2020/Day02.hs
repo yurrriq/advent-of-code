@@ -7,6 +7,7 @@ where
 
 import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (inputFilePath)
+import AdventOfCode.Util (count)
 import Control.Monad (void)
 import Data.Ix (inRange)
 import Text.Trifecta (Parser, char, lower, natural, newline, sepEndBy, some, symbol)
@@ -51,9 +52,6 @@ passwordPolicy =
 
 posInt :: Parser Int
 posInt = fromInteger <$> natural
-
-count :: (a -> Bool) -> [a] -> Int
-count p = length . filter p
 
 xor :: Bool -> Bool -> Bool
 xor p q = (p || q) && not (p && q)

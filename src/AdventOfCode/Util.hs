@@ -9,6 +9,7 @@ module AdventOfCode.Util
     hammingDistance,
     hammingSimilar,
     scan,
+    count,
   )
 where
 
@@ -62,3 +63,6 @@ findFirstDup = go HS.empty
 
 scan :: Monoid m => [m] -> [m]
 scan = scanl mappend mempty
+
+count :: (a -> Bool) -> [a] -> Int
+count p = length . filter p
