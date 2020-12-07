@@ -1,14 +1,14 @@
 module AdventOfCode.Year2019.Day04 where
 
 import Control.Monad (liftM2)
-import Data.Digits (digits)
+import Data.FastDigits (digits)
 import Data.List (group)
 import Data.List.Ordered (isSorted)
 
 main :: IO ()
 main =
   do
-    let input = digits 10 <$> [236491 .. 713787]
+    let input = reverse . digits 10 <$> [236491 .. 713787]
     putStr "Part One: "
     print $ partOne input
     putStr "Part Two: "

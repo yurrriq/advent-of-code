@@ -4,7 +4,6 @@ module Test.AdventOfCode.Year2019.Day09 where
 
 import AdventOfCode.Year2019.Day09 (await', evalStack)
 import Conduit
-import Data.Digits (digits)
 import Data.Vector ((!), fromList)
 import Test.Tasty
 import Test.Tasty.HUnit
@@ -22,7 +21,7 @@ test_day09_examples =
         do
           let input = [1102, 34915192, 34915192, 7, 4, 7, 99, 0]
           output <- runConduit $ pure () .| evalStack input .| await'
-          length (digits 10 output) @?= 16,
+          length (show output) @?= 16,
       testCase "should output the large number in the middle" $
         do
           let input = [104, 1125899906842624, 99]

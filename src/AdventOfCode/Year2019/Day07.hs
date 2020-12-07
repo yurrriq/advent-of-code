@@ -7,7 +7,7 @@ import Control.Monad.State (get, lift, put)
 import Control.Monad.Trans.State.Strict (StateT, execStateT)
 import Data.Conduit
 import Data.Conduit.Lift (evalStateC)
-import Data.Digits (digitsRev)
+import Data.FastDigits (digits)
 import Data.List (permutations)
 import Data.Vector ((!), Vector, fromList, modify)
 import qualified Data.Vector as V
@@ -213,7 +213,7 @@ initialState :: ProgramState
 initialState = ProgramState {_stack = V.empty, _pointer = 0, _debug = False}
 
 normalizeOpCode :: Int -> [Int]
-normalizeOpCode ds = take 4 $ digitsRev 10 ds ++ repeat 0
+normalizeOpCode d = take 4 $ digits 10 (fromIntegral d) ++ repeat 0
 
 mkValue :: Int -> Int -> Value
 mkValue 0 = PositionMode

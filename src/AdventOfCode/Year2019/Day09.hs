@@ -14,7 +14,7 @@ import Control.Monad (liftM2, when)
 import Control.Monad.State (get, lift, put)
 import Control.Monad.Trans.State.Strict (StateT, execStateT)
 import Data.Conduit.Lift (evalStateC)
-import Data.Digits (digitsRev)
+import Data.FastDigits (digits)
 import Data.Vector
   ( (!),
     Vector,
@@ -245,7 +245,7 @@ initialState =
     }
 
 normalizeOpCode :: Int -> [Int]
-normalizeOpCode ds = take 4 $ digitsRev 10 ds ++ repeat 0
+normalizeOpCode d = take 4 $ digits 10 (fromIntegral d) ++ repeat 0
 
 mkValue :: Int -> Int -> Value
 mkValue 0 = PositionMode

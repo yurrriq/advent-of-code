@@ -34,8 +34,8 @@ library:
   - containers
   - cryptonite
   - data-ordlist
-  - digits
   - dlist
+  - fast-digits
   - finite-typelits
   - free-algebras
   - groups
@@ -118,12 +118,12 @@ executables:
     main: AdventOfCode.Year2019.Day04
     dependencies:
     - data-ordlist
-    - digits
+    - fast-digits
   aoc-2019-day05:
     <<: *executable
     main: AdventOfCode.Year2019.Day05
     dependencies:
-    - digits
+    - fast-digits
     - mtl
     - vector
   aoc-2019-day06:
@@ -134,7 +134,7 @@ executables:
     main: AdventOfCode.Year2019.Day07
     dependencies:
     - conduit
-    - digits
+    - fast-digits
     - mtl
     - transformers
     - vector
@@ -146,7 +146,7 @@ executables:
     main: AdventOfCode.Year2019.Day09
     dependencies:
     - conduit
-    - digits
+    - fast-digits
     - mtl
     - transformers
     - vector
@@ -196,7 +196,7 @@ tests:
     dependencies:
     - advent-of-code
     - conduit
-    - digits
+    - fast-digits
     - tasty
     - tasty-discover
     - tasty-hunit

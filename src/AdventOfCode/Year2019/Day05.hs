@@ -10,7 +10,7 @@ import AdventOfCode.TH (inputFilePath)
 import Control.Monad (liftM2, when)
 import Control.Monad.IO.Class (liftIO)
 import Control.Monad.State (StateT, evalStateT, get, put)
-import Data.Digits (digitsRev)
+import Data.FastDigits (digits)
 import Data.Vector ((!), Vector, fromList, modify)
 import qualified Data.Vector as V
 import qualified Data.Vector.Mutable as MV
@@ -181,7 +181,7 @@ initialState :: ProgramState
 initialState = ProgramState {_stack = V.empty, _pointer = 0}
 
 normalizeOpCode :: Int -> [Int]
-normalizeOpCode ds = take 4 $ digitsRev 10 ds ++ repeat 0
+normalizeOpCode d = take 4 $ digits 10 (fromIntegral d) ++ repeat 0
 
 mkValue :: Int -> Int -> Value
 mkValue 0 = PositionMode
