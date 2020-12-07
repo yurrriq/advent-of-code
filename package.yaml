@@ -15,10 +15,11 @@ dependencies:
 - base
 - bytestring
 - hashable
-- unordered-containers
+- parsers
 - split
 - template-haskell
 - trifecta
+- unordered-containers
 default-extensions:
 - TemplateHaskell
 ghc-options:
@@ -171,6 +172,11 @@ executables:
     main: AdventOfCode.Year2020.Day03
     dependencies:
     - vector
+  aoc-2020-day05:
+    <<: *executable
+    main: AdventOfCode.Year2020.Day05
+    dependencies:
+    - fast-digits
 _benchmark: &benchmark
   ghc-options:
   - -threaded
