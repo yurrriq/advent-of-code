@@ -89,7 +89,6 @@ napsByGuard = HM.map (map napTimes) . shifts
 shifts :: [Entry] -> TimeCards
 shifts = go HM.empty . sort
   where
-    go :: TimeCards -> [Entry] -> TimeCards
     go acc ((_when, Shift who) : entries) =
       let (events, rest) = break isShiftChange entries
        in go (HM.insertWith (++) who [events] acc) rest
@@ -98,34 +97,24 @@ shifts = go HM.empty . sort
 sleepiestGuard :: [Entry] -> Maybe (Int, (Guard, [[Integer]]))
 sleepiestGuard = HM.foldrWithKey go Nothing . napsByGuard
   where
-    go ::
-      Guard ->
-      [[Integer]] ->
-      Maybe (Int, (Guard, [[Integer]])) ->
-      Maybe (Int, (Guard, [[Integer]]))
     go a xxs Nothing = Just (sum (length <$> xxs), (a, xxs))
     go a xxs old@(Just (m, (_, _))) =
       let n = sum (length <$> xxs)
        in if n > m then Just (n, (a, xxs)) else old
 
-sleepiestMinute :: [[Integer]] -> (Integer, Integer)
+sleepiestMinute :: [[Integer]] -> (Integer, Int)
 sleepiestMinute =
   maximumBy (comparing snd)
     . HM.toList
     . frequencies
     . concat
 
-mostConsistentSleeper :: [Entry] -> Maybe ((Guard, Integer), Integer)
+mostConsistentSleeper :: [Entry] -> Maybe ((Guard, Integer), Int)
 mostConsistentSleeper =
   HM.foldrWithKey go Nothing
     . HM.map (filter (not . null))
     . napsByGuard
   where
-    go ::
-      Guard ->
-      [[Integer]] ->
-      Maybe ((Guard, Integer), Integer) ->
-      Maybe ((Guard, Integer), Integer)
     go _ [] old = old
     go guard naps Nothing = Just $ first ((,) guard) (sleepiestMinute naps)
     go guard naps old@(Just ((_, _), oldTimes)) =

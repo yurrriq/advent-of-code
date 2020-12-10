@@ -20,7 +20,7 @@ import qualified Data.HashSet as HS
 import Data.Hashable (Hashable (..))
 import Text.Trifecta (Parser, Result (..), parseByteString)
 
-type Frequencies a = HM.HashMap a Integer
+type Frequencies a = HM.HashMap a Int
 
 frequencies :: (Eq a, Hashable a) => [a] -> Frequencies a
 frequencies = foldr go HM.empty
