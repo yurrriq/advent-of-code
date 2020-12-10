@@ -177,6 +177,9 @@ executables:
     main: AdventOfCode.Year2020.Day05
     dependencies:
     - fast-digits
+  aoc-2020-day06:
+    <<: *executable
+    main: AdventOfCode.Year2020.Day06
 _benchmark: &benchmark
   ghc-options:
   - -threaded
