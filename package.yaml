@@ -15,6 +15,7 @@ dependencies:
 - base
 - bytestring
 - hashable
+- lens
 - parsers
 - split
 - template-haskell
@@ -30,6 +31,7 @@ library:
   - -fwarn-incomplete-patterns
   source-dirs: src
   dependencies:
+  - comonad
   - composition
   - conduit
   - containers
@@ -180,6 +182,12 @@ executables:
   aoc-2020-day06:
     <<: *executable
     main: AdventOfCode.Year2020.Day06
+  aoc-2020-day08:
+    <<: *executable
+    main: AdventOfCode.Year2020.Day08
+    dependencies:
+    - comonad
+    - mtl
 _benchmark: &benchmark
   ghc-options:
   - -threaded
