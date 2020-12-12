@@ -13,7 +13,9 @@ pkgs.mkShell {
         idrisPackages.with-packages
           (
             with idrisPackages; [
+              contrib
               effects
+              lightyear
             ]
           )
       )
