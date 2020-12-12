@@ -3,6 +3,7 @@
 module AdventOfCode.Util
   ( Frequencies,
     frequencies,
+    frequenciesInt,
     maybeParseByteString,
     commonElems,
     findFirstDup,
@@ -18,6 +19,7 @@ import Data.ByteString (ByteString)
 import qualified Data.HashMap.Strict as HM
 import qualified Data.HashSet as HS
 import Data.Hashable (Hashable (..))
+import qualified Data.IntMap as IM
 import Text.Trifecta (Parser, Result (..), parseByteString)
 
 type Frequencies a = HM.HashMap a Int
@@ -27,6 +29,11 @@ frequencies = foldr go HM.empty
   where
     go :: (Eq a, Hashable a) => a -> Frequencies a -> Frequencies a
     go k = HM.insertWith (+) k 1
+
+frequenciesInt :: Foldable t => t Int -> IM.IntMap Int
+frequenciesInt = foldr go IM.empty
+  where
+    go key = IM.insertWith (+) key 1
 
 maybeParseByteString :: Parser a -> ByteString -> Maybe a
 maybeParseByteString p = parseByteString p mempty >>> \case
