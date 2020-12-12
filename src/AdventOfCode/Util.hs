@@ -11,6 +11,7 @@ module AdventOfCode.Util
     hammingSimilar,
     scan,
     count,
+    snoc,
   )
 where
 
@@ -73,3 +74,6 @@ scan = scanl mappend mempty
 
 count :: (a -> Bool) -> [a] -> Int
 count p = length . filter p
+
+snoc :: [a] -> a -> [a]
+snoc xs x = xs ++ [x]
