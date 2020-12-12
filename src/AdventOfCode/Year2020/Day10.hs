@@ -2,8 +2,10 @@ module AdventOfCode.Year2020.Day10 where
 
 import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (inputFilePath)
-import AdventOfCode.Util (frequencies)
-import Data.HashMap.Strict ((!))
+import AdventOfCode.Util (frequenciesInt, snoc)
+import Data.IntMap ((!))
+import qualified Data.IntMap as IM
+import qualified Data.IntSet as IS
 import Data.List (sort)
 import Text.Trifecta (natural, some)
 
@@ -13,23 +15,25 @@ main =
     input <- getInput
     putStr "Part One: "
     print $ partOne input
-
--- putStr "Part Two: "
--- print $ partTwo input
+    putStr "Part Two: "
+    print $ partTwo input
 
 getInput :: IO [Int]
 getInput = sort <$> parseInput (some (fromInteger <$> natural)) $(inputFilePath)
 
--- getInput =
---   do
---     Just res <- parseFromFile (some (fromInteger <$> natural)) "../../../input/2020/day10.txt"
---     pure (sort res)
-
 partOne :: [Int] -> Int
 partOne adapters = (connections ! 1) * (connections ! 3)
   where
-    connections = frequencies (zipWith (-) (tail adapters') adapters')
-    adapters' = 0 : adapters ++ [maximum adapters + 3]
+    connections = frequenciesInt (zipWith (-) (tail chain) chain)
+    chain = 0 : snoc adapters builtIn
+    builtIn = maximum adapters + 3
 
 partTwo :: [Int] -> Int
-partTwo = undefined
+partTwo adapters = paths ! 0
+  where
+    paths = IM.fromSet countPaths adaptersSet
+    countPaths from
+      | from == builtIn = 1
+      | otherwise = sum [IM.findWithDefault 0 (from + k) paths | k <- [1 .. 3]]
+    adaptersSet = IS.fromList (0 : adapters ++ [builtIn])
+    builtIn = maximum adapters + 3
