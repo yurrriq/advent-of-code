@@ -4,13 +4,11 @@ import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (inputFilePath)
 import AdventOfCode.Util (wigglesum)
 import Control.Applicative ((<|>))
-import Control.Comonad.Store (experiment)
 import Control.Lens
-import Control.Monad ((>=>))
 import Control.Monad.State (State, evalState, get)
 import Data.Either (rights)
 import Text.Parser.Token.Highlight (Highlight (..))
-import Text.Trifecta
+import Text.Trifecta ((<?>), Parser, highlight, integer, some, symbol)
 
 type Instruction = (Operation, Int)
 
