@@ -1,3 +1,4 @@
+{-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE LambdaCase #-}
 
 module AdventOfCode.Util
@@ -13,6 +14,7 @@ module AdventOfCode.Util
     count,
     snoc,
     wigglesum,
+    fix',
   )
 where
 
@@ -21,6 +23,7 @@ import Control.Comonad.Store (experiment)
 import Control.Lens (holesOf)
 import Control.Monad ((>=>))
 import Data.ByteString (ByteString)
+import Data.Function (fix)
 import qualified Data.HashMap.Strict as HM
 import qualified Data.HashSet as HS
 import Data.Hashable (Hashable (..))
@@ -86,3 +89,6 @@ snoc xs x = xs ++ [x]
 -- https://jaspervdj.be/posts/2012-10-17-wiggling-sums.html
 wigglesum :: Traversable t => (a -> [a]) -> t a -> [t a]
 wigglesum wiggle = holesOf traverse >=> experiment wiggle
+
+fix' :: Eq a => (a -> a) -> a -> a
+fix' f = fix (\g !x -> let fx = f x in if fx == x then x else g fx)

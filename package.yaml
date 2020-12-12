@@ -14,6 +14,7 @@ data-files:
 dependencies:
 - base
 - bytestring
+- comonad
 - containers
 - hashable
 - lens
@@ -192,6 +193,12 @@ executables:
   aoc-2020-day10:
     <<: *executable
     main: AdventOfCode.Year2020.Day10
+  aoc-2020-day11:
+    <<: *executable
+    main: AdventOfCode.Year2020.Day11
+    dependencies:
+    - linear
+    - vector
 _benchmark: &benchmark
   ghc-options:
   - -threaded
