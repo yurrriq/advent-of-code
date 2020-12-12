@@ -27,6 +27,7 @@ pkgs.mkShell {
     ] ++ (
       with haskellPackages;
       [
+        hoogle
         ormolu
         pointfree
       ]
