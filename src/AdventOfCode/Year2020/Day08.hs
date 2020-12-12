@@ -2,6 +2,7 @@ module AdventOfCode.Year2020.Day08 where
 
 import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (inputFilePath)
+import AdventOfCode.Util (wigglesum)
 import Control.Applicative ((<|>))
 import Control.Comonad.Store (experiment)
 import Control.Lens
@@ -88,8 +89,3 @@ moveCursor x =
     n <- view cursor <$> get
     history %= (n :)
     cursor += x
-
--- http://r6.ca/blog/20121209T182914Z.html
--- https://jaspervdj.be/posts/2012-10-17-wiggling-sums.html
-wigglesum :: Traversable t => (a -> [a]) -> t a -> [t a]
-wigglesum wiggle = holesOf traverse >=> experiment wiggle

@@ -12,10 +12,14 @@ module AdventOfCode.Util
     scan,
     count,
     snoc,
+    wigglesum,
   )
 where
 
 import Control.Category ((>>>))
+import Control.Comonad.Store (experiment)
+import Control.Lens (holesOf)
+import Control.Monad ((>=>))
 import Data.ByteString (ByteString)
 import qualified Data.HashMap.Strict as HM
 import qualified Data.HashSet as HS
@@ -77,3 +81,8 @@ count p = length . filter p
 
 snoc :: [a] -> a -> [a]
 snoc xs x = xs ++ [x]
+
+-- http://r6.ca/blog/20121209T182914Z.html
+-- https://jaspervdj.be/posts/2012-10-17-wiggling-sums.html
+wigglesum :: Traversable t => (a -> [a]) -> t a -> [t a]
+wigglesum wiggle = holesOf traverse >=> experiment wiggle
