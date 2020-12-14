@@ -199,6 +199,18 @@ executables:
     dependencies:
     - linear
     - vector
+  aoc-2020-day14:
+    <<: *executable
+    main: AdventOfCode.Year2020.Day14
+    dependencies:
+    - mtl
+    other-modules:
+    - AdventOfCode.Input
+    - AdventOfCode.TH
+    - AdventOfCode.Util
+    - AdventOfCode.Year2020.Day14.Parsers
+    - AdventOfCode.Year2020.Day14.Types
+    - Paths_advent_of_code
 _benchmark: &benchmark
   ghc-options:
   - -threaded
