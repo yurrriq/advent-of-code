@@ -5,8 +5,11 @@ import AdventOfCode.TH (inputFilePath)
 import AdventOfCode.Util (fix')
 import Control.Applicative ((<|>))
 import Data.Bool (bool)
+import Data.Ix (inRange)
+import Data.List (find)
 import Data.Map (Map)
 import qualified Data.Map as Map
+import Data.Maybe (mapMaybe)
 import Data.Set (Set)
 import qualified Data.Set as Set
 import Data.Vector (Vector)
@@ -22,25 +25,42 @@ main =
     input <- getInput
     putStr "Part One: "
     print $ partOne input
+    putStr "Part Two: "
+    print $ partTwo input
 
 getInput :: IO (Vector (Vector Position))
 getInput = parseInput seatLayout $(inputFilePath)
 
--- getInput =
---   do
---     Just res <- parseFromFile seatLayout "../../../input/2020/day11.txt"
---     pure res
-
 partOne :: Vector (Vector Position) -> Int
-partOne xxs = Map.size $ Map.filter id $ fix' (musicalChairs 4 neighborhood) grid
+partOne xxs = solve 4 neighborhood grid
   where
     neighborhood = neighborsMap (Map.keysSet grid)
+    neighborsMap ps = flip Map.fromSet ps $ Set.intersection ps . neighborsOf
+    neighborsOf = Set.fromList . flip map adjacencies . (+)
     grid = toGrid xxs
 
-neighborsMap :: Set Point -> Map Point (Set Point)
-neighborsMap ps = flip Map.fromSet ps $ Set.intersection ps . neighborsOf
+partTwo :: Vector (Vector Position) -> Int
+partTwo xxs = solve 5 neighborhood grid
   where
-    neighborsOf = Set.fromList . flip map adjacencies . (+)
+    neighborhood = neighborsMap (Map.keysSet grid)
+    neighborsMap ps = flip Map.fromSet ps $ Set.intersection ps . neighborsOf
+      where
+        neighborsOf p =
+          Set.fromList
+            $ mapMaybe (firstNeighborInLine p)
+            $ adjacencies
+        firstNeighborInLine p dxy =
+          find (`Set.member` ps)
+            $ takeWhile (all inRange')
+            $ tail (iterate (+ dxy) p)
+    -- TODO: be smarter, or (something like) the Grid type from 2019.10
+    inRange' = inRange (0, max (length xxs) (length (V.head xxs)))
+    grid = toGrid xxs
+
+solve :: Int -> Map Point (Set Point) -> Map Point Bool -> Int
+solve n neighborhood =
+  Map.size . Map.filter id
+    . fix' (musicalChairs n neighborhood)
 
 adjacencies :: [Point]
 adjacencies =
