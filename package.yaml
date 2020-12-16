@@ -45,7 +45,6 @@ library:
   - free-algebras
   - groups
   - hashable
-  - hashable
   - lens
   - linear
   - mtl
@@ -214,6 +213,11 @@ executables:
     - AdventOfCode.Year2020.Day14.Parsers
     - AdventOfCode.Year2020.Day14.Types
     - Paths_advent_of_code
+  aoc-2020-day16:
+    <<: *executable
+    main: AdventOfCode.Year2020.Day16
+    dependencies:
+    - linear
 _benchmark: &benchmark
   ghc-options:
   - -threaded
