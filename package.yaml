@@ -190,6 +190,9 @@ executables:
     dependencies:
     - comonad
     - mtl
+  aoc-2020-day09:
+    <<: *executable
+    main: AdventOfCode.Year2020.Day09
   aoc-2020-day10:
     <<: *executable
     main: AdventOfCode.Year2020.Day10

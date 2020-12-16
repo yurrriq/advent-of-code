@@ -8,6 +8,7 @@ pkgs.mkShell {
   };
   buildInputs = with pkgs; (
     [
+      cabal-install
       gap-full
       (
         idrisPackages.with-packages
