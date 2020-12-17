@@ -2,7 +2,7 @@ module AdventOfCode.Year2020.Day11 where
 
 import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (inputFilePath)
-import AdventOfCode.Util (fix')
+import AdventOfCode.Util (adjacencies, fix', neighborsOf)
 import Control.Applicative ((<|>))
 import Data.Bool (bool)
 import Data.Ix (inRange)
@@ -14,7 +14,7 @@ import Data.Set (Set)
 import qualified Data.Set as Set
 import Data.Vector (Vector)
 import qualified Data.Vector as V
-import Linear.V2 (V2 (..))
+import Linear (V2 (..))
 import Text.Parser.Token.Highlight (Highlight (..))
 import Text.Trifecta ((<?>), Parser, char, highlight, newline, sepEndBy, some)
 import Prelude hiding (floor)
@@ -36,16 +36,15 @@ partOne xxs = solve 4 neighborhood grid
   where
     neighborhood = neighborsMap (Map.keysSet grid)
     neighborsMap ps = flip Map.fromSet ps $ Set.intersection ps . neighborsOf
-    neighborsOf = Set.fromList . flip map adjacencies . (+)
     grid = toGrid xxs
 
 partTwo :: Vector (Vector Position) -> Int
 partTwo xxs = solve 5 neighborhood grid
   where
     neighborhood = neighborsMap (Map.keysSet grid)
-    neighborsMap ps = flip Map.fromSet ps $ Set.intersection ps . neighborsOf
+    neighborsMap ps = flip Map.fromSet ps $ Set.intersection ps . neighborsOf'
       where
-        neighborsOf p =
+        neighborsOf' p =
           Set.fromList
             $ mapMaybe (firstNeighborInLine p)
             $ adjacencies
@@ -61,14 +60,6 @@ solve :: Int -> Map Point (Set Point) -> Map Point Bool -> Int
 solve n neighborhood =
   Map.size . Map.filter id
     . fix' (musicalChairs n neighborhood)
-
-adjacencies :: [Point]
-adjacencies =
-  [ V2 dx dy
-    | dx <- [-1 .. 1],
-      dy <- [-1 .. 1],
-      not (dx == 0 && dy == 0)
-  ]
 
 -- TODO: Control.Lens tricks with indexed
 toGrid :: Vector (Vector Position) -> Map (V2 Int) Bool
