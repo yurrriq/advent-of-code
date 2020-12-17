@@ -15,6 +15,8 @@ module AdventOfCode.Util
     snoc,
     wigglesum,
     fix',
+    adjacencies,
+    neighborsOf,
   )
 where
 
@@ -28,6 +30,8 @@ import qualified Data.HashMap.Strict as HM
 import qualified Data.HashSet as HS
 import Data.Hashable (Hashable (..))
 import qualified Data.IntMap as IM
+import Data.Set (Set)
+import qualified Data.Set as Set
 import Text.Trifecta (Parser, Result (..), parseByteString)
 
 type Frequencies a = HM.HashMap a Int
@@ -92,3 +96,9 @@ wigglesum wiggle = holesOf traverse >=> experiment wiggle
 
 fix' :: Eq a => (a -> a) -> a -> a
 fix' f = fix (\g !x -> let fx = f x in if fx == x then x else g fx)
+
+adjacencies :: (Applicative f, Num a, Eq (f a), Traversable f) => [f a]
+adjacencies = filter (/= pure 0) $ sequenceA (pure [-1, 0, 1])
+
+neighborsOf :: (Applicative f, Num a, Num (f a), Ord (f a), Traversable f) => f a -> Set (f a)
+neighborsOf = Set.fromList . flip map adjacencies . (+)

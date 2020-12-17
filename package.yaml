@@ -218,6 +218,11 @@ executables:
     main: AdventOfCode.Year2020.Day16
     dependencies:
     - linear
+  aoc-2020-day17:
+    <<: *executable
+    main: AdventOfCode.Year2020.Day17
+    dependencies:
+    - linear
 _benchmark: &benchmark
   ghc-options:
   - -threaded
