@@ -1,5 +1,3 @@
-{-# LANGUAGE GeneralizedNewtypeDeriving #-}
-
 module AdventOfCode.Year2015.Day11
   ( main,
     getInput,
@@ -38,12 +36,12 @@ isValidPassword str =
     && hasStraight 3 str
 
 isConfusing :: String -> Bool
-isConfusing = any (flip elem "iol")
+isConfusing = any (`elem` "iol")
 
 hasStraight :: Int -> String -> Bool
 hasStraight n = go
   where
-    go (c : cs) = (maybe False (flip isPrefixOf cs) (buildStraight (n - 1) c)) || go cs
+    go (c : cs) = maybe False (`isPrefixOf` cs) (buildStraight (n - 1) c) || go cs
     go [] = False
 
 -- TODO: s/Char/Bounded a/

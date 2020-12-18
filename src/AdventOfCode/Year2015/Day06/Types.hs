@@ -1,7 +1,7 @@
 module AdventOfCode.Year2015.Day06.Types where
 
 import Foreign.Marshal.Utils (fromBool)
-import Linear.V2 (V2 (..))
+import Linear (V2 (..))
 
 data Instruction
   = Instruction Operation (Location, Location)
