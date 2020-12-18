@@ -9,7 +9,7 @@ import AdventOfCode.Year2020.Day14.Types
 import Control.Applicative (some)
 import Control.Lens
 import Control.Lens.Indexed (ifoldl', ifoldlM)
-import Control.Monad.State (State, execState, get)
+import Control.Monad.State (State, execState, gets)
 import Data.Bits (clearBit, setBit)
 import qualified Data.IntMap as IM
 
@@ -32,7 +32,7 @@ runInstructionV1 :: Instruction -> State ProgState ()
 runInstructionV1 (SetMask newMask) = mask .= newMask
 runInstructionV1 (SetValue addr val) =
   do
-    newVal <- applyMaskV1 val <$> view mask <$> get
+    newVal <- gets (applyMaskV1 val <$> view mask)
     memory %= IM.insert addr newVal
 
 applyMaskV1 :: Int -> [Maybe Bool] -> Int
@@ -48,7 +48,7 @@ runInstructionV2 :: Instruction -> State ProgState ()
 runInstructionV2 (SetMask newMask) = mask .= newMask
 runInstructionV2 (SetValue addr val) =
   do
-    addresses <- applyMaskV2 addr <$> view mask <$> get
+    addresses <- gets (applyMaskV2 addr <$> view mask)
     mapM_ ((memory %=) . flip IM.insert val) addresses
 
 applyMaskV2 :: Int -> [Maybe Bool] -> [Int]

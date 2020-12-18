@@ -13,6 +13,7 @@ import AdventOfCode.TH (inputFilePath)
 import Control.Applicative ((<|>))
 import Control.Arrow (first)
 import Control.Lens
+import Data.Functor (($>))
 import Linear (V2 (..), _yx, perp)
 import Text.Parser.Token.Highlight (Highlight (..))
 import Text.Trifecta (Parser, char, highlight, natural, some)
@@ -90,16 +91,16 @@ instruction = instruct <*> (fromInteger <$> natural)
 heading :: Parser Heading
 heading =
   highlight ReservedIdentifier $
-    char 'N' *> pure N
-      <|> char 'S' *> pure S
-      <|> char 'E' *> pure E
-      <|> char 'W' *> pure W
+    char 'N' $> N
+      <|> char 'S' $> S
+      <|> char 'E' $> E
+      <|> char 'W' $> W
 
 turning :: Parser Turning
 turning =
   highlight ReservedIdentifier $
-    char 'L' *> pure L
-      <|> char 'R' *> pure R
+    char 'L' $> L
+      <|> char 'R' $> R
 
 movement :: Parser Movement
-movement = char 'F' *> pure F
+movement = char 'F' $> F

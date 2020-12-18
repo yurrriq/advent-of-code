@@ -12,7 +12,7 @@ import Control.Monad (void)
 import Data.Ix (inRange)
 import Data.List ((\\), isPrefixOf, transpose)
 import Data.Maybe (mapMaybe)
-import Linear.V2 (V2 (..))
+import Linear (V2 (..))
 import Text.Trifecta (Parser, anyChar, char, commaSep, eof, manyTill, natural, symbol)
 
 main :: IO ()
@@ -42,12 +42,11 @@ partOne (rules, _, nearbyTickets) =
 partTwo :: ([(String, V2 (Int, Int))], [Int], [[Int]]) -> Int
 partTwo (rules, myTicket, nearbyTickets) =
   product
-    $ map (myTicket !!)
-    $ map fst
+    $ map ((myTicket !!) . fst)
     $ filter (isPrefixOf "departure" . snd)
-    $ zipWith (,) [0 ..]
+    $ zip [0 ..]
     $ concat
-    $ iterate go possibleFields !! (length nearbyTickets)
+    $ iterate go possibleFields !! length nearbyTickets
   where
     go xs =
       flip map xs $ \ys ->
@@ -56,7 +55,7 @@ partTwo (rules, myTicket, nearbyTickets) =
         singles = filter ((1 ==) . length) xs
     possibleFields =
       [ flip mapMaybe rules $ \(label, ranges) ->
-          if all (\field -> any (flip inRange field) ranges) fields
+          if all (\field -> any (`inRange` field) ranges) fields
             then Just label
             else Nothing
         | fields <- transpose validTickets
@@ -76,8 +75,7 @@ invalidFields :: [(String, V2 (Int, Int))] -> [Int] -> [Int]
 invalidFields = filter . invalidField
 
 invalidField :: [(String, V2 (Int, Int))] -> Int -> Bool
-invalidField rules field =
-  not (any (any (flip inRange field)) (map snd rules))
+invalidField rules field = not (any (any (`inRange` field) . snd) rules)
 
 intRange :: Parser (Int, Int)
 intRange =

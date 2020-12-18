@@ -11,6 +11,7 @@ import AdventOfCode.TH (inputFilePath)
 import AdventOfCode.Util (neighborsOf)
 import Control.Applicative ((<|>))
 import Control.Lens (ifoldl', set)
+import Data.Functor (($>))
 import qualified Data.Map as Map
 import Data.Set (Set)
 import qualified Data.Set as Set
@@ -58,5 +59,5 @@ region :: Parser [[Bool]]
 region = some cube `sepEndBy` newline
   where
     cube =
-      char '#' *> pure True
-        <|> char '.' *> pure False
+      char '#' $> True
+        <|> char '.' $> False

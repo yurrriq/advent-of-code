@@ -5,7 +5,7 @@ import AdventOfCode.TH (inputFilePath)
 import AdventOfCode.Util (wigglesum)
 import Control.Applicative ((<|>))
 import Control.Lens
-import Control.Monad.State (State, evalState, get)
+import Control.Monad.State (State, evalState, get, gets)
 import Data.Either (rights)
 import Text.Parser.Token.Highlight (Highlight (..))
 import Text.Trifecta ((<?>), Parser, highlight, integer, some, symbol)
@@ -84,6 +84,6 @@ runInstruction (NOP, _) = moveCursor 1
 moveCursor :: Int -> State ProgState ()
 moveCursor x =
   do
-    n <- view cursor <$> get
+    n <- gets (view cursor)
     history %= (n :)
     cursor += x

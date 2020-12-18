@@ -9,6 +9,7 @@ where
 import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (inputFilePath)
 import Control.Monad (liftM2)
+import Data.Functor (($>))
 import Data.List (find, inits, splitAt, tails)
 import Text.Trifecta (natural, some)
 
@@ -19,7 +20,7 @@ main =
     putStr "Part One: "
     answerOne <-
       case partOne input of
-        Just answer -> print answer *> pure answer
+        Just answer -> print answer $> answer
         Nothing -> error "Failed!"
     putStr "Part Two: "
     case partTwo answerOne input of
@@ -32,7 +33,7 @@ getInput = parseInput (some (fromInteger <$> natural)) $(inputFilePath)
 partOne :: [Int] -> Maybe Int
 partOne xs = head . snd <$> find (null . go) (splitAt 25 <$> tails xs)
   where
-    go (preamble, (z : _)) =
+    go (preamble, z : _) =
       [ (z, x, y)
         | length preamble == 25,
           (x : ys) <- tails preamble,

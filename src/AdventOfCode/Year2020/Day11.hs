@@ -45,9 +45,7 @@ partTwo xxs = solve 5 neighborhood grid
     neighborsMap ps = flip Map.fromSet ps $ Set.intersection ps . neighborsOf'
       where
         neighborsOf' p =
-          Set.fromList
-            $ mapMaybe (firstNeighborInLine p)
-            $ adjacencies
+          Set.fromList $ mapMaybe (firstNeighborInLine p) adjacencies
         firstNeighborInLine p dxy =
           find (`Set.member` ps)
             $ takeWhile (all inRange')
@@ -68,7 +66,7 @@ toGrid xxs = foldr rowIter Map.empty [0 .. height - 1]
     rowIter y z = foldr (columnIter y) z [0 .. width - 1]
     columnIter y x = Map.alter go (V2 x y)
       where
-        go _ = case ((xxs V.! y) V.! x) of
+        go _ = case (xxs V.! y) V.! x of
           Floor -> Nothing
           EmptySeat -> Just False
           OccupiedSeat -> Just True

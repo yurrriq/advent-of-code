@@ -10,6 +10,7 @@ import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (inputFilePath)
 import AdventOfCode.Util (count)
 import Control.Applicative ((<|>))
+import Data.Functor (($>))
 import Data.Vector ((!), Vector)
 import qualified Data.Vector as V
 import Text.Trifecta (Parser, char, newline, sepEndBy, some)
@@ -32,15 +33,15 @@ partOne = slide (3, 1)
 partTwo :: Vector (Vector Bool) -> Int
 partTwo theMap =
   product $
-    map (flip slide theMap) [(1, 1), (3, 1), (5, 1), (7, 1), (1, 2)]
+    map (`slide` theMap) [(1, 1), (3, 1), (5, 1), (7, 1), (1, 2)]
 
 tobogganMap :: Parser (Vector (Vector Bool))
 tobogganMap = V.fromList . map V.fromList <$> some square `sepEndBy` newline
 
 square :: Parser Bool
 square =
-  char '.' *> pure False
-    <|> char '#' *> pure True
+  char '.' $> False
+    <|> char '#' $> True
 
 slide :: (Int, Int) -> Vector (Vector Bool) -> Int
 slide (right, down) theMap = count id (map go [0 .. (V.length theMap - 1) `div` down])
