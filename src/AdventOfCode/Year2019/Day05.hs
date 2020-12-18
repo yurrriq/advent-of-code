@@ -9,7 +9,7 @@ import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (inputFilePath)
 import Control.Monad (liftM2, when)
 import Control.Monad.IO.Class (liftIO)
-import Control.Monad.State (StateT, evalStateT, get, put)
+import Control.Monad.State (StateT, evalStateT, get, gets, put)
 import Data.FastDigits (digits)
 import Data.Vector ((!), Vector, fromList, modify)
 import qualified Data.Vector as V
@@ -90,7 +90,7 @@ getInstruction [1, 0, c, b] =
 getInstruction [2, 0, c, b] =
   Multiply <$> (mkValue c <$> nextInt) <*> (mkValue b <$> nextInt) <*> nextInt
 getInstruction [3, 0, 0, 0] =
-  Set <$> (liftIO (ImmediateMode . read <$> getLine)) <*> nextInt
+  Set <$> liftIO (ImmediateMode . read <$> getLine) <*> nextInt
 getInstruction [4, 0, c, 0] =
   Print <$> (mkValue c <$> nextInt)
 getInstruction [5, 0, c, b] =
@@ -120,18 +120,12 @@ runInstruction (JumpIfTrue vx vy) =
   do
     x <- handleValue vx
     when (x /= 0) $
-      do
-        state <- get
-        y <- handleValue vy
-        put $ state {_pointer = y}
+      jump vy
 runInstruction (JumpIfFalse vx vy) =
   do
     x <- handleValue vx
     when (x == 0) $
-      do
-        state <- get
-        y <- handleValue vy
-        put $ state {_pointer = y}
+      jump vy
 runInstruction (LessThan vx vy dst) =
   do
     lt <- (<) <$> handleValue vx <*> handleValue vy
@@ -145,6 +139,13 @@ runInstruction (Equals vx vy dst) =
       then setValue 1 dst
       else setValue 0 dst
 runInstruction End = pure ()
+
+jump :: Value -> Program ()
+jump vy =
+  do
+    state <- get
+    y <- handleValue vy
+    put $ state {_pointer = y}
 
 evalStack :: Stack -> IO ()
 evalStack st = evalStateT runProgram (initialState {_stack = st})
@@ -167,7 +168,7 @@ incrementPointer =
 nextInt :: Program Int
 nextInt =
   do
-    vx <- liftM2 (!) _stack _pointer <$> get
+    vx <- gets (liftM2 (!) _stack _pointer)
     incrementPointer
     pure vx
 

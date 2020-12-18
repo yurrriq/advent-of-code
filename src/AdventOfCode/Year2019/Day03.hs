@@ -7,6 +7,7 @@ import Control.Arrow ((&&&), second)
 import Control.Category ((>>>))
 import Data.Foldable (minimumBy)
 import Data.Function (on)
+import Data.Functor ((<$))
 import qualified Data.HashSet as HS
 import Data.Hashable (Hashable (..))
 import Data.Ix (Ix (..))
@@ -71,10 +72,10 @@ segment = Segment <$> direction <*> nonnegInt
 
 direction :: Parser Direction
 direction =
-  (pure D <* char 'D')
-    <|> (pure L <* char 'L')
-    <|> (pure R <* char 'R')
-    <|> (pure U <* char 'U')
+  (D <$ char 'D')
+    <|> (L <$ char 'L')
+    <|> (R <$ char 'R')
+    <|> (U <$ char 'U')
 
 nonnegInt :: Parser Int
 nonnegInt = fromIntegral <$> natural
@@ -135,7 +136,7 @@ partOne :: ([Segment], [Segment]) -> Int
 partOne =
   distance
     . minimumBy (compare `on` distance)
-    . (uncurry (findCrossings `on` runSegments))
+    . uncurry (findCrossings `on` runSegments)
   where
     distance = manhattanDistance (Point 0 0)
 

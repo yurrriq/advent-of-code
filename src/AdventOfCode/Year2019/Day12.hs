@@ -1,3 +1,5 @@
+{-# LANGUAGE TupleSections #-}
+
 module AdventOfCode.Year2019.Day12
   ( main,
     getInput,
@@ -10,7 +12,7 @@ import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (inputFilePath)
 import Control.Arrow ((&&&), (>>>), second)
 import Data.Function (on)
-import Linear.V3 (V3 (..))
+import Linear (V3 (..))
 import Text.Trifecta (Parser, angles, between, integer, some, string)
 
 main :: IO ()
@@ -35,7 +37,7 @@ partTwo = foldr lcm 1 . fmap period . traverse transpose
 type Pair = (Dimensions, Dimensions)
 
 mkPair :: V3 Int -> Pair
-mkPair = flip (,) (V3 0 0 0)
+mkPair = (,pure 0)
 
 type Dimensions = V3 Int
 
@@ -58,7 +60,7 @@ step :: Num a => [(a, a)] -> [(a, a)]
 step = fmap applyVelocity . applyGravities
 
 applyGravities :: Num a => [(a, a)] -> [(a, a)]
-applyGravities moons = fmap (flip applyGravity moons) moons
+applyGravities moons = fmap (`applyGravity` moons) moons
 
 applyGravity :: Num a => (a, a) -> [(a, a)] -> (a, a)
 applyGravity = foldr stepVelocity

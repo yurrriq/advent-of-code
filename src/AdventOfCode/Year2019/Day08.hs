@@ -9,7 +9,7 @@ import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (inputFilePath)
 import Control.Applicative ((<|>))
 import Data.Function (on)
-import Data.List (sortBy)
+import Data.List (minimumBy)
 import Text.Trifecta ((<?>), Parser, char, count, some)
 
 data Pixel
@@ -42,7 +42,7 @@ main =
 partOne :: Image -> Int
 partOne layers = numberOf White layer * numberOf Transparent layer
   where
-    layer = head $ sortBy (compare `on` numberOf Black) layers
+    layer = minimumBy (compare `on` numberOf Black) layers
     numberOf :: Eq a => a -> [[a]] -> Int
     numberOf x = sum . fmap (length . filter (== x))
 

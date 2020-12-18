@@ -7,10 +7,11 @@ import AdventOfCode.TH (inputFilePath)
 import Control.Applicative ((<|>))
 import Control.Monad (foldM)
 import Data.Foldable (minimumBy)
+import Data.Functor (($>))
 import qualified Data.HashMap.Strict as HM
 import Data.HashMap.Strict ((!), HashMap)
 import qualified Data.HashSet as HS
-import Data.List (delete, maximumBy, sortBy)
+import Data.List (delete, maximumBy, sortOn)
 import Data.Ord (comparing)
 import GHC.Real (Ratio (..))
 import Text.Trifecta (Parser, char, newline, sepEndBy, some)
@@ -32,7 +33,7 @@ partOne :: Grid -> Int
 partOne = HM.size . snd . bestLocation
 
 partTwo :: Grid -> Int
-partTwo asteroidBelt = (x * 100 + y)
+partTwo asteroidBelt = x * 100 + y
   where
     (_from, visible) = bestLocation asteroidBelt
     angles = clockwise (HM.keys visible)
@@ -70,11 +71,11 @@ grid =
     gridDetection
       . Grid (width, height)
       . HM.map (const HM.empty)
-      . HM.filter (id . fst)
+      . HM.filter fst
       <$> foldM outer HM.empty [0 .. height - 1]
 
 asteroid :: Parser Bool
-asteroid = (char '.' *> pure False) <|> (char '#' *> pure True)
+asteroid = (char '.' $> False) <|> (char '#' $> True)
 
 bestLocation :: Grid -> (Location, HashMap Angle (HashMap Location Distance))
 bestLocation (Grid _ asteroids) = maximumBy go (HM.toList asteroids)
@@ -100,10 +101,10 @@ vaporize visible allAngles = go [] visible allAngles
 clockwise :: [Angle] -> [Angle]
 clockwise angles =
   let (i, ii, iii, iv) = foldl go ([], [], [], []) angles
-   in sortBy (comparing (fromRational)) i
-        ++ sortBy (comparing fromRational) iv
-        ++ sortBy (comparing fromRational) iii
-        ++ sortBy (comparing fromRational) ii
+   in sortOn fromRational i
+        ++ sortOn fromRational iv
+        ++ sortOn fromRational iii
+        ++ sortOn fromRational ii
   where
     go (i, ii, iii, iv) a@(n :% d)
       | n <= 0 && d >= 0 = (a : i, ii, iii, iv)
@@ -123,19 +124,10 @@ detect :: Location -> HashMap Angle (HashMap Location Distance) -> Location -> H
 detect (fromX, fromY) detections (toX, toY) = HM.alter go angle detections
   where
     distance = sqrt (fromIntegral dX ** 2 + fromIntegral dY ** 2)
-    angle =
-      if dX == 0
-        then
-          if dY > 0
-            then 1 :% 0
-            else (-1) :% 0
-        else
-          if dY == 0
-            then
-              if dX > 0
-                then 0 :% 1
-                else 0 :% (-1)
-            else reduce dY dX
+    angle
+      | dX == 0 = if dY > 0 then 1 :% 0 else (-1) :% 0
+      | dY == 0 = if dX > 0 then 0 :% 1 else 0 :% (-1)
+      | otherwise = reduce dY dX
     dX = fromIntegral (toX - fromX)
     dY = fromIntegral (toY - fromY)
     reduce x y = (x `quot` d) :% (y `quot` d)

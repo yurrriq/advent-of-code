@@ -52,8 +52,8 @@ minimumOrbitalTransfers from to iorbs =
   let froms = reverse (iorbs ! from)
       tos = reverse (iorbs ! to)
    in 2
-        + (length (takeWhile (not . flip elem tos) froms))
-        + (length (takeWhile (not . flip elem froms) tos))
+        + length (takeWhile (not . flip elem tos) froms)
+        + length (takeWhile (not . flip elem froms) tos)
 
 partOne :: [Orbit] -> Int
 partOne orbs = HM.size dorbs + sum (HM.map length iorbs)

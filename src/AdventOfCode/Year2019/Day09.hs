@@ -11,7 +11,7 @@ import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (inputFilePath)
 import Conduit
 import Control.Monad (liftM2, when)
-import Control.Monad.State (get, lift, put)
+import Control.Monad.State (get, gets, lift, put)
 import Control.Monad.Trans.State.Strict (StateT, execStateT)
 import Data.Conduit.Lift (evalStateC)
 import Data.FastDigits (digits)
@@ -150,18 +150,12 @@ runInstruction (JumpIfTrue vx vy) =
   lift $ do
     x <- handleValue vx
     when (x /= 0) $
-      do
-        state <- get
-        y <- handleValue vy
-        put $ state {_pointer = y}
+      jump vy
 runInstruction (JumpIfFalse vx vy) =
   lift $ do
     x <- handleValue vx
     when (x == 0) $
-      do
-        state <- get
-        y <- handleValue vy
-        put $ state {_pointer = y}
+      jump vy
 runInstruction (LessThan vx vy dst) =
   lift $ do
     lt <- (<) <$> handleValue vx <*> handleValue vy
@@ -180,6 +174,13 @@ runInstruction (AdjustRelativeBase vx) =
     x <- handleValue vx
     put $ state {_relativeBase = _relativeBase state + x}
 runInstruction End = pure ()
+
+jump :: Value -> Program ()
+jump vy =
+  do
+    state <- get
+    y <- handleValue vy
+    put $ state {_pointer = y}
 
 evalStack :: Stack -> ConduitT Int Int IO ()
 evalStack st = evalStateC (initialState {_stack = st}) runProgram
@@ -218,7 +219,7 @@ incrementPointer =
 nextInt :: Program Int
 nextInt =
   do
-    vx <- liftM2 (!) _stack _pointer <$> get
+    vx <- gets (liftM2 (!) _stack _pointer)
     incrementPointer
     pure vx
 
@@ -226,11 +227,11 @@ handleValue :: Value -> Program Int
 handleValue (PositionMode i) =
   do
     growStack i
-    flip V.indexM i =<< _stack <$> get
+    flip V.indexM i =<< gets _stack
 handleValue (ImmediateMode n) = pure n
 handleValue (RelativeMode n) =
   do
-    relativeBase <- _relativeBase <$> get
+    relativeBase <- gets _relativeBase
     handleValue (PositionMode (relativeBase + n))
 
 -- -------------------------------------------------------- [ Helper Functions ]

@@ -2,8 +2,8 @@ module AdventOfCode.Year2019.Day07 where
 
 import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (inputFilePath)
-import Control.Monad (liftM2, mapM, when)
-import Control.Monad.State (get, lift, put)
+import Control.Monad (forM, liftM2, when)
+import Control.Monad.State (get, gets, lift, put)
 import Control.Monad.Trans.State.Strict (StateT, execStateT)
 import Data.Conduit
 import Data.Conduit.Lift (evalStateC)
@@ -29,7 +29,7 @@ partOne :: Vector Int -> IO ()
 partOne prog =
   do
     let ampses = prepareAmps prog <$> permutations [0 .. 4]
-    results <- flip mapM ampses $ \[a, b, c, d, e] ->
+    results <- forM ampses $ \[a, b, c, d, e] ->
       runConduit $
         yield 0
           .| a
@@ -146,18 +146,12 @@ runInstruction (JumpIfTrue vx vy) =
   lift $ do
     x <- handleValue vx
     when (x /= 0) $
-      do
-        state <- get
-        y <- handleValue vy
-        put $ state {_pointer = y}
+      jump vy
 runInstruction (JumpIfFalse vx vy) =
   lift $ do
     x <- handleValue vx
     when (x == 0) $
-      do
-        state <- get
-        y <- handleValue vy
-        put $ state {_pointer = y}
+      jump vy
 runInstruction (LessThan vx vy dst) =
   lift $ do
     lt <- (<) <$> handleValue vx <*> handleValue vy
@@ -171,6 +165,13 @@ runInstruction (Equals vx vy dst) =
       then setValue 1 dst
       else setValue 0 dst
 runInstruction End = pure ()
+
+jump :: Value -> Program ()
+jump vy =
+  do
+    state <- get
+    y <- handleValue vy
+    put $ state {_pointer = y}
 
 evalStack :: Stack -> ConduitT Int Int IO ()
 evalStack st = evalStateC (initialState {_stack = st}) runProgram
@@ -199,7 +200,7 @@ incrementPointer =
 nextInt :: Program Int
 nextInt =
   do
-    vx <- liftM2 (!) _stack _pointer <$> get
+    vx <- gets (liftM2 (!) _stack _pointer)
     incrementPointer
     pure vx
 
