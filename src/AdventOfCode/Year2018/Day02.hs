@@ -10,7 +10,7 @@ import AdventOfCode.TH (inputFilePath)
 import AdventOfCode.Util (commonElems, frequencies, hammingSimilar)
 import Control.Arrow ((&&&), (***), (>>>))
 import Data.List (find, tails)
-import Data.Maybe (listToMaybe, mapMaybe)
+import Data.Maybe (fromMaybe, listToMaybe, mapMaybe)
 import Text.Trifecta (Parser, letter, newline, sepEndBy, some)
 
 type BoxID = String
@@ -47,4 +47,4 @@ main = do
   putStr "Part One: "
   print (partOne input)
   putStr "Part Two: "
-  putStrLn (maybe "failed!" id (partTwo input))
+  putStrLn (fromMaybe "failed!" (partTwo input))

@@ -11,6 +11,7 @@ import AdventOfCode.Util (Frequencies, frequencies)
 import qualified Data.HashMap.Strict as HM
 import Data.Hashable (Hashable (..))
 import Data.List (find)
+import Data.Maybe (fromMaybe)
 import Text.Trifecta (Parser, comma, digit, many, natural, some, space, symbol)
 
 -- ------------------------------------------------------------------  [ Types ]
@@ -96,4 +97,4 @@ main = do
   putStr "Part One: "
   print (partOne input)
   putStr "Part Two: "
-  putStrLn $ maybe "failed!" id (partTwo input)
+  putStrLn $ fromMaybe "failed!" (partTwo input)

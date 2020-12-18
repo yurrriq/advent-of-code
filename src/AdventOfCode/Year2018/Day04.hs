@@ -1,3 +1,5 @@
+{-# LANGUAGE TupleSections #-}
+
 module AdventOfCode.Year2018.Day04
   ( main,
     partOne,
@@ -116,7 +118,7 @@ mostConsistentSleeper =
     . napsByGuard
   where
     go _ [] old = old
-    go guard naps Nothing = Just $ first ((,) guard) (sleepiestMinute naps)
+    go guard naps Nothing = Just $ first (guard,) (sleepiestMinute naps)
     go guard naps old@(Just ((_, _), oldTimes)) =
       let (minute, times) = sleepiestMinute naps
        in if times > oldTimes
@@ -128,7 +130,7 @@ mostConsistentSleeper =
 partOne :: [Entry] -> Maybe Integer
 partOne entries =
   case sleepiestGuard entries of
-    Just (_, (Guard gid, naps)) -> Just (gid * (fst (sleepiestMinute naps)))
+    Just (_, (Guard gid, naps)) -> Just (gid * fst (sleepiestMinute naps))
     _ -> Nothing
 
 partTwo :: [Entry] -> Maybe Integer

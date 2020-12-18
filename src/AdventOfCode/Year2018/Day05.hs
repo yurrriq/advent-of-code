@@ -55,14 +55,14 @@ order = length . FG.toList
 -- [free algebra]: https://en.wikipedia.org/wiki/Free_algebra
 -- [`FreeAlgebra`]: https://hackage.haskell.org/package/free-algebras-0.6.0.0/docs/Data-Algebra-Free.html#t:FreeAlgebra
 
-partOne :: [Char] -> Int
+partOne :: String -> Int
 partOne = order . foldMap inject
 
-partTwo :: [Char] -> Int
+partTwo :: String -> Int
 partTwo = minimum . cleanedPolymers . foldMap inject
   where
     cleanedPolymers :: FG.FreeGroupL Unit -> [Int]
-    cleanedPolymers polymer = (order . flip clean polymer) <$> finites
+    cleanedPolymers polymer = order . flip clean polymer <$> finites
 
 main :: IO ()
 main =
