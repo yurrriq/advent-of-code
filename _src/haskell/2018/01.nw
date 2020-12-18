@@ -4,15 +4,18 @@ As usual, \href{https://adventofcode.com/2018/1}{Day 1} consists of two parts,
 [[partOne]] and [[partTwo]].
 
 <<Day01.hs>>=
-module Day01
-  ( partOne
-  , partTwo
-  ) where
-
+module AdventOfCode.Year2018.Day01
+  ( main,
+    partOne,
+    partTwo,
+  )
+where
 
 <<Import functions, operators, and types from other modules.>>
 
 <<Define data types to model the puzzle input.>>
+
+<<Define the main function>>
 
 <<Define parsers for handling puzzle input.>>
 
@@ -32,8 +35,9 @@ module Day01
 A frequency change is represented by a (summable) integer.
 
 <<Define data types to model the puzzle input.>>=
-newtype FrequencyChange = FrequencyChange
-  { unFrequencyChange :: Sum Integer}
+newtype FrequencyChange
+  = FrequencyChange
+      {unFrequencyChange :: Sum Integer}
   deriving (Eq, Show)
 
 @ %def FrequencyChange
@@ -46,16 +50,16 @@ Since \hs{findFirstDup} uses \hs{HashSet}s internally, we need to make sure
 
 <<Define data types to model the puzzle input.>>=
 instance Hashable FrequencyChange where
-    hashWithSalt salt = hashWithSalt salt . getSum . unFrequencyChange
+  hashWithSalt salt = hashWithSalt salt . getSum . unFrequencyChange
 
 @
 
 <<Define data types to model the puzzle input.>>=
 instance Semigroup FrequencyChange where
-    (FrequencyChange x) <> (FrequencyChange y) =  FrequencyChange (x <> y)
+  (FrequencyChange x) <> (FrequencyChange y) = FrequencyChange (x <> y)
 
 instance Monoid FrequencyChange where
-    mempty = FrequencyChange (Sum 0)
+  mempty = FrequencyChange (Sum 0)
 @
 
 \section{Parsing}
@@ -69,17 +73,9 @@ represented by signed integers, e.g.
 \end{minted}
 
 <<Define parsers for handling puzzle input.>>=
-frequencyChanges :: Parser [FrequencyChange]
-frequencyChanges = many (FrequencyChange . Sum <$> integer)
-@ %def frequencyChanges
-
-In practice, we'll use \hs{ByteString}s and the helper function\\
-\hs{maybeParseByteString :: Parser a -> ByteString -> Maybe a},
-to try to parse the puzzle input.
-
-<<Try to parse the input>>=
-maybeParseByteString frequencyChanges
-@
+frequencyChange :: Parser FrequencyChange
+frequencyChange = FrequencyChange . Sum <$> integer
+@ %def frequencyChange
 
 
 \section{Part One}
@@ -89,20 +85,19 @@ sequence of changes in frequency, then sum them.
 
 
 <<Solve parts one and two.>>=
-partOne :: ByteString -> Maybe Integer
-partOne = fmap (getSum . unFrequencyChange . mconcat) .
-	  <<Try to parse the input>>
+partOne :: [FrequencyChange] -> Integer
+partOne = getSum . unFrequencyChange . mconcat
+
 @
 
 \section{Part Two}
 
 <<Solve parts one and two.>>=
-partTwo :: ByteString -> Maybe Integer
+partTwo :: [FrequencyChange] -> Maybe Integer
 partTwo =
-    <<Try to parse the input>> >=>
-    <<Compute the list of frequencies reached>> >>>
-    <<Find the first duplicate>> >>>
-    <<Unbox the result>>
+  <<Compute the list of frequencies reached>>
+    >>> <<Find the first duplicate>>
+    >>> <<Unbox the result>>
 @
 
 <<Compute the list of frequencies reached>>=
@@ -118,34 +113,27 @@ fmap (getSum . unFrequencyChange)
 @
 
 
+\section{Main}
+
+<<Define the main function>>=
+main :: IO ()
+main = do
+  input <- parseInput (some frequencyChange) $(inputFilePath)
+  putStr "Part One: "
+  print (partOne input)
+  putStr "Part Two: "
+  putStrLn $ maybe "failed!" show (partTwo input)
+@
+
+
 \section{Imports}
 
 <<Import functions, operators, and types from other modules.>>=
-import           Control.Category ((>>>))
-@
-
-<<Import functions, operators, and types from other modules.>>=
-import           Control.Monad    ((>=>))
-@
-@
-
-
-<<Import functions, operators, and types from other modules.>>=
-import           Data.ByteString  (ByteString)
-@
-
-<<Import functions, operators, and types from other modules.>>=
-import           Data.Hashable    (Hashable (..))
-@
-
-<<Import functions, operators, and types from other modules.>>=
-import           Data.Monoid      (Sum (..))
-@
-
-<<Import functions, operators, and types from other modules.>>=
-import           Text.Trifecta    (Parser, integer, many)
-@
-
-<<Import functions, operators, and types from other modules.>>=
-import           Util             (findFirstDup, maybeParseByteString, scan)
+import AdventOfCode.Input (parseInput)
+import AdventOfCode.TH (inputFilePath)
+import AdventOfCode.Util (findFirstDup, scan)
+import Control.Category ((>>>))
+import Data.Hashable (Hashable (..))
+import Data.Monoid (Sum (..))
+import Text.Trifecta (Parser, integer, some)
 @
