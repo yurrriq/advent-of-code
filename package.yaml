@@ -201,6 +201,11 @@ executables:
     dependencies:
     - linear
     - vector
+  aoc-2020-day12:
+    <<: *executable
+    main: AdventOfCode.Year2020.Day12
+    dependencies:
+    - linear
   aoc-2020-day14:
     <<: *executable
     main: AdventOfCode.Year2020.Day14
