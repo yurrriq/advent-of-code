@@ -48,6 +48,7 @@ library:
   - lens
   - linear
   - mtl
+  - parser-combinators
   - transformers
   - unordered-containers
   - vector
@@ -228,6 +229,11 @@ executables:
     main: AdventOfCode.Year2020.Day17
     dependencies:
     - linear
+  aoc-2020-day18:
+    <<: *executable
+    main: AdventOfCode.Year2020.Day18
+    dependencies:
+    - parser-combinators
 _benchmark: &benchmark
   ghc-options:
   - -threaded
