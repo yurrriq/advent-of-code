@@ -49,6 +49,7 @@ library:
   - linear
   - mtl
   - parser-combinators
+  - recursion-schemes
   - transformers
   - unordered-containers
   - vector
@@ -234,6 +235,11 @@ executables:
     main: AdventOfCode.Year2020.Day18
     dependencies:
     - parser-combinators
+  aoc-2020-day19:
+    <<: *executable
+    main: AdventOfCode.Year2020.Day19
+    dependencies:
+    - recursion-schemes
 _benchmark: &benchmark
   ghc-options:
   - -threaded
