@@ -6,7 +6,6 @@ module AdventOfCode.Util
     frequencies,
     frequenciesInt,
     maybeParseByteString,
-    commonElems,
     findFirstDup,
     hammingDistance,
     hammingSimilar,
@@ -43,20 +42,12 @@ frequencies = foldr go Map.empty
 frequenciesInt :: Foldable t => t Int -> IM.IntMap Int
 frequenciesInt = foldr go IM.empty
   where
-    go key = IM.insertWith (+) key 1
+    go k = IM.insertWith (+) k 1
 
 maybeParseByteString :: Parser a -> ByteString -> Maybe a
 maybeParseByteString p = parseByteString p mempty >>> \case
   Failure _ -> Nothing
   Success res -> Just res
-
-commonElems :: (Eq a) => [a] -> [a] -> Maybe [a]
-commonElems (x : xs) (y : ys)
-  | x == y = Just [x] <> recur
-  | otherwise = recur
-  where
-    recur = commonElems xs ys
-commonElems _ _ = Nothing
 
 hammingDistance :: Eq a => [a] -> [a] -> Maybe Integer
 hammingDistance (x : xs) (y : ys)
@@ -87,8 +78,6 @@ count p = length . filter p
 snoc :: [a] -> a -> [a]
 snoc xs x = xs ++ [x]
 
--- http://r6.ca/blog/20121209T182914Z.html
--- https://jaspervdj.be/posts/2012-10-17-wiggling-sums.html
 wigglesum :: Traversable t => (a -> [a]) -> t a -> [t a]
 wigglesum wiggle = holesOf traverse >=> experiment wiggle
 

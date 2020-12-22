@@ -18,7 +18,6 @@ module AdventOfCode.Util
     frequencies,
     frequenciesInt,
     maybeParseByteString,
-    commonElems,
     findFirstDup,
     hammingDistance,
     hammingSimilar,
@@ -95,18 +94,6 @@ maybeParseByteString p = parseByteString p mempty >>> \case
 
 
 \section{Manipulating lists}
-
-\todor{Describe commonElems}
-<<Manipulating lists>>=
-commonElems :: (Eq a) => [a] -> [a] -> Maybe [a]
-commonElems (x : xs) (y : ys)
-  | x == y = Just [x] <> recur
-  | otherwise = recur
-  where
-    recur = commonElems xs ys
-commonElems _ _ = Nothing
-
-@ %def commonElems
 
 \todor{Describe hammingDistance, incl. design choices}
 <<Manipulating lists>>=

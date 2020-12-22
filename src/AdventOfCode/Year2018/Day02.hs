@@ -7,9 +7,9 @@ where
 
 import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (inputFilePath)
-import AdventOfCode.Util (commonElems, frequencies, hammingSimilar)
+import AdventOfCode.Util (frequencies, hammingSimilar)
 import Control.Arrow ((&&&), (***), (>>>))
-import Data.List (find, tails)
+import Data.List (find, intersect, tails)
 import Data.Maybe (fromMaybe, listToMaybe, mapMaybe)
 import Text.Trifecta (Parser, letter, newline, sepEndBy, some)
 
@@ -38,7 +38,7 @@ correctBoxIDs = listToMaybe . mapMaybe go . tails
     go _ = Nothing
 
 partTwo :: [BoxID] -> Maybe String
-partTwo boxIDs = uncurry commonElems =<< correctBoxIDs boxIDs
+partTwo = fmap (uncurry intersect) . correctBoxIDs
 
 main :: IO ()
 main = do
