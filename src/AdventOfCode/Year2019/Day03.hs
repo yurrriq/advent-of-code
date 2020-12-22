@@ -8,9 +8,9 @@ import Control.Category ((>>>))
 import Data.Foldable (minimumBy)
 import Data.Function (on)
 import Data.Functor ((<$))
-import qualified Data.HashSet as HS
-import Data.Hashable (Hashable (..))
 import Data.Ix (Ix (..))
+import Data.Set (Set)
+import qualified Data.Set as Set
 import GHC.Arr (unsafeIndex, unsafeRangeSize)
 import Text.Trifecta
 
@@ -33,9 +33,6 @@ data Point
         _y :: Int
       }
   deriving (Eq, Ord)
-
-instance Hashable Point where
-  hashWithSalt salt (Point x y) = hashWithSalt salt (x, y)
 
 instance Ix Point where
   {-# SPECIALIZE instance Ix Point #-}
@@ -88,8 +85,8 @@ manhattanDistance = curry $ (distanceOn _x &&& distanceOn _y) >>> uncurry (+)
     distanceOn :: Num a => (b -> a) -> (b, b) -> a
     distanceOn f = abs . uncurry (subtract `on` f)
 
-findCrossings :: [Point] -> [Point] -> HS.HashSet Point
-findCrossings = HS.intersection `on` HS.fromList
+findCrossings :: [Point] -> [Point] -> Set Point
+findCrossings = Set.intersection `on` Set.fromList
 
 runSegments :: [Segment] -> [Point]
 runSegments = snd . foldl go (Point 0 0, [])
@@ -143,7 +140,7 @@ partOne =
 partTwo :: ([Segment], [Segment]) -> Int
 partTwo (xs, ys) =
   minimum
-    $ HS.map (\p -> ((+) `on` (+ 1) . length . takeWhile (/= p)) xs' ys')
+    $ Set.map (\p -> ((+) `on` (+ 1) . length . takeWhile (/= p)) xs' ys')
     $ findCrossings xs' ys'
   where
     (xs', ys') = (runSegments xs, runSegments ys)

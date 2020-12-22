@@ -12,9 +12,9 @@ import AdventOfCode.TH (inputFilePath)
 import AdventOfCode.Util (frequencies)
 import Control.Applicative ((<|>))
 import Control.Arrow (first)
-import qualified Data.HashMap.Strict as HM
-import Data.Hashable (Hashable (..))
 import Data.List (maximumBy, sort)
+import Data.Map (Map)
+import qualified Data.Map as Map
 import Data.Ord (comparing)
 import Text.Trifecta ((<?>), Parser, brackets, char, colon, many, natural, symbol)
 
@@ -45,9 +45,6 @@ time =
 newtype Guard = Guard {unGuard :: Integer}
   deriving (Eq, Ord, Show)
 
-instance Hashable Guard where
-  hashWithSalt salt = hashWithSalt salt . unGuard
-
 data Event
   = Shift Guard
   | Asleep
@@ -72,7 +69,7 @@ type Entry = (Time, Event)
 entry :: Parser Entry
 entry = (,) <$> time <*> event
 
-type TimeCards = HM.HashMap Guard [[Entry]]
+type TimeCards = Map Guard [[Entry]]
 
 -- ----------------------------------------------------------------- [ Helpers ]
 
@@ -85,19 +82,19 @@ napTimes ((from, Asleep) : (to, Awake) : rest) =
   [_tMinute from .. _tMinute to - 1] ++ napTimes rest
 napTimes _ = []
 
-napsByGuard :: [Entry] -> HM.HashMap Guard [[Integer]]
-napsByGuard = HM.map (map napTimes) . shifts
+napsByGuard :: [Entry] -> Map Guard [[Integer]]
+napsByGuard = fmap (map napTimes) . shifts
 
 shifts :: [Entry] -> TimeCards
-shifts = go HM.empty . sort
+shifts = go Map.empty . sort
   where
     go acc ((_when, Shift who) : entries) =
       let (events, rest) = break isShiftChange entries
-       in go (HM.insertWith (++) who [events] acc) rest
+       in go (Map.insertWith (++) who [events] acc) rest
     go acc _ = acc
 
 sleepiestGuard :: [Entry] -> Maybe (Int, (Guard, [[Integer]]))
-sleepiestGuard = HM.foldrWithKey go Nothing . napsByGuard
+sleepiestGuard = Map.foldrWithKey go Nothing . napsByGuard
   where
     go a xxs Nothing = Just (sum (length <$> xxs), (a, xxs))
     go a xxs old@(Just (m, (_, _))) =
@@ -107,14 +104,14 @@ sleepiestGuard = HM.foldrWithKey go Nothing . napsByGuard
 sleepiestMinute :: [[Integer]] -> (Integer, Int)
 sleepiestMinute =
   maximumBy (comparing snd)
-    . HM.toList
+    . Map.toList
     . frequencies
     . concat
 
 mostConsistentSleeper :: [Entry] -> Maybe ((Guard, Integer), Int)
 mostConsistentSleeper =
-  HM.foldrWithKey go Nothing
-    . HM.map (filter (not . null))
+  Map.foldrWithKey go Nothing
+    . fmap (filter (not . null))
     . napsByGuard
   where
     go _ [] old = old

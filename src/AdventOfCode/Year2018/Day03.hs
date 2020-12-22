@@ -8,9 +8,8 @@ where
 import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (inputFilePath)
 import AdventOfCode.Util (Frequencies, frequencies)
-import qualified Data.HashMap.Strict as HM
-import Data.Hashable (Hashable (..))
 import Data.List (find)
+import qualified Data.Map as Map
 import Data.Maybe (fromMaybe)
 import Text.Trifecta (Parser, comma, digit, many, natural, some, space, symbol)
 
@@ -21,10 +20,7 @@ data Point
       { _left :: Integer,
         _top :: Integer
       }
-  deriving (Eq)
-
-instance Hashable Point where
-  hashWithSalt salt (Point l t) = hashWithSalt salt (l, t)
+  deriving (Eq, Ord)
 
 instance Show Point where
   showsPrec _ (Point left top) =
@@ -71,7 +67,7 @@ isClaimOverlapping :: Frequencies Point -> Claim -> Bool
 isClaimOverlapping covered = any (isPointOverlapping covered) . squaresCovered
 
 isPointOverlapping :: Frequencies Point -> Point -> Bool
-isPointOverlapping covered = maybe False (> 1) . flip HM.lookup covered
+isPointOverlapping covered = maybe False (> 1) . flip Map.lookup covered
 
 squaresCovered :: Claim -> [Point]
 squaresCovered (Claim _ (Point x0 y0) (Size w h)) =
@@ -81,8 +77,8 @@ squaresCovered (Claim _ (Point x0 y0) (Size w h)) =
 
 partOne :: [Claim] -> Int
 partOne =
-  HM.size
-    . HM.filter (>= 2)
+  Map.size
+    . Map.filter (>= 2)
     . frequencies
     . concatMap squaresCovered
 

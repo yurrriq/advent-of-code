@@ -8,7 +8,7 @@ where
 
 import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (inputFilePath)
-import qualified Data.HashSet as HashSet
+import qualified Data.Set as Set
 import Text.Trifecta (Parser, lower, newline, sepEndBy, some)
 
 main :: IO ()
@@ -24,13 +24,13 @@ getInput :: IO [[String]]
 getInput = parseInput (group `sepEndBy` newline) $(inputFilePath)
 
 partOne :: [[String]] -> Int
-partOne = sum . map (HashSet.size . foldr go HashSet.empty)
+partOne = sum . map (Set.size . foldr go Set.empty)
   where
-    go = flip (foldr HashSet.insert)
+    go = flip (foldr Set.insert)
 
 partTwo :: [[String]] -> Int
 partTwo =
-  sum . map (HashSet.size . foldr1 HashSet.intersection . map HashSet.fromList)
+  sum . map (Set.size . foldr1 Set.intersection . map Set.fromList)
 
 group :: Parser [String]
 group = questionnaire `sepEndBy` newline

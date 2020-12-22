@@ -9,17 +9,13 @@ import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (inputFilePath)
 import AdventOfCode.Util (findFirstDup, scan)
 import Control.Category ((>>>))
-import Data.Hashable (Hashable (..))
 import Data.Monoid (Sum (..))
 import Text.Trifecta (Parser, integer, some)
 
 newtype FrequencyChange
   = FrequencyChange
       {unFrequencyChange :: Sum Integer}
-  deriving (Eq, Show)
-
-instance Hashable FrequencyChange where
-  hashWithSalt salt = hashWithSalt salt . getSum . unFrequencyChange
+  deriving (Eq, Ord, Show)
 
 instance Semigroup FrequencyChange where
   (FrequencyChange x) <> (FrequencyChange y) = FrequencyChange (x <> y)

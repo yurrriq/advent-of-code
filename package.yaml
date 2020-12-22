@@ -16,13 +16,11 @@ dependencies:
 - bytestring
 - comonad
 - containers
-- hashable
 - lens
 - parsers
 - split
 - template-haskell
 - trifecta
-- unordered-containers
 default-extensions:
 - TemplateHaskell
 ghc-options:
@@ -44,14 +42,12 @@ library:
   - finite-typelits
   - free-algebras
   - groups
-  - hashable
   - lens
   - linear
   - mtl
   - parser-combinators
   - recursion-schemes
   - transformers
-  - unordered-containers
   - vector
 _executable: &executable
   ghc-options:

@@ -26,21 +26,19 @@ import Control.Lens (holesOf)
 import Control.Monad ((>=>))
 import Data.ByteString (ByteString)
 import Data.Function (fix)
-import qualified Data.HashMap.Strict as HM
-import qualified Data.HashSet as HS
-import Data.Hashable (Hashable (..))
 import qualified Data.IntMap as IM
+import Data.Map (Map)
+import qualified Data.Map as Map
 import Data.Set (Set)
 import qualified Data.Set as Set
 import Text.Trifecta (Parser, Result (..), parseByteString)
 
-type Frequencies a = HM.HashMap a Int
+type Frequencies a = Map a Int
 
-frequencies :: (Eq a, Hashable a) => [a] -> Frequencies a
-frequencies = foldr go HM.empty
+frequencies :: Ord a => [a] -> Frequencies a
+frequencies = foldr go Map.empty
   where
-    go :: (Eq a, Hashable a) => a -> Frequencies a -> Frequencies a
-    go k = HM.insertWith (+) k 1
+    go k = Map.insertWith (+) k 1
 
 frequenciesInt :: Foldable t => t Int -> IM.IntMap Int
 frequenciesInt = foldr go IM.empty
@@ -72,13 +70,13 @@ hammingDistance _ _ = Nothing
 hammingSimilar :: Eq a => Integer -> [a] -> [a] -> Bool
 hammingSimilar n xs = maybe False (<= n) . hammingDistance xs
 
-findFirstDup :: (Eq a, Hashable a) => [a] -> Maybe a
-findFirstDup = go HS.empty
+findFirstDup :: Ord a => [a] -> Maybe a
+findFirstDup = go Set.empty
   where
     go _ [] = Nothing
     go seen (x : xs)
-      | x `HS.member` seen = Just x
-      | otherwise = go (HS.insert x seen) xs
+      | x `Set.member` seen = Just x
+      | otherwise = go (Set.insert x seen) xs
 
 scan :: Monoid m => [m] -> [m]
 scan = scanl mappend mempty

@@ -3,8 +3,8 @@ module AdventOfCode.Year2019.Day06 where
 import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (inputFilePath)
 import Control.Monad (void)
-import Data.HashMap.Strict ((!))
-import qualified Data.HashMap.Strict as HM
+import Data.Map ((!), Map)
+import qualified Data.Map as Map
 import Text.Trifecta
   ( Parser,
     alphaNum,
@@ -33,21 +33,20 @@ orbit =
     outer <- some alphaNum
     pure $ Orbit outer inner
 
-directOrbits :: [Orbit] -> HM.HashMap String String
-directOrbits = foldr go HM.empty
+directOrbits :: [Orbit] -> Map String String
+directOrbits = foldr go Map.empty
   where
-    go :: Orbit -> HM.HashMap String String -> HM.HashMap String String
-    go (Orbit outer inner) = HM.insert outer inner
+    go (Orbit outer inner) = Map.insert outer inner
 
-indirectOrbits :: HM.HashMap String String -> HM.HashMap String [String]
-indirectOrbits dorbs = HM.foldrWithKey go HM.empty dorbs
+indirectOrbits :: Map String String -> Map String [String]
+indirectOrbits dorbs = Map.foldrWithKey go Map.empty dorbs
   where
-    go :: String -> String -> HM.HashMap String [String] -> HM.HashMap String [String]
-    go outer inner = HM.insert outer (go' [] (HM.lookup inner dorbs))
+    go :: String -> String -> Map String [String] -> Map String [String]
+    go outer inner = Map.insert outer (go' [] (Map.lookup inner dorbs))
     go' inners Nothing = inners
-    go' inners (Just inner') = go' (inner' : inners) (HM.lookup inner' dorbs)
+    go' inners (Just inner') = go' (inner' : inners) (Map.lookup inner' dorbs)
 
-minimumOrbitalTransfers :: String -> String -> HM.HashMap String [String] -> Int
+minimumOrbitalTransfers :: String -> String -> Map String [String] -> Int
 minimumOrbitalTransfers from to iorbs =
   let froms = reverse (iorbs ! from)
       tos = reverse (iorbs ! to)
@@ -56,7 +55,7 @@ minimumOrbitalTransfers from to iorbs =
         + length (takeWhile (not . flip elem froms) tos)
 
 partOne :: [Orbit] -> Int
-partOne orbs = HM.size dorbs + sum (HM.map length iorbs)
+partOne orbs = Map.size dorbs + sum (fmap length iorbs)
   where
     dorbs = directOrbits orbs
     iorbs = indirectOrbits dorbs

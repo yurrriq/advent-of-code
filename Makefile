@@ -71,6 +71,9 @@ src/AdventOfCode/Year2019/Day%.hs: _src/haskell/2019/%.nw
 	notangle -R'$(@F)' $< ${cpif} $@
 
 
+src/AdventOfCode/Util.hs: _src/haskell/Util.nw
+	@ mkdir -p $(@D)
+	notangle -R'$(@F)' $< ${cpif} $@
 
 
 # compiler := ghc862
