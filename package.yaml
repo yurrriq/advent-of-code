@@ -236,6 +236,11 @@ executables:
     main: AdventOfCode.Year2020.Day19
     dependencies:
     - recursion-schemes
+  aoc-2020-day20:
+    <<: *executable
+    main: AdventOfCode.Year2020.Day20
+    dependencies:
+    - linear
 _benchmark: &benchmark
   ghc-options:
   - -threaded
