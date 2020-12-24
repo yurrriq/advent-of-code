@@ -173,6 +173,9 @@ executables:
     main: AdventOfCode.Year2020.Day03
     dependencies:
     - vector
+  aoc-2020-day04:
+    <<: *executable
+    main: AdventOfCode.Year2020.Day04
   aoc-2020-day05:
     <<: *executable
     main: AdventOfCode.Year2020.Day05
