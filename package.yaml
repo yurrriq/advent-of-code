@@ -219,6 +219,11 @@ executables:
     - AdventOfCode.Year2020.Day14.Parsers
     - AdventOfCode.Year2020.Day14.Types
     - Paths_advent_of_code
+  aoc-2020-day15:
+    <<: *executable
+    main: AdventOfCode.Year2020.Day15
+    dependencies:
+    - mtl
   aoc-2020-day16:
     <<: *executable
     main: AdventOfCode.Year2020.Day16
