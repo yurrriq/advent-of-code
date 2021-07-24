@@ -8,14 +8,13 @@ where
 
 import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (inputFilePath)
-import Control.Applicative ((<|>), some)
+import Control.Applicative (some, (<|>))
 import Control.Arrow (first)
-import Control.Monad (foldM)
 import Data.Bool (bool)
 import Data.Char (isDigit, isHexDigit)
 import Data.Ix (inRange)
-import Data.Map (Map)
-import qualified Data.Map as Map
+import Data.Map.Strict (Map)
+import qualified Data.Map.Strict as Map
 import Data.Maybe (mapMaybe)
 import Text.Trifecta
   ( Parser,
@@ -42,59 +41,56 @@ main =
     putStr "Part Two: "
     print (partTwo input)
 
-getInput :: IO [[(String, Either Int String)]]
+getInput :: IO [Passport]
 getInput = parseInput (passport `sepEndBy` newline) $(inputFilePath)
 
-partOne :: [[(String, Either Int String)]] -> Int
+partOne :: [Passport] -> Int
 partOne =
   length
     . filter (flip all requiredFields . flip Map.member)
-    . map Map.fromList
 
-partTwo :: [[(String, Either Int String)]] -> Int
+partTwo :: [Passport] -> Int
 partTwo =
   length
     . filter (flip all requiredFields . flip Map.member)
     . mapMaybe validPassport
 
-validPassport :: [(String, Either Int String)] -> Maybe (Map String (Either Int String))
-validPassport fs = foldM go Map.empty fs
-  where
-    go m f = mappend m . uncurry Map.singleton <$> validateField f
+validPassport :: Passport -> Maybe Passport
+validPassport = Map.foldMapWithKey validateField
 
-validateField :: (String, Either Int String) -> Maybe (String, Either Int String)
-validateField x@("byr", Left year) =
-  bool Nothing (Just x) $
-    inRange (1920, 2002) year
-validateField x@("iyr", Left year) =
-  bool Nothing (Just x) $
-    inRange (2010, 2020) year
-validateField x@("eyr", Left year) =
-  bool Nothing (Just x) $
-    inRange (2020, 2030) year
-validateField x@("hgt", Right height) =
-  case first (read :: String -> Int) (span isDigit height) of
-    (n, "cm") ->
-      bool Nothing (Just x) $
-        inRange (150, 193) n
-    (n, "in") ->
-      bool Nothing (Just x) $
-        inRange (59, 76) n
+validateField :: String -> Either Int String -> Maybe Passport
+validateField k v =
+  case (k, v) of
+    ("byr", Left year) ->
+      go (inRange (1920, 2002) year)
+    ("iyr", Left year) ->
+      go (inRange (2010, 2020) year)
+    ("eyr", Left year) ->
+      go (inRange (2020, 2030) year)
+    ("hgt", Right height) ->
+      case first (read :: String -> Int) (span isDigit height) of
+        (n, "cm") ->
+          go (inRange (150, 193) n)
+        (n, "in") ->
+          go (inRange (59, 76) n)
+        _ -> Nothing
+    ("hcl", Right ('#' : cs)) ->
+      go (6 == length cs && all isHexDigit cs)
+    ("ecl", Right color) ->
+      go (color `elem` ["amb", "blu", "brn", "gry", "grn", "hzl", "oth"])
+    ("pid", Left pid) ->
+      go (9 == length (show pid))
+    ("pid", Right pid) ->
+      go (9 == length pid && all isDigit pid)
     _ -> Nothing
-validateField x@("hcl", Right ('#' : cs)) =
-  bool Nothing (Just x) $
-    6 == length (filter isHexDigit cs)
-validateField x@("ecl", Right color) =
-  bool Nothing (Just x) $
-    color `elem` ["amb", "blu", "brn", "gry", "grn", "hzl", "oth"]
-validateField x@("pid", Right pid) =
-  bool Nothing (Just x) $
-    9 == length (filter isDigit pid)
-validateField x@("cid", _) = Just x
-validateField _ = Nothing
+  where
+    go = bool Nothing success
+    success = Just (Map.singleton k v)
 
-passport :: Parser [(String, Either Int String)]
-passport = concat <$> some field `sepEndBy` (try newline <|> try space)
+type Passport = Map String (Either Int String)
+
+passport :: Parser Passport
+passport = Map.fromList . concat <$> some field `sepEndBy` (try newline <|> try space)
 
 field :: Parser (String, Either Int String)
 field =
