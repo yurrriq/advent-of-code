@@ -7,7 +7,7 @@ import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (inputFilePath)
 import AdventOfCode.Year2015.Day06.Parsers
 import AdventOfCode.Year2015.Day06.Types
-import Control.Monad (forM_, mapM_)
+import Control.Monad (forM_)
 import Control.Monad.Trans.State
 import Data.Ix (range)
 import Data.Map.Strict (Map)

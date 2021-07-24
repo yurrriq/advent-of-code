@@ -8,7 +8,6 @@ import AdventOfCode.Year2020.Day14.Parsers
 import AdventOfCode.Year2020.Day14.Types
 import Control.Applicative (some)
 import Control.Lens
-import Control.Lens.Indexed (ifoldl', ifoldlM)
 import Control.Monad.State (State, execState, gets)
 import Data.Bits (clearBit, setBit)
 import qualified Data.IntMap as IM

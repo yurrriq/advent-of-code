@@ -15,7 +15,6 @@ import AdventOfCode.TH (inputFilePath)
 import Data.Algebra.Free (foldMapFree, returnFree)
 import Data.Char (isLower, ord, toLower)
 import Data.Finite (Finite, finites, packFinite)
-import Data.Foldable (foldMap)
 import Data.Function (on)
 import Data.Group (invert)
 import qualified Data.Group.Free as FG

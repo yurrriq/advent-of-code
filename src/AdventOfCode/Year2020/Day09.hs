@@ -10,7 +10,7 @@ import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (inputFilePath)
 import Control.Monad (liftM2)
 import Data.Functor (($>))
-import Data.List (find, inits, splitAt, tails)
+import Data.List (find, inits, tails)
 import Text.Trifecta (natural, some)
 
 main :: IO ()

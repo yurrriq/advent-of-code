@@ -7,7 +7,6 @@ import Control.Arrow ((&&&), second)
 import Control.Category ((>>>))
 import Data.Foldable (minimumBy)
 import Data.Function (on)
-import Data.Functor ((<$))
 import Data.Ix (Ix (..))
 import Data.Set (Set)
 import qualified Data.Set as Set

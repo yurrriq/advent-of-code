@@ -11,9 +11,8 @@ import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (inputFilePath)
 import Conduit
 import Control.Monad (liftM2, when)
-import Control.Monad.State (get, gets, lift, put)
+import Control.Monad.State (get, gets, put)
 import Control.Monad.Trans.State.Strict (StateT, execStateT)
-import Data.Conduit.Lift (evalStateC)
 import Data.FastDigits (digits)
 import Data.Vector
   ( (!),

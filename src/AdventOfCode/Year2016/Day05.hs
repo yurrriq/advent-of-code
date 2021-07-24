@@ -11,7 +11,6 @@ import Data.ByteString (ByteString)
 import Data.ByteString.Char8 (pack)
 import Data.List (isPrefixOf)
 import qualified Data.Map.Lazy as Map
-import Data.Monoid ((<>))
 
 type Password = Map.Map Char Char
 

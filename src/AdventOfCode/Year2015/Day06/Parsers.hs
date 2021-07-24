@@ -2,7 +2,6 @@ module AdventOfCode.Year2015.Day06.Parsers where
 
 import AdventOfCode.Year2015.Day06.Types
 import Control.Applicative ((<|>))
-import Data.Functor ((<$))
 import Linear (V2 (..))
 import Text.Trifecta
 
