@@ -21,6 +21,7 @@ dependencies:
 - split
 - template-haskell
 - trifecta
+- unordered-containers
 default-extensions:
 - TemplateHaskell
 ghc-options:
