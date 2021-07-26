@@ -190,6 +190,16 @@ executables:
   aoc-2020-day06:
     <<: *executable
     main: AdventOfCode.Year2020.Day06
+  aoc-2020-day07:
+    <<: *executable
+    main: AdventOfCode.Year2020.Day07
+    other-modules:
+    - AdventOfCode.Input
+    - AdventOfCode.TH
+    - AdventOfCode.Util
+    - Data.Digraph
+    - Data.Digraph.Lazy
+    - Paths_advent_of_code
   aoc-2020-day08:
     <<: *executable
     main: AdventOfCode.Year2020.Day08
