@@ -9,7 +9,7 @@ import Data.Conduit
 import Data.Conduit.Lift (evalStateC)
 import Data.FastDigits (digits)
 import Data.List (permutations)
-import Data.Vector ((!), Vector, fromList, modify)
+import Data.Vector (Vector, fromList, modify, (!))
 import qualified Data.Vector as V
 import qualified Data.Vector.Mutable as MV
 import Text.Trifecta (Parser, comma, integer, sepBy)
@@ -19,9 +19,12 @@ import Text.Trifecta (Parser, comma, integer, sepBy)
 main :: IO ()
 main =
   do
-    input <- parseInput stack $(inputFilePath)
+    input <- getInput
     putStr "Part One: "
     partOne input
+
+getInput :: IO (Vector Int)
+getInput = parseInput stack $(inputFilePath)
 
 -- ------------------------------------------------------------------- [ Parts ]
 
@@ -46,12 +49,11 @@ type Program = StateT ProgramState IO
 
 type Stack = Vector Int
 
-data ProgramState
-  = ProgramState
-      { _stack :: Stack,
-        _pointer :: Int,
-        _debug :: Bool
-      }
+data ProgramState = ProgramState
+  { _stack :: Stack,
+    _pointer :: Int,
+    _debug :: Bool
+  }
   deriving (Eq, Show)
 
 data Instruction
@@ -222,7 +224,7 @@ mkValue 1 = ImmediateMode
 mkValue _ = error "Invalid parameter mode"
 
 prepareAmps :: Stack -> [Int] -> [ConduitM Int Int IO ()]
-prepareAmps = zipWith ($) . repeat . flip prepareAmp
+prepareAmps = map . flip prepareAmp
 
 prepareAmp :: Int -> Stack -> ConduitM Int Int IO ()
 prepareAmp phase prog = fuseAmp phase .| evalStack prog

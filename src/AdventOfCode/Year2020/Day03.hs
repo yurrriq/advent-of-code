@@ -11,7 +11,7 @@ import AdventOfCode.TH (inputFilePath)
 import AdventOfCode.Util (count)
 import Control.Applicative ((<|>))
 import Data.Functor (($>))
-import Data.Vector ((!), Vector)
+import Data.Vector (Vector, (!))
 import qualified Data.Vector as V
 import Text.Trifecta (Parser, char, newline, sepEndBy, some)
 

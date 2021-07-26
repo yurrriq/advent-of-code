@@ -30,8 +30,9 @@ partTwo = memoryGame 30000000
 
 memoryGame :: Int -> [Int] -> Int
 memoryGame n input =
-  evalState memoryRound $ (!! pred n) $
-    iterate (execState memoryRound) (input, 1, IM.empty)
+  evalState memoryRound $
+    (!! pred n) $
+      iterate (execState memoryRound) (input, 1, IM.empty)
 
 memoryRound :: State ([Int], Int, IntMap Int) Int
 memoryRound =

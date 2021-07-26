@@ -16,7 +16,7 @@ import Data.Vector (Vector)
 import qualified Data.Vector as V
 import Linear (V2 (..))
 import Text.Parser.Token.Highlight (Highlight (..))
-import Text.Trifecta ((<?>), Parser, char, highlight, newline, sepEndBy, some)
+import Text.Trifecta (Parser, char, highlight, newline, sepEndBy, some, (<?>))
 import Prelude hiding (floor)
 
 main :: IO ()
@@ -47,9 +47,9 @@ partTwo xxs = solve 5 neighborhood grid
         neighborsOf' p =
           Set.fromList $ mapMaybe (firstNeighborInLine p) adjacencies
         firstNeighborInLine p dxy =
-          find (`Set.member` ps)
-            $ takeWhile (all inRange')
-            $ tail (iterate (+ dxy) p)
+          find (`Set.member` ps) $
+            takeWhile (all inRange') $
+              tail (iterate (+ dxy) p)
     -- TODO: be smarter, or (something like) the Grid type from 2019.10
     inRange' = inRange (0, max (length xxs) (length (V.head xxs)))
     grid = toGrid xxs

@@ -13,9 +13,9 @@ import AdventOfCode.TH (inputFilePath)
 import AdventOfCode.Util (count)
 import Control.Applicative ((<|>))
 import Control.Arrow (first)
-import Control.Monad ((>=>), guard)
+import Control.Monad (guard, (>=>))
 import Data.Functor.Foldable (hylo)
-import Data.IntMap ((!), IntMap)
+import Data.IntMap (IntMap, (!))
 import qualified Data.IntMap as IntMap
 import Text.Trifecta
   ( Parser,

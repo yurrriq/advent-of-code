@@ -10,7 +10,7 @@ import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (inputFilePath)
 import Control.Monad (void)
 import Data.Ix (inRange)
-import Data.List ((\\), isPrefixOf, transpose)
+import Data.List (isPrefixOf, transpose, (\\))
 import Data.Maybe (mapMaybe)
 import Linear (V2 (..))
 import Text.Trifecta (Parser, anyChar, char, commaSep, eof, manyTill, natural, symbol)
@@ -41,12 +41,12 @@ partOne (rules, _, nearbyTickets) =
 -- FIXME: Clean this up...
 partTwo :: ([(String, V2 (Int, Int))], [Int], [[Int]]) -> Int
 partTwo (rules, myTicket, nearbyTickets) =
-  product
-    $ map ((myTicket !!) . fst)
-    $ filter (isPrefixOf "departure" . snd)
-    $ zip [0 ..]
-    $ concat
-    $ iterate go possibleFields !! length nearbyTickets
+  product $
+    map ((myTicket !!) . fst) $
+      filter (isPrefixOf "departure" . snd) $
+        zip [0 ..] $
+          concat $
+            iterate go possibleFields !! length nearbyTickets
   where
     go xs =
       flip map xs $ \ys ->

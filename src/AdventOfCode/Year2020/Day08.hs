@@ -8,7 +8,7 @@ import Control.Lens
 import Control.Monad.State (State, evalState, get, gets)
 import Data.Either (rights)
 import Text.Parser.Token.Highlight (Highlight (..))
-import Text.Trifecta ((<?>), Parser, highlight, integer, some, symbol)
+import Text.Trifecta (Parser, highlight, integer, some, symbol, (<?>))
 
 type Instruction = (Operation, Int)
 
@@ -18,12 +18,11 @@ data Operation
   | NOP
   deriving (Eq, Show)
 
-data ProgState
-  = ProgState
-      { _cursor :: Int,
-        _history :: [Int],
-        _accumulator :: Int
-      }
+data ProgState = ProgState
+  { _cursor :: Int,
+    _history :: [Int],
+    _accumulator :: Int
+  }
   deriving (Eq, Show)
 
 makeLenses ''ProgState

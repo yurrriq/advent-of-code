@@ -10,15 +10,15 @@ import AdventOfCode.TH (inputFilePath)
 import AdventOfCode.Util (frequencies)
 import Control.Applicative ((<|>))
 import Control.Arrow ((&&&))
-import Control.Lens ((+~), (-~), ifoldl', view)
+import Control.Lens (ifoldl', view, (+~), (-~))
 import Control.Monad (ap, guard)
 import Data.Bool (bool)
 import Data.Foldable (toList)
-import Data.Map ((!), (!?), Map)
+import Data.Map (Map, (!), (!?))
 import qualified Data.Map as Map
 import Data.Set (Set)
 import qualified Data.Set as Set
-import Linear.V2 (R1 (..), R2 (..), V2 (..), _yx, perp)
+import Linear.V2 (R1 (..), R2 (..), V2 (..), perp, _yx)
 import Text.Trifecta (Parser, char, natural, newline, sepEndBy, some, symbol)
 
 type Image = Map Coords LabeledTile
@@ -54,17 +54,17 @@ arrange edges layout pieces (hole : holes) =
     ((n, piece), remainingPieces) <- choices pieces
     orientedTile <- orientations piece
     let theTopEdge = topEdge orientedTile
-    guard
-      $ maybe
+    guard $
+      maybe
         (normalizeEdge theTopEdge `Set.member` edges)
         ((theTopEdge ==) . bottomEdge . snd)
-      $ layout !? (_y -~ 1) hole
+        $ layout !? (_y -~ 1) hole
     let theLeftEdge = leftEdge orientedTile
-    guard
-      $ maybe
+    guard $
+      maybe
         (normalizeEdge theLeftEdge `Set.member` edges)
         ((theLeftEdge ==) . rightEdge . snd)
-      $ layout !? (_x -~ 1) hole
+        $ layout !? (_x -~ 1) hole
     arrange edges (Map.insert hole (n, orientedTile) layout) remainingPieces holes
 
 findEdges :: [LabeledTile] -> Set [Int]

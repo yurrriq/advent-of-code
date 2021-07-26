@@ -16,18 +16,17 @@ import Data.List (maximumBy, sort)
 import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Ord (comparing)
-import Text.Trifecta ((<?>), Parser, brackets, char, colon, many, natural, symbol)
+import Text.Trifecta (Parser, brackets, char, colon, many, natural, symbol, (<?>))
 
 -- ------------------------------------------------------------------- [ Types ]
 
-data Time
-  = Time
-      { _tYear :: Integer,
-        _tMonth :: Integer,
-        _tDay :: Integer,
-        _tHour :: Integer,
-        _tMinute :: Integer
-      }
+data Time = Time
+  { _tYear :: Integer,
+    _tMonth :: Integer,
+    _tDay :: Integer,
+    _tHour :: Integer,
+    _tMinute :: Integer
+  }
   deriving (Eq, Ord, Show)
 
 time :: Parser Time

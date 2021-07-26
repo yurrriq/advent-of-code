@@ -60,7 +60,7 @@
           xindy
           xfor
           xstring
-        ;
+          ;
       };
     };
   } // flake-utils.lib.eachSystem [ "x86_64-linux" ] (
@@ -73,7 +73,8 @@
         ];
         inherit system;
       };
-    in {
+    in
+    {
       defaultPackage =
         pkgs.haskellPackages.callCabal2nix
           "advent-of-code"

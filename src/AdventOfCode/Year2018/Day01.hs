@@ -12,9 +12,8 @@ import Control.Category ((>>>))
 import Data.Monoid (Sum (..))
 import Text.Trifecta (Parser, integer, some)
 
-newtype FrequencyChange
-  = FrequencyChange
-      {unFrequencyChange :: Sum Integer}
+newtype FrequencyChange = FrequencyChange
+  {unFrequencyChange :: Sum Integer}
   deriving (Eq, Ord, Show)
 
 instance Semigroup FrequencyChange where

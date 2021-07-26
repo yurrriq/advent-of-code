@@ -15,22 +15,20 @@ import Text.Trifecta (Parser, comma, digit, many, natural, some, space, symbol)
 
 -- ------------------------------------------------------------------  [ Types ]
 
-data Point
-  = Point
-      { _left :: Integer,
-        _top :: Integer
-      }
+data Point = Point
+  { _left :: Integer,
+    _top :: Integer
+  }
   deriving (Eq, Ord)
 
 instance Show Point where
   showsPrec _ (Point left top) =
     showString $ "(" <> show left <> ", " <> show top <> ")"
 
-data Size
-  = Size
-      { _width :: Integer,
-        _height :: Integer
-      }
+data Size = Size
+  { _width :: Integer,
+    _height :: Integer
+  }
   deriving (Eq)
 
 instance Show Size where
@@ -38,12 +36,11 @@ instance Show Size where
 
 type ClaimID = String
 
-data Claim
-  = Claim
-      { _id :: ClaimID,
-        _origin :: Point,
-        _size :: Size
-      }
+data Claim = Claim
+  { _id :: ClaimID,
+    _origin :: Point,
+    _size :: Size
+  }
   deriving (Eq, Show)
 
 -- ----------------------------------------------------------------- [ Parsers ]

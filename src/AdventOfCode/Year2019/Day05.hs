@@ -11,7 +11,7 @@ import Control.Monad (liftM2, when)
 import Control.Monad.IO.Class (liftIO)
 import Control.Monad.State (StateT, evalStateT, get, gets, put)
 import Data.FastDigits (digits)
-import Data.Vector ((!), Vector, fromList, modify)
+import Data.Vector (Vector, fromList, modify, (!))
 import qualified Data.Vector as V
 import qualified Data.Vector.Mutable as MV
 import Text.Trifecta (Parser, comma, integer, sepBy)
@@ -41,11 +41,10 @@ type Program = StateT ProgramState IO
 
 type Stack = Vector Int
 
-data ProgramState
-  = ProgramState
-      { _stack :: Stack,
-        _pointer :: Int
-      }
+data ProgramState = ProgramState
+  { _stack :: Stack,
+    _pointer :: Int
+  }
   deriving (Eq, Show)
 
 data Instruction
@@ -113,9 +112,9 @@ runInstruction (Set vx dst) =
 runInstruction (Print vx) =
   do
     x <- handleValue vx
-    when (x /= 0)
-      $ liftIO
-      $ print x
+    when (x /= 0) $
+      liftIO $
+        print x
 runInstruction (JumpIfTrue vx vy) =
   do
     x <- handleValue vx

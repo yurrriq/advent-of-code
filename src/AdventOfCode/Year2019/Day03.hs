@@ -3,7 +3,7 @@ module AdventOfCode.Year2019.Day03 where
 import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (inputFilePath)
 import Control.Applicative ((<|>))
-import Control.Arrow ((&&&), second)
+import Control.Arrow (second, (&&&))
 import Control.Category ((>>>))
 import Data.Foldable (minimumBy)
 import Data.Function (on)
@@ -26,11 +26,10 @@ data Direction
   | U
   deriving (Eq, Show)
 
-data Point
-  = Point
-      { _x :: Int,
-        _y :: Int
-      }
+data Point = Point
+  { _x :: Int,
+    _y :: Int
+  }
   deriving (Eq, Ord)
 
 instance Ix Point where
@@ -138,9 +137,9 @@ partOne =
 
 partTwo :: ([Segment], [Segment]) -> Int
 partTwo (xs, ys) =
-  minimum
-    $ Set.map (\p -> ((+) `on` (+ 1) . length . takeWhile (/= p)) xs' ys')
-    $ findCrossings xs' ys'
+  minimum $
+    Set.map (\p -> ((+) `on` (+ 1) . length . takeWhile (/= p)) xs' ys') $
+      findCrossings xs' ys'
   where
     (xs', ys') = (runSegments xs, runSegments ys)
 

@@ -10,7 +10,7 @@ import AdventOfCode.TH (inputFilePath)
 import Control.Applicative ((<|>))
 import Data.Function (on)
 import Data.List (minimumBy)
-import Text.Trifecta ((<?>), Parser, char, count, some)
+import Text.Trifecta (Parser, char, count, some, (<?>))
 
 data Pixel
   = Black

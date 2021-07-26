@@ -14,7 +14,7 @@ import Control.Applicative ((<|>))
 import Control.Arrow (first)
 import Control.Lens
 import Data.Functor (($>))
-import Linear (V2 (..), _yx, perp)
+import Linear (V2 (..), perp, _yx)
 import Text.Parser.Token.Highlight (Highlight (..))
 import Text.Trifecta (Parser, char, highlight, natural, some)
 

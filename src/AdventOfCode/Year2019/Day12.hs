@@ -10,7 +10,7 @@ where
 
 import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (inputFilePath)
-import Control.Arrow ((&&&), (>>>), second)
+import Control.Arrow (second, (&&&), (>>>))
 import Data.Function (on)
 import Linear (V3 (..))
 import Text.Trifecta (Parser, angles, between, integer, some, string)

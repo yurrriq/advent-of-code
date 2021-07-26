@@ -6,7 +6,7 @@ import Control.Applicative ((<|>))
 import Data.FastDigits (undigits)
 import Data.List (delete)
 import Text.Parser.Token.Highlight (Highlight (..))
-import Text.Trifecta ((<?>), Parser, char, count, highlight, newline, sepEndBy)
+import Text.Trifecta (Parser, char, count, highlight, newline, sepEndBy, (<?>))
 
 main :: IO ()
 main =

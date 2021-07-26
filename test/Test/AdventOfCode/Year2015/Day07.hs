@@ -7,7 +7,7 @@ import qualified Data.Map as Map
 import Data.Maybe (fromJust)
 import Test.Tasty
 import Test.Tasty.HUnit
-import Text.Trifecta (Result(..), parseString)
+import Text.Trifecta (Result (..), parseString)
 
 test_day07_examples :: TestTree
 test_day07_examples =
@@ -26,15 +26,16 @@ test_day07_examples =
                     "NOT x -> h",
                     "NOT y -> i"
                   ]
-          let expected = Map.fromList [
-                ("d", 72),
-                ("e", 507),
-                ("f", 492),
-                ("g", 114),
-                ("h", 65412),
-                ("i", 65079),
-                ("x", 123),
-                ("y", 456)
-                ]
+          let expected =
+                Map.fromList
+                  [ ("d", 72),
+                    ("e", 507),
+                    ("f", 492),
+                    ("g", 114),
+                    ("h", 65412),
+                    ("i", 65079),
+                    ("x", 123),
+                    ("y", 456)
+                  ]
           evalCircuit input @?= expected
     ]

@@ -15,10 +15,10 @@ import Control.Monad.State (get, gets, put)
 import Control.Monad.Trans.State.Strict (StateT, execStateT)
 import Data.FastDigits (digits)
 import Data.Vector
-  ( (!),
-    Vector,
+  ( Vector,
     fromList,
     modify,
+    (!),
   )
 import qualified Data.Vector as V
 import qualified Data.Vector.Mutable as MV
@@ -44,13 +44,12 @@ type Program = StateT ProgramState IO
 
 type Stack = Vector Int
 
-data ProgramState
-  = ProgramState
-      { _stack :: Stack,
-        _pointer :: Int,
-        _debug :: Bool,
-        _relativeBase :: Int
-      }
+data ProgramState = ProgramState
+  { _stack :: Stack,
+    _pointer :: Int,
+    _debug :: Bool,
+    _relativeBase :: Int
+  }
   deriving (Eq, Show)
 
 data Instruction
@@ -205,9 +204,9 @@ growStack dst =
   do
     state <- get
     let size = length (_stack state)
-    when (dst >= size)
-      $ put
-      $ state {_stack = _stack state <> V.replicate (1 + dst - size) 0}
+    when (dst >= size) $
+      put $
+        state {_stack = _stack state <> V.replicate (1 + dst - size) 0}
 
 incrementPointer :: Program ()
 incrementPointer =

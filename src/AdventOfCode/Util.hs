@@ -45,9 +45,10 @@ frequenciesInt = foldr go IM.empty
     go k = IM.insertWith (+) k 1
 
 maybeParseByteString :: Parser a -> ByteString -> Maybe a
-maybeParseByteString p = parseByteString p mempty >>> \case
-  Failure _ -> Nothing
-  Success res -> Just res
+maybeParseByteString p =
+  parseByteString p mempty >>> \case
+    Failure _ -> Nothing
+    Success res -> Just res
 
 hammingDistance :: Eq a => [a] -> [a] -> Maybe Integer
 hammingDistance (x : xs) (y : ys)

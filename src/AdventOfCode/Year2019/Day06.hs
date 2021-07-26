@@ -3,7 +3,7 @@ module AdventOfCode.Year2019.Day06 where
 import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (inputFilePath)
 import Control.Monad (void)
-import Data.Map ((!), Map)
+import Data.Map (Map, (!))
 import qualified Data.Map as Map
 import Text.Trifecta
   ( Parser,

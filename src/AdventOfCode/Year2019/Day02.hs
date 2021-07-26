@@ -2,9 +2,9 @@ module AdventOfCode.Year2019.Day02 where
 
 import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (inputFilePath)
-import Control.Arrow ((>>>), first)
+import Control.Arrow (first, (>>>))
 import Data.List (find)
-import Data.Vector ((!), Vector, fromList, modify, toList)
+import Data.Vector (Vector, fromList, modify, toList, (!))
 import qualified Data.Vector as V
 import Data.Vector.Mutable (write)
 import qualified Data.Vector.Mutable as MV

@@ -1,3 +1,5 @@
+{-# LANGUAGE TupleSections #-}
+
 module AdventOfCode.Year2018.Day02
   ( main,
     partOne,
@@ -34,7 +36,7 @@ partOne = checksum
 correctBoxIDs :: [BoxID] -> Maybe (BoxID, BoxID)
 correctBoxIDs = listToMaybe . mapMaybe go . tails
   where
-    go (x : xs@(_ : _)) = (,) <$> pure x <*> find (hammingSimilar 1 x) xs
+    go (x : xs@(_ : _)) = (x,) <$> find (hammingSimilar 1 x) xs
     go _ = Nothing
 
 partTwo :: [BoxID] -> Maybe String
