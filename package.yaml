@@ -81,6 +81,11 @@ executables:
     dependencies:
     - containers
     - mtl
+  aoc-2015-day08:
+    <<: *executable
+    main: AdventOfCode.Year2015.Day08
+    dependencies:
+    - recursion-schemes
   aoc-2015-day10:
     <<: *executable
     main: AdventOfCode.Year2015.Day10

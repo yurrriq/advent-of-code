@@ -26,14 +26,9 @@ repos:
   repo: git://github.com/detailyang/pre-commit-shell
   rev: v1.0.6
 - hooks:
-  - description: Use Biber to format .bib files
-    entry: format-biber
-    files: '.+\.bib$'
-    id: biber-format
-    language: system
-    name: Format .bib files
   - description: Prettify Haskell code with ormolu
     entry: "ormolu --mode inplace"
+    exclude: 'TH\.hs$'
     files: '.+\.hs$'
     id: ormolu
     language: system
