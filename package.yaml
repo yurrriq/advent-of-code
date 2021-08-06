@@ -20,6 +20,7 @@ dependencies:
 - parsers
 - split
 - template-haskell
+- text
 - trifecta
 - unordered-containers
 default-extensions:
@@ -103,6 +104,9 @@ executables:
     - aeson
     - mtl
     - scientific
+  aoc-2015-day13:
+    <<: *executable
+    main: AdventOfCode.Year2015.Day13
   aoc-2016-day05:
     <<: *executable
     main: AdventOfCode.Year2016.Day05
