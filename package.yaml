@@ -107,6 +107,11 @@ executables:
   aoc-2015-day13:
     <<: *executable
     main: AdventOfCode.Year2015.Day13
+  aoc-2015-day14:
+    <<: *executable
+    main: AdventOfCode.Year2015.Day14
+    dependencies:
+    - mtl
   aoc-2016-day05:
     <<: *executable
     main: AdventOfCode.Year2016.Day05
