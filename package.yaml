@@ -32,6 +32,7 @@ library:
   - -fwarn-incomplete-patterns
   source-dirs: src
   dependencies:
+  - aeson
   - comonad
   - composition
   - conduit
@@ -48,6 +49,7 @@ library:
   - mtl
   - parser-combinators
   - recursion-schemes
+  - scientific
   - transformers
   - vector
 _executable: &executable
@@ -94,6 +96,13 @@ executables:
     <<: *executable
     main: AdventOfCode.Year2015.Day11
     other-modules: []
+  aoc-2015-day12:
+    <<: *executable
+    main: AdventOfCode.Year2015.Day12
+    dependencies:
+    - aeson
+    - mtl
+    - scientific
   aoc-2016-day05:
     <<: *executable
     main: AdventOfCode.Year2016.Day05
