@@ -35,6 +35,11 @@
   :config
   (editorconfig-mode 1))
 
+(use-package fill-column-indicator
+  :config
+  (setq-default fill-column 80)
+  (global-display-fill-column-indicator-mode))
+
 (use-package haskell-mode)
 
 (use-package hl-todo
