@@ -19,6 +19,8 @@ dependencies:
 - lens
 - parsers
 - split
+- tasty
+- tasty-hunit
 - template-haskell
 - text
 - trifecta
@@ -112,6 +114,9 @@ executables:
     main: AdventOfCode.Year2015.Day14
     dependencies:
     - mtl
+  aoc-2015-day15:
+    <<: *executable
+    main: AdventOfCode.Year2015.Day15
   aoc-2016-day05:
     <<: *executable
     main: AdventOfCode.Year2016.Day05
