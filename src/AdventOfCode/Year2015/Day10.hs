@@ -6,17 +6,12 @@ module AdventOfCode.Year2015.Day10
   )
 where
 
+import AdventOfCode.TH
 import Data.Char (digitToInt)
 import Data.List (group)
 
 main :: IO ()
-main =
-  do
-    input <- getInput
-    putStr "Part One: "
-    print $ partOne input
-    putStr "Part Two: "
-    print $ partTwo input
+main = $(defaultMain)
 
 getInput :: IO [Int]
 getInput = pure (map digitToInt "1113222113")

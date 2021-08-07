@@ -6,19 +6,13 @@ module AdventOfCode.Year2015.Day11
   )
 where
 
+import AdventOfCode.TH
 import Control.Monad ((>=>))
 import Data.Char (ord)
 import Data.List (find, group, isPrefixOf, nub)
-import Data.Maybe (fromMaybe)
 
 main :: IO ()
-main =
-  do
-    input <- getInput
-    putStr "Part One: "
-    putStrLn $ fromMaybe "failed!" $ partOne input
-    putStr "Part Two: "
-    putStrLn $ fromMaybe "failed!" $ partTwo input
+main = $(defaultMainM)
 
 getInput :: IO String
 getInput = pure "cqjxjnds"
