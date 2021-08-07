@@ -120,6 +120,9 @@ executables:
   aoc-2015-day16:
     <<: *executable
     main: AdventOfCode.Year2015.Day16
+  aoc-2015-day17:
+    <<: *executable
+    main: AdventOfCode.Year2015.Day17
   aoc-2016-day05:
     <<: *executable
     main: AdventOfCode.Year2016.Day05
