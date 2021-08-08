@@ -123,6 +123,11 @@ executables:
   aoc-2015-day17:
     <<: *executable
     main: AdventOfCode.Year2015.Day17
+  aoc-2015-day18:
+    <<: *executable
+    main: AdventOfCode.Year2015.Day18
+    dependencies:
+    - linear
   aoc-2016-day05:
     <<: *executable
     main: AdventOfCode.Year2016.Day05
