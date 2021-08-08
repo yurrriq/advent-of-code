@@ -23,6 +23,16 @@ defaultMain =
       noBindS [|$(doPartTwo)|]
     ]
 
+defaultMainMaybe :: Q Exp
+defaultMainMaybe =
+  doE
+    [ bindS (varP (mkName "input")) (varE (mkName "getInput")),
+      noBindS [|putStr "Part One: "|],
+      noBindS [|maybe (print "failed!") print (partOne input)|],
+      noBindS [|putStr "Part Two: "|],
+      noBindS [|maybe (print "failed!") print (partTwo input)|]
+    ]
+
 doPartOne :: Q Exp
 doPartOne = [|putStr "Part One: " *> print (partOne input)|]
 
