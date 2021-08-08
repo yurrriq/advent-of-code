@@ -1,18 +1,14 @@
-module AdventOfCode.Year2015.Day11
-  ( main,
-    getInput,
-    partOne,
-    partTwo,
-  )
-where
+{-# LANGUAGE LambdaCase #-}
+
+module AdventOfCode.Year2015.Day11 where
 
 import AdventOfCode.TH
+import Control.Arrow ((***), (>>>))
 import Control.Monad ((>=>))
-import Data.Char (ord)
 import Data.List (find, group, isPrefixOf, nub)
 
 main :: IO ()
-main = $(defaultMainM)
+main = $(defaultMain)
 
 getInput :: IO String
 getInput = pure "cqjxjnds"
@@ -23,42 +19,52 @@ partOne = findNextPassword
 partTwo :: String -> Maybe String
 partTwo = partOne >=> findNextPassword
 
-isValidPassword :: String -> Bool
-isValidPassword str =
+findNextPassword :: String -> Maybe String
+findNextPassword =
+  fmap reverse
+    . find isValidPasswordR
+    . tail
+    . iterate stepPasswordR
+    . reverse
+
+stepPasswordR :: String -> String
+stepPasswordR =
+  span (== 'z')
+    >>> (map (const 'a') *** mapHead nextChar)
+    >>> uncurry (++)
+
+nextChar :: Char -> Char
+nextChar 'h' = 'j'
+nextChar 'k' = 'm'
+nextChar 'n' = 'p'
+nextChar 'z' = 'a'
+nextChar c = succ c
+
+mapHead :: (a -> a) -> [a] -> [a]
+mapHead f = \case
+  [] -> []
+  x : xs -> f x : xs
+
+isValidPasswordR :: String -> Bool
+isValidPasswordR str =
   not (isConfusing str)
     && countUniquePairs str >= 2
-    && hasStraight 3 str
+    && hasStraightR 3 str
 
 isConfusing :: String -> Bool
 isConfusing = any (`elem` "iol")
 
-hasStraight :: Int -> String -> Bool
-hasStraight n = go
-  where
-    go (c : cs) = maybe False (`isPrefixOf` cs) (buildStraight (n - 1) c) || go cs
-    go [] = False
-
--- TODO: s/Char/Bounded a/
-buildStraight :: Int -> Char -> Maybe String
-buildStraight n c
-  | (ord 'z' - ord c) >= n - 1 = Just $ take n (iterate succ c)
-  | otherwise = Nothing
-
 countUniquePairs :: String -> Int
 countUniquePairs = length . nub . map head . filter ((>= 2) . length) . group
 
-findNextPassword :: String -> Maybe String
-findNextPassword = find isValidPassword . tail . iterate stepPassword
+hasStraightR :: Int -> String -> Bool
+hasStraightR n = go
   where
-    stepPassword = reverse . go . reverse
-    go ('z' : cs) = 'a' : go cs
-    go (c : cs) = nextChar c : cs
-    go [] = []
+    go s@(c : cs) = maybe False (`isPrefixOf` s) (buildStraightR n c) || go cs
+    go [] = False
 
--- TODO: clamp
-nextChar :: Char -> Char
-nextChar 'z' = 'a'
-nextChar 'h' = 'j'
-nextChar 'n' = 'p'
-nextChar 'k' = 'm'
-nextChar c = succ c
+buildStraightR :: Int -> Char -> Maybe String
+buildStraightR 0 _ = Just []
+buildStraightR 1 c = Just [c]
+buildStraightR _ 'a' = Nothing
+buildStraightR n c = (c :) <$> buildStraightR (n -1) (pred c)
