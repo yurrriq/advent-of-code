@@ -36,6 +36,7 @@ library:
   source-dirs: src
   dependencies:
   - aeson
+  - arithmoi
   - comonad
   - composition
   - conduit
@@ -131,6 +132,11 @@ executables:
   aoc-2015-day19:
     <<: *executable
     main: AdventOfCode.Year2015.Day19
+  aoc-2015-day20:
+    <<: *executable
+    main: AdventOfCode.Year2015.Day20
+    dependencies:
+    - arithmoi
   aoc-2016-day05:
     <<: *executable
     main: AdventOfCode.Year2016.Day05
