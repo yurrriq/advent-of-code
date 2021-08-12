@@ -37,6 +37,7 @@ library:
   dependencies:
   - aeson
   - arithmoi
+  - combinat
   - comonad
   - composition
   - conduit
@@ -44,6 +45,7 @@ library:
   - cryptonite
   - data-ordlist
   - dlist
+  - extra
   - fast-digits
   - finite-typelits
   - free-algebras
@@ -55,6 +57,7 @@ library:
   - recursion-schemes
   - scientific
   - transformers
+  - utility-ht
   - vector
 _executable: &executable
   ghc-options:
@@ -137,6 +140,14 @@ executables:
     main: AdventOfCode.Year2015.Day20
     dependencies:
     - arithmoi
+  aoc-2015-day21:
+    <<: *executable
+    main: AdventOfCode.Year2015.Day21
+    dependencies:
+    - combinat
+    - extra
+    - linear
+    - utility-ht
   aoc-2016-day05:
     <<: *executable
     main: AdventOfCode.Year2016.Day05
