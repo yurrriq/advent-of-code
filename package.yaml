@@ -154,6 +154,11 @@ executables:
     dependencies:
     - containers
     - cryptonite
+  aoc-2017-day01:
+    <<: *executable
+    main: AdventOfCode.Year2017.Day01
+    dependencies:
+    - vector
   aoc-2018-day01:
     <<: *executable
     main: AdventOfCode.Year2018.Day01

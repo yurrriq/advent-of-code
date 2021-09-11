@@ -9,34 +9,35 @@ where
 
 import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (inputFilePath)
-import AdventOfCode.Util (snoc)
-import Control.Arrow ((&&&), (<<<), (>>>))
 import Data.Char (digitToInt)
-import Data.List (group)
+import Data.Monoid (Sum (..))
+import Data.Vector (Vector)
 import qualified Data.Vector as V
 import Text.Trifecta (Parser, digit, some)
 
-getInput :: IO [Int]
-getInput = parseInput p $(inputFilePath)
-  where
-    p = (uncurry snoc <<< (id &&& head)) <$> digits
+main :: IO ()
+main =
+  do
+    input <- getInput
+    putStr "Part One: " *> print (partOne input)
+    putStr "Part Two: " *> print (partTwo input)
 
-digits :: Parser [Int]
-digits = map digitToInt <$> some digit
+getInput :: IO (Vector (Sum Int))
+getInput = parseInput digits $(inputFilePath)
 
-partOne :: [Int] -> Int
-partOne =
-  sum
-    . map ((head &&& (subtract 1 . length)) >>> uncurry (*))
-    . filter ((> 1) . length)
-    . group
+digits :: Parser (Vector (Sum Int))
+digits = V.fromList <$> some (Sum . digitToInt <$> digit)
 
-partTwo :: [Int] -> Int
-partTwo xs = V.ifoldl' go 0 v
+partOne :: Vector (Sum Int) -> Int
+partOne = day01 1
+
+partTwo :: Vector (Sum Int) -> Int
+partTwo = day01 =<< (`div` 2) . V.length
+
+day01 :: (Eq a, Num a) => Int -> Vector (Sum a) -> a
+day01 k v = getSum $ V.ifoldl' go mempty v
   where
     go z i x
-      | x == v V.! ((i + k) `mod` n) = z + x
+      | x == v V.! ((i + k) `mod` n) = z <> x
       | otherwise = z
-    v = V.fromList xs
-    k = n `div` 2
     n = V.length v
