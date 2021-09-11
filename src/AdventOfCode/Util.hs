@@ -16,10 +16,11 @@ module AdventOfCode.Util
     fix',
     adjacencies,
     neighborsOf,
+    holes,
   )
 where
 
-import Control.Category ((>>>))
+import Control.Arrow (second, (>>>))
 import Control.Comonad.Store (experiment)
 import Control.Lens (holesOf)
 import Control.Monad ((>=>))
@@ -90,3 +91,10 @@ adjacencies = filter (/= pure 0) $ sequenceA (pure [-1, 0, 1])
 
 neighborsOf :: (Applicative f, Num a, Num (f a), Ord (f a), Traversable f) => f a -> Set (f a)
 neighborsOf = Set.fromList . flip map adjacencies . (+)
+
+-- | All ways of removing one element from a list.
+--   O(n²).
+-- Agda.Utils.List
+holes :: [a] -> [(a, [a])]
+holes [] = []
+holes (x : xs) = (x, xs) : map (second (x :)) (holes xs)

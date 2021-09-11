@@ -159,6 +159,9 @@ executables:
     main: AdventOfCode.Year2017.Day01
     dependencies:
     - vector
+  aoc-2017-day02:
+    <<: *executable
+    main: AdventOfCode.Year2017.Day02
   aoc-2018-day01:
     <<: *executable
     main: AdventOfCode.Year2018.Day01

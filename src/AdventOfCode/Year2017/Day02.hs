@@ -1,10 +1,18 @@
 module AdventOfCode.Year2017.Day02 where
 
-import AdventOfCode.Input
-import AdventOfCode.TH
+import AdventOfCode.Input (parseInput)
+import AdventOfCode.TH (inputFilePath)
+import AdventOfCode.Util (holes)
 import Control.Arrow ((&&&))
-import Data.List (foldl')
-import Text.Trifecta
+import Data.Maybe (catMaybes, listToMaybe, mapMaybe)
+import Text.Trifecta (digit, newline, sepBy, some, tab)
+
+main :: IO ()
+main =
+  do
+    input <- getInput
+    putStr "Part One: " *> print (partOne input)
+    putStr "Part Two: " *> print (partTwo input)
 
 getInput :: IO [[Int]]
 getInput = parseInput (some (row <* newline)) $(inputFilePath)
@@ -13,6 +21,18 @@ getInput = parseInput (some (row <* newline)) $(inputFilePath)
     int = read <$> some digit
 
 partOne :: [[Int]] -> Int
-partOne = foldl' go 0
+partOne = sum . map (uncurry (-) . (maximum &&& minimum))
+
+partTwo :: [[Int]] -> Int
+partTwo = sum . mapMaybe handleRow
   where
-    go z = (z +) . uncurry (-) . (maximum &&& minimum)
+    handleRow :: [Int] -> Maybe Int
+    handleRow xs =
+      listToMaybe . catMaybes $
+        do
+          (x, ys) <- holes xs
+          y <- ys
+          case (quotRem x y, quotRem y x) of
+            ((q, 0), _) -> pure $ Just q
+            (_, (q, 0)) -> pure $ Just q
+            _ -> pure Nothing
