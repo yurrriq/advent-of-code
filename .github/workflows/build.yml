@@ -1,0 +1,25 @@
+name: Build the flake
+
+on:
+  push:
+    branches:
+    - main
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+    - name: Checkout
+      uses: actions/checkout@v2
+    - name: Install Nix
+      uses: cachix/install-nix-action@v12
+      with:
+        install_url: https://github.com/numtide/nix-flakes-installer/releases/download/nix-2.4pre20210207_fd6eaa1/install
+        extra_nix_config: |
+          experimental-features = nix-command flakes
+        skip_adding_nixpkgs_channel: true
+    - uses: cachix/cachix-action@v8
+      with:
+        name: yurrriq
+        skipPush: true
+    - run: nix build --show-trace --verbose
