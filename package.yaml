@@ -77,8 +77,6 @@ executables:
     - AdventOfCode.Input
     - AdventOfCode.TH
     - AdventOfCode.Util
-    - AdventOfCode.Year2015.Day06.Parsers
-    - AdventOfCode.Year2015.Day06.Types
     - Paths_advent_of_code
     dependencies:
     - containers
@@ -98,11 +96,9 @@ executables:
   aoc-2015-day10:
     <<: *executable
     main: AdventOfCode.Year2015.Day10
-    other-modules: []
   aoc-2015-day11:
     <<: *executable
     main: AdventOfCode.Year2015.Day11
-    other-modules: []
   aoc-2015-day12:
     <<: *executable
     main: AdventOfCode.Year2015.Day12
