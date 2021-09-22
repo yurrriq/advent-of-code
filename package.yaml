@@ -164,6 +164,11 @@ executables:
   aoc-2017-day04:
     <<: *executable
     main: AdventOfCode.Year2017.Day04
+  aoc-2017-day05:
+    <<: *executable
+    main: AdventOfCode.Year2017.Day05
+    dependencies:
+    - mtl
   aoc-2018-day01:
     <<: *executable
     main: AdventOfCode.Year2018.Day01
