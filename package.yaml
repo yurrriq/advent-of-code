@@ -161,6 +161,9 @@ executables:
   aoc-2017-day03:
     <<: *executable
     main: AdventOfCode.Year2017.Day03
+  aoc-2017-day04:
+    <<: *executable
+    main: AdventOfCode.Year2017.Day04
   aoc-2018-day01:
     <<: *executable
     main: AdventOfCode.Year2018.Day01
