@@ -38,6 +38,7 @@
         inherit noweb;
         inherit (prev.texlive) scheme-small
           braket
+          catchfile
           datatool
           datetime
           # dirtytalk
