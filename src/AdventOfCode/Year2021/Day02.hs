@@ -3,10 +3,10 @@ module AdventOfCode.Year2021.Day02 where
 import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (defaultMain, inputFilePath)
 import Control.Applicative ((<|>))
-import Control.Lens ((+~), (-~))
+import Control.Lens (view, (+~), (-~))
 import Data.Foldable (foldl')
 import Data.Functor (($>))
-import Linear (V2 (..), _x, _y)
+import Linear (V2 (..), V3 (..), _x, _xy, _y, _z)
 import Text.Trifecta (Parser, many, natural, symbol)
 
 data Command a
@@ -44,7 +44,13 @@ partOne = product . foldl' (flip runCommand) (pure 0)
     runCommand (Cmd Up n) = _y -~ n
 
 partTwo :: [Command Integer] -> Integer
-partTwo = undefined
+partTwo = product . view _xy . foldl' runCommand (pure 0)
+  where
+    runCommand :: V3 Integer -> Command Integer -> V3 Integer
+    runCommand pos (Cmd Forward n) =
+      (_x +~ n) . (_y +~ ((* n) . view _z $ pos)) $ pos
+    runCommand pos (Cmd Down n) = _z +~ n $ pos
+    runCommand pos (Cmd Up n) = _z -~ n $ pos
 
 command :: Parser (Command Integer)
 command = Cmd <$> direction <*> natural
