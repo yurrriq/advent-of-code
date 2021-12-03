@@ -43,15 +43,12 @@ example =
 partOne :: [[Bool]] -> Int
 partOne diagnostics = gammaRate * epsilonRate
   where
-    gammaRate =
-      binToDec $
-        map (> 500) sums
-    epsilonRate =
-      binToDec $
-        map (< 500) sums
-    sums =
-      foldl1' (zipWith (+)) $
-        map (map fromEnum) diagnostics
+    gammaRate = mkRate (>)
+    epsilonRate = mkRate (<)
+
+    mkRate cmp = binToDec ((`cmp` pivot) <$> sums)
+    pivot = mkPivot diagnostics
+    sums = mkSums diagnostics
 
 partTwo :: [[Bool]] -> Int
 partTwo = (generatorRating 0 &&& scrubberRating 0) >>> uncurry (*)
