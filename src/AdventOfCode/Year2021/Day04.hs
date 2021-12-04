@@ -7,7 +7,8 @@ import AdventOfCode.TH (defaultMain, inputFilePath)
 import Control.Lens (ifoldl')
 import Data.IntMap (IntMap)
 import qualified Data.IntMap as IM
-import Data.List (find)
+import Data.List (find, maximumBy)
+import Data.Ord (comparing)
 import Text.Trifecta (Parser, commaSep, count, natural, some)
 
 type Board = IntMap (Int, Bool)
@@ -23,15 +24,30 @@ getInput = parseInput input $(inputFilePath)
 partOne :: ([Int], [Board]) -> Int
 partOne (c : cs, bs) =
   let marked = map (markBoard c) bs
-   in case find isWinner marked of
-        Nothing -> partOne (cs, marked)
-        Just winner ->
-          (c *) . sum . map fst . filter (not . snd) $
-            IM.elems winner
+   in maybe
+        (partOne (cs, marked))
+        (scoreBoard c)
+        (find isWinner marked)
 partOne _ = error "No winner"
 
 partTwo :: ([Int], [Board]) -> Int
-partTwo = undefined
+partTwo (cs, bs) =
+  let (c : _, b) =
+        maximumBy
+          (comparing (length . fst))
+          (map (playToWin cs . ([],)) bs)
+   in scoreBoard c b
+
+playToWin :: [Int] -> ([Int], Board) -> ([Int], Board)
+playToWin (c : cs) (seen, b) =
+  let marked = markBoard c b
+   in if isWinner marked
+        then (c : seen, marked)
+        else playToWin cs (c : seen, marked)
+playToWin _ _ = error "Loser"
+
+scoreBoard :: Int -> Board -> Int
+scoreBoard c = (c *) . sum . map fst . filter (not . snd) . IM.elems
 
 calls :: Parser [Int]
 calls = commaSep (fromInteger <$> natural)
@@ -56,14 +72,9 @@ isWinner b = any (all (snd . (b IM.!))) runs
 
 runs :: [[Int]]
 runs =
-  [ [0 .. 4],
-    [5 .. 9],
-    [10 .. 14],
-    [15 .. 19],
-    [20 .. 24],
-    [0, 5 .. 24],
-    [1, 6 .. 24],
-    [2, 7 .. 24],
-    [3, 8 .. 24],
-    [4, 9 .. 24]
-  ]
+  concat
+    [ [ [n * 5 .. n * 5 + 4],
+        [n, n + 5 .. 24]
+      ]
+      | n <- [0 .. 4]
+    ]
