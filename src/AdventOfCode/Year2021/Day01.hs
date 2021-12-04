@@ -4,13 +4,13 @@ import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (defaultMain, inputFilePath)
 import AdventOfCode.Util (count)
 import Data.List (tails)
-import Text.Trifecta (many, natural)
+import Text.Trifecta (natural, some)
 
 main :: IO ()
 main = $(defaultMain)
 
 getInput :: IO [Integer]
-getInput = parseInput (many natural) $(inputFilePath)
+getInput = parseInput (some natural) $(inputFilePath)
 
 example :: [Integer]
 example = [199, 200, 208, 210, 200, 207, 240, 269, 260, 263]
