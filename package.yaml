@@ -52,6 +52,7 @@ library:
   - groups
   - lens
   - linear
+  - monoid-extras
   - mtl
   - parser-combinators
   - recursion-schemes
@@ -348,6 +349,7 @@ executables:
     main: AdventOfCode.Year2021.Day02
     dependencies:
     - linear
+    - monoid-extras
   aoc-2021-day03:
     <<: *executable
     main: AdventOfCode.Year2021.Day03
