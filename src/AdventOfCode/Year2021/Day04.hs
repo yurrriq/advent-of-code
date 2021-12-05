@@ -16,9 +16,9 @@ import Data.IntMap (IntMap)
 import qualified Data.IntMap as IM
 import Data.IntSet (IntSet)
 import qualified Data.IntSet as IS
-import Data.List (maximumBy, uncons)
 import Data.Maybe (mapMaybe)
 import Data.Ord (comparing)
+import Safe.Foldable (maximumByMay)
 import Text.Trifecta (Parser, commaSep, count, natural, some)
 
 -- | A 'Board' is map from callable number to square.
@@ -113,7 +113,3 @@ board = mkBoard <$> count 5 (count 5 (fromInteger <$> natural))
   where
     mkBoard = ifoldl' go IM.empty . concat
     go i m n = IM.insert n i m
-
--- FIXME: https://hackage.haskell.org/package/safe-0.3.19/docs/Safe-Foldable.html#v:maximumByMay
-maximumByMay :: (a -> a -> Ordering) -> [a] -> Maybe a
-maximumByMay cmp = fmap (maximumBy cmp . uncurry (:)) . uncons
