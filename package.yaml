@@ -358,6 +358,8 @@ executables:
   aoc-2021-day04:
     <<: *executable
     main: AdventOfCode.Year2021.Day04
+    dependencies:
+    - recursion-schemes
 _benchmark: &benchmark
   ghc-options:
   - -threaded
