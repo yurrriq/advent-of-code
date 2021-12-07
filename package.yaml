@@ -362,6 +362,11 @@ executables:
     dependencies:
     - recursion-schemes
     - safe
+  aoc-2021-day05:
+    <<: *executable
+    main: AdventOfCode.Year2021.Day05
+    dependencies:
+    - linear
 _benchmark: &benchmark
   ghc-options:
   - -threaded
