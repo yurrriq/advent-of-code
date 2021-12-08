@@ -370,6 +370,9 @@ executables:
   aoc-2021-day06:
     <<: *executable
     main: AdventOfCode.Year2021.Day06
+    dependencies:
+    - linear
+    - vector
 _benchmark: &benchmark
   ghc-options:
   - -threaded
