@@ -1,53 +1,81 @@
+{-# LANGUAGE DataKinds #-}
+{-# LANGUAGE QuantifiedConstraints #-}
+{-# OPTIONS_GHC -Wno-orphans #-}
+
 module AdventOfCode.Year2021.Day06 where
 
 import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (defaultMain, inputFilePath)
-import Control.Monad (forM_)
-import qualified Data.Vector as V
-import qualified Data.Vector.Mutable as MV
-import Linear (Additive, (!*), (!*!))
+import Control.Lens ((%~))
+import Data.Finite (Finite)
+import Data.Maybe (fromJust, mapMaybe)
+import Data.Semigroup (stimes)
+import qualified Data.Vector.Generic as VG
+import qualified Data.Vector.Generic.Sized as VGS
+import qualified Data.Vector.Sized as VS
+import GHC.TypeNats (KnownNat)
+import Linear (Additive (..), negated, scaled, (!*), (!*!))
 import Text.Trifecta (commaSep, natural)
 
--- TODO: Data.Finite
--- TODO: Data.Vector.Sized
+type Lanternfish = Finite 9
+
+type State = VS.Vector 9 Int
+
+newtype STM n = STM {unSTM :: VS.Vector n (VS.Vector n Int)}
+  deriving (Eq, Show)
+
+instance (Functor v, KnownNat n, forall a. VG.Vector v a) => Additive (VGS.Vector v n) where
+  zero = VGS.replicate 0
+  liftU2 = VGS.zipWith
+  liftI2 = VGS.zipWith
+
+instance KnownNat n => Num (STM n) where
+  STM x + STM y = STM (x ^+^ y)
+  STM x - STM y = STM (x ^-^ y)
+  STM x * STM y = STM (x !*! y)
+  negate = STM . negated . unSTM
+  abs = undefined
+  signum = undefined
+  fromInteger = STM . scaled . fromInteger
+
+instance KnownNat n => Semigroup (STM n) where
+  STM x <> STM y = STM (x !*! y)
 
 main :: IO ()
 main = $(defaultMain)
 
-getInput :: IO [Int]
+getInput :: IO [Lanternfish]
 getInput = parseInput (commaSep (fromInteger <$> natural)) $(inputFilePath)
 
-example :: [Int]
+example :: [Lanternfish]
 example = [3, 4, 3, 1, 2]
 
-partOne :: [Int] -> Int
+partOne :: [Lanternfish] -> Int
 partOne = simulate 80
 
-partTwo :: [Int] -> Int
+partTwo :: [Lanternfish] -> Int
 partTwo = simulate 256
 
-simulate :: Int -> [Int] -> Int
-simulate n xs = sum $ (matrix !^! n) !* v
-  where
-    v = V.modify (forM_ xs . flip MV.modify succ) (V.replicate 9 0)
+simulate :: Int -> [Lanternfish] -> Int
+simulate n = sum . (unSTM (stm ^ n) !*) . mkState
 
-matrix :: V.Vector (V.Vector Int)
-matrix =
-  V.fromListN 9 . map (V.fromListN 9) $
-    [ [0, 1, 0, 0, 0, 0, 0, 0, 0],
-      [0, 0, 1, 0, 0, 0, 0, 0, 0],
-      [0, 0, 0, 1, 0, 0, 0, 0, 0],
-      [0, 0, 0, 0, 1, 0, 0, 0, 0],
-      [0, 0, 0, 0, 0, 1, 0, 0, 0],
-      [0, 0, 0, 0, 0, 0, 1, 0, 0],
-      [1, 0, 0, 0, 0, 0, 0, 1, 0],
-      [0, 0, 0, 0, 0, 0, 0, 0, 1],
-      [1, 0, 0, 0, 0, 0, 0, 0, 0]
-    ]
+ssimulate :: Int -> [Lanternfish] -> Int
+ssimulate n = sum . (unSTM (stimes n stm) !*) . mkState
 
-infixl 8 !^!
+mkState :: [Lanternfish] -> State
+mkState = foldr ((%~ succ) . VS.ix) (pure 0)
 
-(!^!) :: (Foldable m, Additive m, Num a) => m (m a) -> Int -> m (m a)
-a !^! n = iterate (!*! a) a !! pred n
-
--- TODO: stimes with Semigroup
+stm :: STM 9
+stm =
+  STM . fromJust . VS.fromListN
+    . mapMaybe VS.fromListN
+    $ [ [0, 1, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 1, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 1, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 1, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 1, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 1, 0, 0],
+        [1, 0, 0, 0, 0, 0, 0, 1, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0, 1],
+        [1, 0, 0, 0, 0, 0, 0, 0, 0]
+      ]

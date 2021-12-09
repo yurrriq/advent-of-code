@@ -61,6 +61,7 @@ library:
   - transformers
   - utility-ht
   - vector
+  - vector-sized
 _executable: &executable
   ghc-options:
   - -O0
@@ -371,8 +372,10 @@ executables:
     <<: *executable
     main: AdventOfCode.Year2021.Day06
     dependencies:
+    - finite-typelits
     - linear
     - vector
+    - vector-sized
 _benchmark: &benchmark
   ghc-options:
   - -threaded
