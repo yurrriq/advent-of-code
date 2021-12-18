@@ -5,8 +5,8 @@ module AdventOfCode.Year2015.Day12 (main) where
 import AdventOfCode.TH (defaultMain, inputFilePath)
 import Control.Monad.Reader (Reader, asks, foldM, runReader)
 import Data.Aeson (Array, Object, Value (..), decodeFileStrict')
+import qualified Data.Aeson.KeyMap as KM
 import Data.Bool (bool)
-import qualified Data.HashMap.Strict as HM
 import Data.Maybe (fromJust)
 import Data.Scientific (Scientific (coefficient))
 
@@ -20,7 +20,7 @@ partOne :: Object -> Integer
 partOne = sumFilter (const True)
 
 partTwo :: Object -> Integer
-partTwo = sumFilter ((String "red" `notElem`) . HM.elems)
+partTwo = sumFilter ((String "red" `notElem`) . map snd . KM.toList)
 
 sumFilter :: (Object -> Bool) -> Object -> Integer
 sumFilter p = coefficient . flip runReader p . sumObject
