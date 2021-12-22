@@ -1,5 +1,4 @@
 {-# LANGUAGE DerivingVia #-}
-{-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 
 module AdventOfCode.Year2021.Day02 where
@@ -10,19 +9,24 @@ import Control.Applicative ((<|>))
 import Data.Functor (($>))
 import Data.Monoid.Action (Action (..))
 import Data.Monoid.SemiDirectProduct.Strict (Semi, embed, inject, untag)
-import Data.Semigroup (Sum (..), getSum)
+import Data.Semigroup (Sum (..))
 import Linear (V2 (..))
 import Text.Trifecta (Parser, natural, some, symbol)
 
-type Direction = Sum (V2 Int)
+newtype Direction = Direction {unDirection :: V2 Int}
+  deriving stock (Eq, Show)
+  deriving
+    (Semigroup, Monoid)
+    via (Sum (V2 Int))
 
 newtype Aim = Aim Int
+  deriving stock (Eq, Show)
   deriving
     (Semigroup, Monoid)
     via (Sum Int)
 
 instance Action Aim Direction where
-  act (Aim a) (Sum (V2 x y)) = Sum (V2 x (y + a * x))
+  act (Aim a) (Direction (V2 x y)) = Direction (V2 x (y + a * x))
 
 main :: IO ()
 main = $(defaultMain)
@@ -41,15 +45,18 @@ example =
   ]
 
 partOne :: [Direction] -> Int
-partOne = product . getSum . mconcat
+partOne = solve unDirection
 
 partTwo :: [Direction] -> Int
-partTwo = product . getSum . untag . mconcat . map transform
+partTwo = solve (unDirection . untag) . map phi
   where
-    transform :: Direction -> Semi Direction Aim
-    transform dir@(Sum (V2 _ 0)) = inject dir
-    transform (Sum (V2 0 y)) = embed (Aim y)
-    transform _ = error "Invalid direction"
+    phi :: Direction -> Semi Direction Aim
+    phi dir@(Direction (V2 _ 0)) = inject dir
+    phi (Direction (V2 0 y)) = embed (Aim y)
+    phi _ = error "Invalid direction"
+
+solve :: Monoid m => (m -> V2 Int) -> [m] -> Int
+solve extract = product . extract . mconcat
 
 direction :: Parser Direction
 direction = dir <*> (fromInteger <$> natural)
@@ -60,6 +67,6 @@ direction = dir <*> (fromInteger <$> natural)
         <|> symbol "up" $> up
 
 forward, down, up :: Int -> Direction
-forward = pure . flip V2 0
-down = pure . V2 0
+forward = Direction . flip V2 0
+down = Direction . V2 0
 up = down . negate

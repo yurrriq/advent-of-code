@@ -1,0 +1,70 @@
+\newpage
+\chapter{Day 2: Dive!}
+\marginnote{\url{https://adventofcode.com/2021/day/2}}
+
+Now, you need to figure out how to pilot this thing.
+
+It seems like the submarine can take a series of commands like [[forward]]\hs{ 1}, [[down]]\hs{ 2}, or [[up]]\hs{ 3}:
+\begin{itemize}
+\item [[forward]]\hs{ x} increases the horizontal position by \hs{x} units.
+\item [[down]]\hs{ x} increases the depth by \hs{x} units.
+\item [[up]]\hs{ x} decreases the depth by \hs{x} units.
+\end{itemize}
+
+Note that since you're on a submarine, [[down]] and [[up]] affect your \textbf{depth}, and so they have the opposite result of what you might expect.
+
+The submarine seems to already have a planned course (your puzzle input). You should probably figure out where it's going. For example:
+\begin{minted}{text}
+  forward 5
+  down 5
+  forward 8
+  up 3
+  down 8
+  forward 2
+\end{minted}
+
+Your horizontal position and depth both start at \hs{0}. The steps above would then modify them as follows:
+\begin{itemize}
+  \item [[forward]]\hs{ 5} adds \hs{5} to your horizontal position, a total of \hs{5}.
+  \item [[down]]\hs{ 5} adds \hs{5} to your depth, resulting in a value of \hs{5}.
+  \item [[forward]]\hs{ 8} adds \hs{8} to your horizontal position, a total of \hs{13}.
+  \item [[up]]\hs{ 3} decreases your depth by \hs{3}, resulting in a value of \hs{2}.
+  \item [[down]]\hs{ 8} adds \hs{8} to your depth, resulting in a value of \hs{10}.
+  \item [[forward]]\hs{ 2} adds \hs{2} to your horizontal position, a total of \hs{15}.
+\end{itemize}
+
+After following these instructions, you would have a horizontal position of 15 and a depth of 10. (Multiplying these together produces \hs{150}.)
+
+Calculate the horizontal position and depth you would have after following the planned course. \textbf{What do you get if you multiply your final horizontal position by your final depth?}
+
+\newthought{Part Two}
+
+Based on your calculations, the planned course doesn't seem to make any sense. You find the submarine manual and discover that the process is actually slightly more complicated.
+
+In addition to horizontal position and depth, you'll also need to track a third value, \textbf{aim}, which also starts at \hs{0}. The commands also mean something entirely different than you first thought:
+
+\begin{itemize}
+\item [[down]]\hs{ x} increases your aim by \hs{x} units.
+\item [[up]]\hs{ x} decreases your aim by \hs{x} units.
+\item [[forward]]\hs{ x} does two things:
+  \begin{itemize}
+  \item It increases your horizontal position by \hs{x} units.
+  \item It increases your depth by your aim \textbf{multiplied by} \hs{x}.
+  \end{itemize}
+\end{itemize}
+
+Again note that since you're on a submarine, [[down]] and [[up]] do the opposite of what you might expect: ``down'' means aiming in the positive direction.
+
+Now, the above example does something different:
+\begin{itemize}
+\item [[forward]]\hs{ 5} adds \hs{5} to your horizontal position, a total of \hs{5}. Because your aim is \hs{0}, your depth does not change.
+\item [[down]]\hs{ 5} adds \hs{5} to your aim, resulting in a value of \hs{5}.
+\item [[forward]]\hs{ 8} adds \hs{8} to your horizontal position, a total of \hs{13}. Because your aim is \hs{5}, your depth increases by $8*5=40$.
+\item [[up]]\hs{ 3} decreases your aim by \hs{3}, resulting in a value of \hs{2}.
+\item [[down]]\hs{ 8} adds \hs{8} to your aim, resulting in a value of \hs{10}.
+\item [[forward]]\hs{ 2} adds \hs{2} to your horizontal position, a total of \hs{15}. Because your aim is \hs{10}, your depth increases by $2*10=20$ to a total of \hs{60}.
+\end{itemize}
+
+After following these new instructions, you would have a horizontal position of \hs{15} and a depth of \hs{60}. (Multiplying these produces \hs{900}.)
+
+Using this new interpretation of the commands, calculate the horizontal position and depth you would have after following the planned course. \textbf{What do you get if you multiply your final horizontal position by your final depth?}

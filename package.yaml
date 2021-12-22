@@ -397,6 +397,10 @@ benchmarks:
     <<: *benchmark
     main: Bench.hs
     source-dirs: bench/AdventOfCode/Year2020/Day03
+  aoc-2021-day02-bench:
+    <<: *benchmark
+    main: Bench.hs
+    source-dirs: bench/AdventOfCode/Year2021/Day02
 tests:
   advent-of-code-test:
     main: Main.hs

@@ -1,15 +1,10 @@
 PREFIX ?= .
 cpif   ?= | cpif
 
-day_srcs = $(foreach srcdir,day $(2) $(3) $(4),_src/${srcdir}/$(1).nw)
+day_srcs = $(foreach srcdir,day $(3),_src/${srcdir}/$(1)/$(2).nw)
 
 NW_SRCS := \
-$(call day_srcs,01, gap) \
-$(call day_srcs,01, haskell/2018) \
-$(call day_srcs,02, haskell/2018) \
-$(call day_srcs,04, haskell/2019) \
-$(call day_srcs,08, haskell/2019)
-
+$(call day_srcs,2021,02,haskell)
 
 GAP_SRCS := $(patsubst _src/gap/%.nw,src/Day%.g,$(filter _src/gap/%.nw,${NW_SRCS}))
 
@@ -63,6 +58,11 @@ src/AdventOfCode/Year2018/Day%.hs: _src/haskell/2018/%.nw
 
 
 src/AdventOfCode/Year2019/Day%.hs: _src/haskell/2019/%.nw
+	@ mkdir -p $(@D)
+	notangle -R'$(@F)' $< ${cpif} $@
+
+
+src/AdventOfCode/Year2021/Day%.hs: _src/haskell/2021/%.nw
 	@ mkdir -p $(@D)
 	notangle -R'$(@F)' $< ${cpif} $@
 

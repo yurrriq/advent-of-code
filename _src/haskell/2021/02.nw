@@ -1,0 +1,181 @@
+\newpage
+\section{Haskell solution}
+
+A [[Direction]] is a change in horizontal position and a change in depth,
+represented by \hrefootnote{https://hackage.haskell.org/package/linear/docs/Linear-V2.html\#t:V2}{a 2-dimensional vector}, \hrefootnote{https://hackage.haskell.org/package/base/docs/Data-Monoid.html\#t:Sum}{monoidal under addition}.
+
+<<Define some data types>>=
+newtype Direction = Direction {unDirection :: V2 Int}
+  deriving stock (Eq, Show)
+  deriving
+    (Semigroup, Monoid)
+    via (Sum (V2 Int))
+
+@ %def Direction
+
+The [[<<known directions>>]] are [[forward]], [[down]], and [[up]].
+
+<<known directions>>=
+forward, down, up :: Int -> Direction
+@
+
+[[forward]]\hs{ x} increases the horizontal position by \hs{x} units.
+
+<<known directions>>=
+forward = Direction . flip V2 0
+@ %def forward
+
+[[down]]\hs{ x} increases the depth by \hs{x} units.
+
+<<known directions>>=
+down = Direction . V2 0
+@ %def down
+
+[[up]]\hs{ x} decreases the depth by \hs{x} units, i.e. [[down]] with a \hs{negate}d \hs{x}.
+
+<<known directions>>=
+up = down . negate
+@ %def up
+
+Define a [[Direction]] parser using the [[<<known directions>>]].
+
+<<Define a Direction parser>>=
+direction :: Parser Direction
+direction = dir <*> (fromInteger <$> natural)
+  where
+    dir =
+      symbol "forward" $> forward
+        <|> symbol "down" $> down
+        <|> symbol "up" $> up
+
+<<known directions>>
+@ %def direction
+
+The puzzle input is a list of [[Direction]]s.
+
+<<Parse the input>>=
+getInput :: IO [Direction]
+getInput = parseInput (some direction) $(inputFilePath)
+@ %def getInput
+
+
+\section {General solution}
+
+The general solution of the puzzle is to sum a list of additive monoids, extract the final position, and compute the \hs{product} of the horizontal position and depth.
+
+<<Solve the puzzle>>=
+solve :: Monoid m => (m -> V2 Int) -> [m] -> Int
+solve extract = product . extract . mconcat
+@ %def solve
+
+
+\subsection{Part One}
+
+For Part One, the additive monoid is [[Direction]].
+
+<<Solve Part One>>=
+partOne :: [Direction] -> Int
+partOne = solve unDirection
+@ %def partOne
+
+
+\subsection{Part Two}
+
+For Part Two, the additive monoid is [[Aim]], i.e. an integer.
+
+<<Define some data types>>=
+newtype Aim = Aim Int
+  deriving stock (Eq, Show)
+  deriving
+    (Semigroup, Monoid)
+    via (Sum Int)
+
+@ %def Aim
+
+[[forward]]\hs{ x} increases the horizontal position by \hs{x} units and increases the depth by the aim multiplied by \hs{x}, forming a \hrefootnote{https://hackage.haskell.org/package/monoid-extras/docs/Data-Monoid-SemiDirectProduct.html\#t:Semi}{semi-direct product} of [[Direction]] (the sub-monoid) and [[Aim]] (the quotient monoid).
+
+Define how [[Aim]] acts on [[Direction]].
+
+<<Define some data types>>=
+instance Action Aim Direction where
+  act (Aim a) (Direction (V2 x y)) = Direction (V2 x (y + a * x))
+@
+
+Use the \hs{Action} to construct the semi-direct product [[Direction]]$\ \rtimes_\phi\ $[[Aim]].
+
+<<Define the semi-direct product>>=
+phi :: Direction -> Semi Direction Aim
+@ %def phi
+
+
+[[forward]], i.e. a [[Direction]] with a depth change of \hs{0}, doesn't affect the aim.
+
+<<Define the semi-direct product>>=
+phi dir@(Direction (V2 _ 0)) = inject dir
+@
+
+[[up]] or [[down]], i.e. a [[Direction]] with a horizontal change of \hs{0} and a non-zero depth change \hs{y}, results in an aim change of \hs{y} units.
+
+<<Define the semi-direct product>>=
+phi (Direction (V2 0 y)) = embed (Aim y)
+@
+
+Since [[Direction]] is not specific enough to prevent them, add a catch-all clause to handle invalid directions, e.g. [[forward]] and [[up]] simultaneously.
+
+<<Define the semi-direct product>>=
+phi _ = error "Invalid direction"
+@
+
+To solve Part Two, lift each [[Direction]] in the input to [[Direction]]$\ \rtimes_\phi\ $[[Aim]]. To extract the final position, forget the [[Aim]] tag.
+
+<<Solve Part Two>>=
+partTwo :: [Direction] -> Int
+partTwo = solve (unDirection . untag) . map phi
+  where
+    <<Define the semi-direct product>>
+@ %def partTwo
+
+\subsection{Full solution}
+
+<<Day02.hs>>=
+{-# LANGUAGE DerivingVia #-}
+{-# LANGUAGE MultiParamTypeClasses #-}
+
+module AdventOfCode.Year2021.Day02 where
+
+import AdventOfCode.Input (parseInput)
+import AdventOfCode.TH (defaultMain, inputFilePath)
+import Control.Applicative ((<|>))
+import Data.Functor (($>))
+import Data.Monoid.Action (Action (..))
+import Data.Monoid.SemiDirectProduct.Strict (Semi, embed, inject, untag)
+import Data.Semigroup (Sum (..))
+import Linear (V2 (..))
+import Text.Trifecta (Parser, natural, some, symbol)
+
+<<Define some data types>>
+
+main :: IO ()
+main = $(defaultMain)
+
+getInput :: IO [Direction]
+getInput = parseInput (some direction) $(inputFilePath)
+
+example :: [Direction]
+example =
+  [ forward 5,
+    down 5,
+    forward 8,
+    up 3,
+    down 8,
+    forward 2
+  ]
+
+<<Solve Part One>>
+
+<<Solve Part Two>>
+
+<<Solve the puzzle>>
+
+<<Define a Direction parser>>
+@
