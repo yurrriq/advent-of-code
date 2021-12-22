@@ -34,7 +34,7 @@ data Bingo
 
 makeBaseFunctor ''Bingo
 
--- Keep track of the numbers to call, and the squares marked.
+-- | Keep track of the list of numbers to call, and the set of squares marked.
 data BingoState = BingoState
   { numbersToCall :: [Int],
     squaresMarked :: IntSet
@@ -47,7 +47,7 @@ main = $(defaultMainMaybe)
 getInput :: IO ([Int], [Board])
 getInput = parseInput input $(inputFilePath)
   where
-    input = (,) <$> calls <*> some board
+    input = (,) <$> calls <*> some (board 5)
 
 partOne :: ([Int], [Board]) -> Maybe Int
 partOne (calls, boards) = step allGames
@@ -58,29 +58,29 @@ partOne (calls, boards) = step allGames
       Call games -> Right games
       Won score -> Left (Just score)
       Lost -> Left Nothing
-    allGames = map (\b -> ana (bingoCoalg b) (BingoState calls IS.empty)) boards
+    allGames = map (flip ana (BingoState calls IS.empty) . bingoCoalg 5) boards
 
 partTwo :: ([Int], [Board]) -> Maybe Int
 partTwo (calls, boards) =
   fmap snd
     . maximumByMay (comparing fst)
-    . mapMaybe (\b -> hylo bingoAlg (bingoCoalg b) (BingoState calls IS.empty))
+    . mapMaybe (flip (hylo bingoAlg . bingoCoalg 5) (BingoState calls IS.empty))
     $ boards
 
--- Count the number of called numbers.
+-- | Count the number of called numbers.
 bingoAlg :: BingoF (Maybe (Int, Int)) -> Maybe (Int, Int)
 bingoAlg = \case
   CallF state -> first succ <$> state
   WonF score -> Just (1, score)
   LostF -> Nothing
 
-bingoCoalg :: Board -> BingoState -> BingoF BingoState
-bingoCoalg _ (BingoState [] _) = LostF
-bingoCoalg board (BingoState (call : calls) marked) =
+bingoCoalg :: Int -> Board -> BingoState -> BingoF BingoState
+bingoCoalg _ _ (BingoState [] _) = LostF
+bingoCoalg k board (BingoState (call : calls) marked) =
   case (`IS.insert` marked) <$> IM.lookup call board of
     Nothing -> CallF (BingoState calls marked)
     Just marked' ->
-      if isWinner marked'
+      if isWinner k marked'
         then WonF (calculateScore call marked' board)
         else CallF (BingoState calls marked')
 
@@ -91,25 +91,23 @@ calculateScore lastCall marked =
     . IM.keys
     . IM.filter (`IS.notMember` marked)
 
-isWinner :: IntSet -> Bool
-isWinner marked = any (`IS.isSubsetOf` marked) runs
+isWinner :: Int -> IntSet -> Bool
+isWinner k = flip any (runs k) . flip IS.isSubsetOf
 
--- FIXME: This is gross and specific.
-runs :: [IntSet]
-runs =
+runs :: Int -> [IntSet]
+runs k =
   map IS.fromList . concat $
-    [ [ [n * 5 .. n * 5 + 4],
-        [n, n + 5 .. 24]
+    [ [ [n * k .. n * k + (k - 1)],
+        [n, n + k .. k * k - 1]
       ]
-      | n <- [0 .. 4]
+      | n <- [0 .. k - 1]
     ]
 
 calls :: Parser [Int]
 calls = commaSep (fromInteger <$> natural)
 
--- TODO: Support arbitrary (square) boards.
-board :: Parser Board
-board = mkBoard <$> count 5 (count 5 (fromInteger <$> natural))
+board :: Int -> Parser Board
+board k = mkBoard <$> count k (count k (fromInteger <$> natural))
   where
     mkBoard = ifoldl' go IM.empty . concat
     go i m n = IM.insert n i m
