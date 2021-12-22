@@ -1,9 +1,6 @@
-\section{Haskell solution}
+\subsection{Haskell solution}
 
-\subsection{Pixels}
-
-
-A pixel can be black, white, or transparent.
+\newthought{A pixel} can be black, white, or transparent.
 
 <<Define a Pixel data type>>=
 data Pixel
@@ -27,9 +24,7 @@ instance Show Pixel where
 @
 
 
-\subsection{Type aliases}
-
-Define a [[Layer]] as a list of [[Row]]s, and a [[Row]] as a list of [[Pixel]]s.
+\newthought{Define a [[Layer]]} as a list of [[Row]]s, and a [[Row]] as a list of [[Pixel]]s.
 
 <<Define a few convenient type aliases>>=
 type Image = [Layer]
@@ -42,9 +37,7 @@ type Row = [Pixel]
 @ %def Row
 
 
-\subsection{Parsers}
-
-Parse an [[Image]], i.e. one or more [[Layer]]s comprised of \hs{height}
+\newthought{Parse an [[Image]],} i.e. one or more [[Layer]]s comprised of \hs{height}
 [[Row]]s of \hs{width} [[Pixel]]s.
 
 <<Parse an image>>=
@@ -68,37 +61,25 @@ pixel =
     <|> (char '2' *> pure Transparent <?> "A transparent pixel")
 @
 
-\subsection{Part One}
+\newthought{Solve} Part One.
 
 <<Part One>>=
-partOne :: IO Int
-partOne =
-  do
-    <<Parse a $25 \times 6$ [[image]] from the input>>
+partOne :: Image -> Int
 @
 
+Return the product of the number of ones ([[White]] pixels) and the number of
+twos ([[Transparent]] pixels) in the \hs{layer} with the fewest [[Black]] pixels.
 
-<<Parse a $25 \times 6$ [[image]] from the input>>=
-layers <- parseInput (image 25 6) "input/2019/day08.txt"
+<<Part One>>=
+partOne layers = numberOf White layer * numberOf Transparent layer
+  where
 @
-
 
 Find the \hs{layer} with the fewest zeros\todoo{sp?}, i.e. [[Black]] pixels.
 
 <<Part One>>=
-    let layer = head $ sortBy (compare `on` numberOf Black) layers
+    layer = minimumBy (compare `on` numberOf Black) layers
 @
-
-
-Return the product of the number of ones ([[White]] pixels) and the number of
-twos ([[Transparent]] pixels) in that \hs{layer}.
-
-<<Part One>>=
-    let ones = numberOf White layer
-    let twos = numberOf Transparent layer
-    pure $ ones * twos
-@
-
 
 Return the number of elements equivalent to a given one, in a given list of
 lists of elements of the same type. More specifically, return the number of
@@ -107,22 +88,18 @@ lists of elements of the same type. More specifically, return the number of
 \todoo{There's gotta be a Data.List function for this..}
 
 <<Part One>>=
-  where
     numberOf :: Eq a => a -> [[a]] -> Int
     numberOf x = sum . fmap (length . filter (== x))
 @ %def partOne
 
 
-\subsection{Part Two}
+\newthought{Solve} Part Two.
 
 <<Part Two>>=
-partTwo :: IO String
-partTwo =
-  do
-    layers <- parseInput (image 25 6) "input/2019/day08.txt"
-    pure
-      $ unlines . map (concatMap show)
-      $ foldl decodeLayer (transparentLayer 25 6) layers
+partTwo :: Image -> String
+partTwo layers =
+  unlines . map (concatMap show) $
+    foldl decodeLayer (transparentLayer 25 6) layers
   where
     decodeLayer :: Layer -> Layer -> Layer
     decodeLayer = zipWith (zipWith decodePixel)
@@ -132,29 +109,25 @@ partTwo =
 @ %def partTwo
 
 
-\subsection{Miscellaneous}
+\newthought{Define a helper function} to create a transparent layer.
 
 <<A transparent layer>>=
 transparentLayer :: Int -> Int -> Layer
 transparentLayer width height = replicate height (replicate width Transparent)
-@
+@ %def transparentLayer
 
 
-\subsection{Full solution}
+\todo[inline]{Add some prose here.}
 
 <<Day08.hs>>=
-module AdventOfCode.Year2019.Day08
-  ( main,
-    partOne,
-    partTwo,
-  )
-where
+module AdventOfCode.Year2019.Day08 where
 
-import AdventOfCode.Util (parseInput)
+import AdventOfCode.Input (parseInput)
+import AdventOfCode.TH (defaultMain, inputFilePath)
 import Control.Applicative ((<|>))
 import Data.Function (on)
-import Data.List (sortBy)
-import Text.Trifecta ((<?>), Parser, char, count, some)
+import Data.List (minimumBy)
+import Text.Trifecta (Parser, char, count, some, (<?>))
 
 <<Define a Pixel data type>>
 
@@ -163,13 +136,10 @@ import Text.Trifecta ((<?>), Parser, char, count, some)
 <<Define a few convenient type aliases>>
 
 main :: IO ()
-main =
-  do
-    putStrLn "[2019] Day 8: Space Image Format"
-    putStr "Part One: "
-    print =<< partOne
-    putStrLn "Part Two: "
-    putStrLn =<< partTwo
+main = $(defaultMain)
+
+getInput :: IO Image
+getInput = parseInput (image 25 6) $(inputFilePath)
 
 <<Part One>>
 

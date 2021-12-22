@@ -1,0 +1,175 @@
+\nwfilename{_src/2018/day/01.nw}\nwbegindocs{0}\newpage% ===> this file was generated automatically by noweave --- better not edit it
+\section{Day 1: Chronal Calibration}
+\todoo{Copy description}
+\marginnote{\url{https://adventofcode.com/2018/day/1}}
+\nwenddocs{}\nwfilename{_src/2018/haskell/01.nw}\nwbegindocs{0}\subsection{Haskell Solution}
+
+\newthought{A frequency change} is represented by a summable integer.
+
+\nwenddocs{}\nwbegincode{1}\sublabel{NW1oqLIA-3C8vxP-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW1oqLIA-3C8vxP-1}}}\moddef{Define data types to model the puzzle input.~{\nwtagstyle{}\subpageref{NW1oqLIA-3C8vxP-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1oqLIA-12NRmi-1}}\nwenddeflinemarkup
+newtype \nwlinkedidentc{FrequencyChange}{NW1oqLIA-3C8vxP-1} = \nwlinkedidentc{FrequencyChange}{NW1oqLIA-3C8vxP-1}
+  \{unFrequencyChange :: Integer\}
+  deriving stock
+    (Eq, Ord, Show)
+  deriving
+    (Semigroup, Monoid)
+    via (Sum Integer)
+\nwindexdefn{\nwixident{FrequencyChange}}{FrequencyChange}{NW1oqLIA-3C8vxP-1}\eatline
+\nwused{\\{NW1oqLIA-12NRmi-1}}\nwidentdefs{\\{{\nwixident{FrequencyChange}}{FrequencyChange}}}\nwendcode{}\nwbegindocs{2}\nwdocspar
+
+\newthought{Parsing the puzzle input} for Day 1 is easy.  The frequency changes are
+represented by signed integers, e.g.
+
+\begin{minted}[gobble=2]{haskell}
+  parseString frequencyChanges mempty "+1\n-2\n+3" ==
+  Success [Sum {getSum = 1},Sum {getSum = -2},Sum {getSum = 3}]
+\end{minted}
+
+\nwenddocs{}\nwbegincode{3}\sublabel{NW1oqLIA-2S9BvQ-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW1oqLIA-2S9BvQ-1}}}\moddef{Parse the input.~{\nwtagstyle{}\subpageref{NW1oqLIA-2S9BvQ-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1oqLIA-12NRmi-1}}\nwenddeflinemarkup
+getInput :: IO [\nwlinkedidentc{FrequencyChange}{NW1oqLIA-3C8vxP-1}]
+getInput = parseInput (some (\nwlinkedidentc{FrequencyChange}{NW1oqLIA-3C8vxP-1} <$> integer)) $(inputFilePath)
+\nwused{\\{NW1oqLIA-12NRmi-1}}\nwidentuses{\\{{\nwixident{FrequencyChange}}{FrequencyChange}}}\nwindexuse{\nwixident{FrequencyChange}}{FrequencyChange}{NW1oqLIA-2S9BvQ-1}\nwendcode{}\nwbegindocs{4}\nwdocspar
+
+
+\newthought{Computing the answer for Part One} is also a cinch: just sum the changes in frequency.
+
+\nwenddocs{}\nwbegincode{5}\sublabel{NW1oqLIA-3j9t0t-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW1oqLIA-3j9t0t-1}}}\moddef{Solve parts one and two.~{\nwtagstyle{}\subpageref{NW1oqLIA-3j9t0t-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1oqLIA-12NRmi-1}}\nwprevnextdefs{\relax}{NW1oqLIA-3j9t0t-2}\nwenddeflinemarkup
+\nwlinkedidentc{partOne}{NW1nsOf7-2iOjQS-1} :: [\nwlinkedidentc{FrequencyChange}{NW1oqLIA-3C8vxP-1}] -> Maybe Integer
+\nwlinkedidentc{partOne}{NW1nsOf7-2iOjQS-1} = Just . unFrequencyChange . mconcat
+
+\nwalsodefined{\\{NW1oqLIA-3j9t0t-2}}\nwused{\\{NW1oqLIA-12NRmi-1}}\nwidentuses{\\{{\nwixident{FrequencyChange}}{FrequencyChange}}\\{{\nwixident{partOne}}{partOne}}}\nwindexuse{\nwixident{FrequencyChange}}{FrequencyChange}{NW1oqLIA-3j9t0t-1}\nwindexuse{\nwixident{partOne}}{partOne}{NW1oqLIA-3j9t0t-1}\nwendcode{}\nwbegindocs{6}\nwdocspar
+
+\newthought{To solve Part Two,} compute the list of frequencies reached and find the first duplicate.
+
+\nwenddocs{}\nwbegincode{7}\sublabel{NW1oqLIA-3j9t0t-2}\nwmargintag{{\nwtagstyle{}\subpageref{NW1oqLIA-3j9t0t-2}}}\moddef{Solve parts one and two.~{\nwtagstyle{}\subpageref{NW1oqLIA-3j9t0t-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1oqLIA-12NRmi-1}}\nwprevnextdefs{NW1oqLIA-3j9t0t-1}{\relax}\nwenddeflinemarkup
+\nwlinkedidentc{partTwo}{NW1nsOf7-4P9qKy-1} :: [\nwlinkedidentc{FrequencyChange}{NW1oqLIA-3C8vxP-1}] -> Maybe Integer
+\nwlinkedidentc{partTwo}{NW1nsOf7-4P9qKy-1} =
+  fmap unFrequencyChange
+    . findFirstDup
+    . scan
+    . cycle
+\nwused{\\{NW1oqLIA-12NRmi-1}}\nwidentuses{\\{{\nwixident{FrequencyChange}}{FrequencyChange}}\\{{\nwixident{partTwo}}{partTwo}}}\nwindexuse{\nwixident{FrequencyChange}}{FrequencyChange}{NW1oqLIA-3j9t0t-2}\nwindexuse{\nwixident{partTwo}}{partTwo}{NW1oqLIA-3j9t0t-2}\nwendcode{}\nwbegindocs{8}\nwdocspar
+
+
+\newthought{Bring it} all together.
+
+\nwenddocs{}\nwbegincode{9}\sublabel{NW1oqLIA-12NRmi-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW1oqLIA-12NRmi-1}}}\moddef{Day01.hs~{\nwtagstyle{}\subpageref{NW1oqLIA-12NRmi-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
+\{-# LANGUAGE DerivingVia #-\}
+
+module AdventOfCode.Year2018.Day01 where
+
+import AdventOfCode.Input (parseInput)
+import AdventOfCode.TH (defaultMainMaybe, inputFilePath)
+import AdventOfCode.Util (findFirstDup, scan)
+import Data.Monoid (Sum (..))
+import Text.Trifecta (integer, some)
+
+\LA{}Define data types to model the puzzle input.~{\nwtagstyle{}\subpageref{NW1oqLIA-3C8vxP-1}}\RA{}
+
+main :: IO ()
+main = $(defaultMainMaybe)
+
+\LA{}Parse the input.~{\nwtagstyle{}\subpageref{NW1oqLIA-2S9BvQ-1}}\RA{}
+
+\LA{}Solve parts one and two.~{\nwtagstyle{}\subpageref{NW1oqLIA-3j9t0t-1}}\RA{}
+\nwnotused{Day01.hs}\nwendcode{}\nwbegindocs{10}\nwdocspar
+\nwenddocs{}\nwfilename{_src/2018/day/02.nw}\nwbegindocs{0}\newpage
+\section{Day 2: Inventory Management System}
+\todoo{Copy description}
+\marginnote{\url{https://adventofcode.com/2018/day/2}}
+\nwenddocs{}\nwfilename{_src/2018/haskell/02.nw}\nwbegindocs{0}\subsection{Haskell solution}
+
+\newthought{Define some convient} type aliases.
+
+A {\Tt{}\nwlinkedidentq{BoxID}{NW1nsOf7-4UP1v0-1}\nwendquote} is just a \hs{String}, and a {\Tt{}\nwlinkedidentq{Checksum}{NW1nsOf7-4UP1v0-1}\nwendquote} is just an \hs{Integer}.
+
+\nwenddocs{}\nwbegincode{1}\sublabel{NW1nsOf7-4UP1v0-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW1nsOf7-4UP1v0-1}}}\moddef{Type aliases~{\nwtagstyle{}\subpageref{NW1nsOf7-4UP1v0-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1nsOf7-1375sF-1}}\nwenddeflinemarkup
+type \nwlinkedidentc{BoxID}{NW1nsOf7-4UP1v0-1} = String
+
+type \nwlinkedidentc{Checksum}{NW1nsOf7-4UP1v0-1} = Integer
+\nwindexdefn{\nwixident{BoxID}}{BoxID}{NW1nsOf7-4UP1v0-1}\eatline
+\nwindexdefn{\nwixident{Checksum}}{Checksum}{NW1nsOf7-4UP1v0-1}\eatline
+\nwused{\\{NW1nsOf7-1375sF-1}}\nwidentdefs{\\{{\nwixident{BoxID}}{BoxID}}\\{{\nwixident{Checksum}}{Checksum}}}\nwendcode{}\nwbegindocs{2}\nwdocspar
+\newthought{To solve Part One,} \hs{Just} compute the {\Tt{}\nwlinkedidentq{checksum}{NW1nsOf7-1hMs9W-1}\nwendquote}.\footnote{See what I did there?}
+
+\nwenddocs{}\nwbegincode{3}\sublabel{NW1nsOf7-1hMs9W-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW1nsOf7-1hMs9W-1}}}\moddef{Compute the checksum.~{\nwtagstyle{}\subpageref{NW1nsOf7-1hMs9W-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1nsOf7-1375sF-1}}\nwenddeflinemarkup
+\nwlinkedidentc{checksum}{NW1nsOf7-1hMs9W-1} :: [\nwlinkedidentc{BoxID}{NW1nsOf7-4UP1v0-1}] -> \nwlinkedidentc{Checksum}{NW1nsOf7-4UP1v0-1}
+\nwlinkedidentc{checksum}{NW1nsOf7-1hMs9W-1} =
+  fmap frequencies
+    >>> filter (elem 2) &&& filter (elem 3)
+    >>> length *** length
+    >>> product
+    >>> fromIntegral
+\nwindexdefn{\nwixident{checksum}}{checksum}{NW1nsOf7-1hMs9W-1}\eatline
+\nwused{\\{NW1nsOf7-1375sF-1}}\nwidentdefs{\\{{\nwixident{checksum}}{checksum}}}\nwidentuses{\\{{\nwixident{BoxID}}{BoxID}}\\{{\nwixident{Checksum}}{Checksum}}}\nwindexuse{\nwixident{BoxID}}{BoxID}{NW1nsOf7-1hMs9W-1}\nwindexuse{\nwixident{Checksum}}{Checksum}{NW1nsOf7-1hMs9W-1}\nwendcode{}\nwbegindocs{4}\nwdocspar
+\nwenddocs{}\nwbegincode{5}\sublabel{NW1nsOf7-2iOjQS-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW1nsOf7-2iOjQS-1}}}\moddef{Part One~{\nwtagstyle{}\subpageref{NW1nsOf7-2iOjQS-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1nsOf7-1375sF-1}}\nwenddeflinemarkup
+\nwlinkedidentc{partOne}{NW1nsOf7-2iOjQS-1} :: [\nwlinkedidentc{BoxID}{NW1nsOf7-4UP1v0-1}] -> Maybe \nwlinkedidentc{Checksum}{NW1nsOf7-4UP1v0-1}
+\nwlinkedidentc{partOne}{NW1nsOf7-2iOjQS-1} = Just . \nwlinkedidentc{checksum}{NW1nsOf7-1hMs9W-1}
+\nwindexdefn{\nwixident{partOne}}{partOne}{NW1nsOf7-2iOjQS-1}\eatline
+\nwused{\\{NW1nsOf7-1375sF-1}}\nwidentdefs{\\{{\nwixident{partOne}}{partOne}}}\nwidentuses{\\{{\nwixident{BoxID}}{BoxID}}\\{{\nwixident{Checksum}}{Checksum}}\\{{\nwixident{checksum}}{checksum}}}\nwindexuse{\nwixident{BoxID}}{BoxID}{NW1nsOf7-2iOjQS-1}\nwindexuse{\nwixident{Checksum}}{Checksum}{NW1nsOf7-2iOjQS-1}\nwindexuse{\nwixident{checksum}}{checksum}{NW1nsOf7-2iOjQS-1}\nwendcode{}\nwbegindocs{6}\nwdocspar
+\newthought{Solve} Part Two.
+
+\nwenddocs{}\nwbegincode{7}\sublabel{NW1nsOf7-1vzJfP-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW1nsOf7-1vzJfP-1}}}\moddef{Correct the box IDs.~{\nwtagstyle{}\subpageref{NW1nsOf7-1vzJfP-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1nsOf7-1375sF-1}}\nwenddeflinemarkup
+\nwlinkedidentc{correctBoxIDs}{NW1nsOf7-1vzJfP-1} :: [\nwlinkedidentc{BoxID}{NW1nsOf7-4UP1v0-1}] -> Maybe (\nwlinkedidentc{BoxID}{NW1nsOf7-4UP1v0-1}, \nwlinkedidentc{BoxID}{NW1nsOf7-4UP1v0-1})
+\nwlinkedidentc{correctBoxIDs}{NW1nsOf7-1vzJfP-1} = listToMaybe . mapMaybe go . tails
+  where
+    go (x : xs@(_ : _)) = (x,) <$> find (hammingSimilar 1 x) xs
+    go _ = Nothing
+\nwindexdefn{\nwixident{correctBoxIDs}}{correctBoxIDs}{NW1nsOf7-1vzJfP-1}\eatline
+\nwused{\\{NW1nsOf7-1375sF-1}}\nwidentdefs{\\{{\nwixident{correctBoxIDs}}{correctBoxIDs}}}\nwidentuses{\\{{\nwixident{BoxID}}{BoxID}}}\nwindexuse{\nwixident{BoxID}}{BoxID}{NW1nsOf7-1vzJfP-1}\nwendcode{}\nwbegindocs{8}\nwdocspar
+\nwenddocs{}\nwbegincode{9}\sublabel{NW1nsOf7-4P9qKy-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW1nsOf7-4P9qKy-1}}}\moddef{Part Two~{\nwtagstyle{}\subpageref{NW1nsOf7-4P9qKy-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1nsOf7-1375sF-1}}\nwenddeflinemarkup
+\nwlinkedidentc{partTwo}{NW1nsOf7-4P9qKy-1} :: [\nwlinkedidentc{BoxID}{NW1nsOf7-4UP1v0-1}] -> Maybe String
+\nwlinkedidentc{partTwo}{NW1nsOf7-4P9qKy-1} = fmap (uncurry intersect) . \nwlinkedidentc{correctBoxIDs}{NW1nsOf7-1vzJfP-1}
+\nwindexdefn{\nwixident{partTwo}}{partTwo}{NW1nsOf7-4P9qKy-1}\eatline
+\nwused{\\{NW1nsOf7-1375sF-1}}\nwidentdefs{\\{{\nwixident{partTwo}}{partTwo}}}\nwidentuses{\\{{\nwixident{BoxID}}{BoxID}}\\{{\nwixident{correctBoxIDs}}{correctBoxIDs}}}\nwindexuse{\nwixident{BoxID}}{BoxID}{NW1nsOf7-4P9qKy-1}\nwindexuse{\nwixident{correctBoxIDs}}{correctBoxIDs}{NW1nsOf7-4P9qKy-1}\nwendcode{}\nwbegindocs{10}\nwdocspar
+
+\newthought{Bring it} all together.
+
+\nwenddocs{}\nwbegincode{11}\sublabel{NW1nsOf7-1375sF-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW1nsOf7-1375sF-1}}}\moddef{Day02.hs~{\nwtagstyle{}\subpageref{NW1nsOf7-1375sF-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
+\{-# LANGUAGE TupleSections #-\}
+
+module AdventOfCode.Year2018.Day02 where
+
+import AdventOfCode.Input (parseInput)
+import AdventOfCode.TH (defaultMainMaybe, inputFilePath)
+import AdventOfCode.Util (frequencies, hammingSimilar)
+import Control.Arrow ((&&&), (***), (>>>))
+import Data.List (find, intersect, tails)
+import Data.Maybe (listToMaybe, mapMaybe)
+import Text.Trifecta (letter, newline, sepEndBy, some)
+
+\LA{}Type aliases~{\nwtagstyle{}\subpageref{NW1nsOf7-4UP1v0-1}}\RA{}
+
+main :: IO ()
+main = $(defaultMainMaybe)
+
+getInput :: IO [\nwlinkedidentc{BoxID}{NW1nsOf7-4UP1v0-1}]
+getInput = parseInput (some letter `sepEndBy` newline) $(inputFilePath)
+
+\LA{}Part One~{\nwtagstyle{}\subpageref{NW1nsOf7-2iOjQS-1}}\RA{}
+
+\LA{}Part Two~{\nwtagstyle{}\subpageref{NW1nsOf7-4P9qKy-1}}\RA{}
+
+\LA{}Compute the checksum.~{\nwtagstyle{}\subpageref{NW1nsOf7-1hMs9W-1}}\RA{}
+
+\LA{}Correct the box IDs.~{\nwtagstyle{}\subpageref{NW1nsOf7-1vzJfP-1}}\RA{}
+\nwnotused{Day02.hs}\nwidentuses{\\{{\nwixident{BoxID}}{BoxID}}}\nwindexuse{\nwixident{BoxID}}{BoxID}{NW1nsOf7-1375sF-1}\nwendcode{}\nwbegindocs{12}\nwdocspar
+\nwenddocs{}
+
+\nwixlogsorted{c}{{Compute the checksum.}{NW1nsOf7-1hMs9W-1}{\nwixd{NW1nsOf7-1hMs9W-1}\nwixu{NW1nsOf7-1375sF-1}}}%
+\nwixlogsorted{c}{{Correct the box IDs.}{NW1nsOf7-1vzJfP-1}{\nwixd{NW1nsOf7-1vzJfP-1}\nwixu{NW1nsOf7-1375sF-1}}}%
+\nwixlogsorted{c}{{Day01.hs}{NW1oqLIA-12NRmi-1}{\nwixd{NW1oqLIA-12NRmi-1}}}%
+\nwixlogsorted{c}{{Day02.hs}{NW1nsOf7-1375sF-1}{\nwixd{NW1nsOf7-1375sF-1}}}%
+\nwixlogsorted{c}{{Define data types to model the puzzle input.}{NW1oqLIA-3C8vxP-1}{\nwixd{NW1oqLIA-3C8vxP-1}\nwixu{NW1oqLIA-12NRmi-1}}}%
+\nwixlogsorted{c}{{Parse the input.}{NW1oqLIA-2S9BvQ-1}{\nwixd{NW1oqLIA-2S9BvQ-1}\nwixu{NW1oqLIA-12NRmi-1}}}%
+\nwixlogsorted{c}{{Part One}{NW1nsOf7-2iOjQS-1}{\nwixd{NW1nsOf7-2iOjQS-1}\nwixu{NW1nsOf7-1375sF-1}}}%
+\nwixlogsorted{c}{{Part Two}{NW1nsOf7-4P9qKy-1}{\nwixd{NW1nsOf7-4P9qKy-1}\nwixu{NW1nsOf7-1375sF-1}}}%
+\nwixlogsorted{c}{{Solve parts one and two.}{NW1oqLIA-3j9t0t-1}{\nwixd{NW1oqLIA-3j9t0t-1}\nwixd{NW1oqLIA-3j9t0t-2}\nwixu{NW1oqLIA-12NRmi-1}}}%
+\nwixlogsorted{c}{{Type aliases}{NW1nsOf7-4UP1v0-1}{\nwixd{NW1nsOf7-4UP1v0-1}\nwixu{NW1nsOf7-1375sF-1}}}%
+\nwixlogsorted{i}{{\nwixident{BoxID}}{BoxID}}%
+\nwixlogsorted{i}{{\nwixident{Checksum}}{Checksum}}%
+\nwixlogsorted{i}{{\nwixident{checksum}}{checksum}}%
+\nwixlogsorted{i}{{\nwixident{correctBoxIDs}}{correctBoxIDs}}%
+\nwixlogsorted{i}{{\nwixident{FrequencyChange}}{FrequencyChange}}%
+\nwixlogsorted{i}{{\nwixident{partOne}}{partOne}}%
+\nwixlogsorted{i}{{\nwixident{partTwo}}{partTwo}}%

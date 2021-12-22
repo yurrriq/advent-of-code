@@ -1,0 +1,57 @@
+\subsection{Haskell Solution}
+
+\newthought{My puzzle input} was the range \text{236491-713787}, which I converted into a
+list of lists of \hs{digits}.
+
+<<Input>>=
+getInput :: IO [[Int]]
+getInput = pure $ reverse . digits 10 <$> [236491 .. 713787]
+@
+
+\newthought{Spoiler:} Parts One and Two vary only in the strictness of the definition of a double, so a generic solver can be parameterized by the binary operation to compare the number of adjacent digits that are the same with \hs{2}. In both parts of the puzzle, it must also be the case that the digits never decrease, i.e. the password \hs{isSorted}.
+
+<<Generic solver>>=
+solve :: (Int -> Int -> Bool) -> [[Int]] -> Int
+solve = count . (isSorted <&&>) . hasDouble
+  where
+    hasDouble cmp = any ((`cmp` 2) . length) . group
+@
+
+\newthought{For Part One,} there must be a double, i.e. at least two adjacent digits that are the same.
+
+<<Part One>>=
+partOne :: [[Int]] -> Int
+partOne = solve (>=)
+@
+
+
+\newthought{For Part Two,} the password must have a strict double.
+
+<<Part Two>>=
+partTwo :: [[Int]] -> Int
+partTwo = solve (==)
+@
+
+
+\newthought{Bring it} all together.
+
+<<Day04.hs>>=
+module AdventOfCode.Year2019.Day04 where
+
+import AdventOfCode.TH (defaultMain)
+import AdventOfCode.Util (count, (<&&>))
+import Data.FastDigits (digits)
+import Data.List (group)
+import Data.List.Ordered (isSorted)
+
+main :: IO ()
+main = $(defaultMain)
+
+<<Input>>
+
+<<Part One>>
+
+<<Part Two>>
+
+<<Generic solver>>
+@

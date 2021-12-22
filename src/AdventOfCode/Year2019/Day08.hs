@@ -1,12 +1,7 @@
-module AdventOfCode.Year2019.Day08
-  ( main,
-    partOne,
-    partTwo,
-  )
-where
+module AdventOfCode.Year2019.Day08 where
 
 import AdventOfCode.Input (parseInput)
-import AdventOfCode.TH (inputFilePath)
+import AdventOfCode.TH (defaultMain, inputFilePath)
 import Control.Applicative ((<|>))
 import Data.Function (on)
 import Data.List (minimumBy)
@@ -30,14 +25,10 @@ type Layer = [Row]
 type Row = [Pixel]
 
 main :: IO ()
-main =
-  do
-    putStrLn "[2019] Day 8: Space Image Format"
-    layers <- parseInput (image 25 6) $(inputFilePath)
-    putStr "Part One: "
-    print (partOne layers)
-    putStrLn "Part Two: "
-    putStrLn (partTwo layers)
+main = $(defaultMain)
+
+getInput :: IO Image
+getInput = parseInput (image 25 6) $(inputFilePath)
 
 partOne :: Image -> Int
 partOne layers = numberOf White layer * numberOf Transparent layer

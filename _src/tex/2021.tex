@@ -1,0 +1,268 @@
+\nwfilename{_src/2021/day/02.nw}\nwbegindocs{0}\newpage% ===> this file was generated automatically by noweave --- better not edit it
+\section{Day 2: Dive!}
+\marginnote{\url{https://adventofcode.com/2021/day/2}}
+
+Now, you need to figure out how to pilot this thing.
+
+It seems like the submarine can take a series of commands like {\Tt{}\nwlinkedidentq{forward}{NW2dtzue-38STh2-2}\nwendquote}\hs{ 1}, {\Tt{}\nwlinkedidentq{down}{NW2dtzue-38STh2-3}\nwendquote}\hs{ 2}, or {\Tt{}\nwlinkedidentq{up}{NW2dtzue-38STh2-4}\nwendquote}\hs{ 3}:
+\begin{itemize}
+\item {\Tt{}\nwlinkedidentq{forward}{NW2dtzue-38STh2-2}\nwendquote}\hs{ x} increases the horizontal position by \hs{x} units.
+\item {\Tt{}\nwlinkedidentq{down}{NW2dtzue-38STh2-3}\nwendquote}\hs{ x} increases the depth by \hs{x} units.
+\item {\Tt{}\nwlinkedidentq{up}{NW2dtzue-38STh2-4}\nwendquote}\hs{ x} decreases the depth by \hs{x} units.
+\end{itemize}
+
+Note that since you're on a submarine, {\Tt{}\nwlinkedidentq{down}{NW2dtzue-38STh2-3}\nwendquote} and {\Tt{}\nwlinkedidentq{up}{NW2dtzue-38STh2-4}\nwendquote} affect your \textbf{depth}, and so they have the opposite result of what you might expect.
+
+The submarine seems to already have a planned course (your puzzle input). You should probably figure out where it's going. For example:
+\begin{minted}{text}
+  forward 5
+  down 5
+  forward 8
+  up 3
+  down 8
+  forward 2
+\end{minted}
+
+Your horizontal position and depth both start at \hs{0}. The steps above would then modify them as follows:
+\begin{itemize}
+  \item {\Tt{}\nwlinkedidentq{forward}{NW2dtzue-38STh2-2}\nwendquote}\hs{ 5} adds \hs{5} to your horizontal position, a total of \hs{5}.
+  \item {\Tt{}\nwlinkedidentq{down}{NW2dtzue-38STh2-3}\nwendquote}\hs{ 5} adds \hs{5} to your depth, resulting in a value of \hs{5}.
+  \item {\Tt{}\nwlinkedidentq{forward}{NW2dtzue-38STh2-2}\nwendquote}\hs{ 8} adds \hs{8} to your horizontal position, a total of \hs{13}.
+  \item {\Tt{}\nwlinkedidentq{up}{NW2dtzue-38STh2-4}\nwendquote}\hs{ 3} decreases your depth by \hs{3}, resulting in a value of \hs{2}.
+  \item {\Tt{}\nwlinkedidentq{down}{NW2dtzue-38STh2-3}\nwendquote}\hs{ 8} adds \hs{8} to your depth, resulting in a value of \hs{10}.
+  \item {\Tt{}\nwlinkedidentq{forward}{NW2dtzue-38STh2-2}\nwendquote}\hs{ 2} adds \hs{2} to your horizontal position, a total of \hs{15}.
+\end{itemize}
+
+After following these instructions, you would have a horizontal position of 15 and a depth of 10. (Multiplying these together produces \hs{150}.)
+
+Calculate the horizontal position and depth you would have after following the planned course. \textbf{What do you get if you multiply your final horizontal position by your final depth?}
+
+\newthought{Part Two}
+
+Based on your calculations, the planned course doesn't seem to make any sense. You find the submarine manual and discover that the process is actually slightly more complicated.
+
+In addition to horizontal position and depth, you'll also need to track a third value, \textbf{aim}, which also starts at \hs{0}. The commands also mean something entirely different than you first thought:
+
+\begin{itemize}
+\item {\Tt{}\nwlinkedidentq{down}{NW2dtzue-38STh2-3}\nwendquote}\hs{ x} increases your aim by \hs{x} units.
+\item {\Tt{}\nwlinkedidentq{up}{NW2dtzue-38STh2-4}\nwendquote}\hs{ x} decreases your aim by \hs{x} units.
+\item {\Tt{}\nwlinkedidentq{forward}{NW2dtzue-38STh2-2}\nwendquote}\hs{ x} does two things:
+  \begin{itemize}
+  \item It increases your horizontal position by \hs{x} units.
+  \item It increases your depth by your aim \textbf{multiplied by} \hs{x}.
+  \end{itemize}
+\end{itemize}
+
+Again note that since you're on a submarine, {\Tt{}\nwlinkedidentq{down}{NW2dtzue-38STh2-3}\nwendquote} and {\Tt{}\nwlinkedidentq{up}{NW2dtzue-38STh2-4}\nwendquote} do the opposite of what you might expect: ``down'' means aiming in the positive direction.
+
+Now, the above example does something different:
+\begin{itemize}
+\item {\Tt{}\nwlinkedidentq{forward}{NW2dtzue-38STh2-2}\nwendquote}\hs{ 5} adds \hs{5} to your horizontal position, a total of \hs{5}. Because your aim is \hs{0}, your depth does not change.
+\item {\Tt{}\nwlinkedidentq{down}{NW2dtzue-38STh2-3}\nwendquote}\hs{ 5} adds \hs{5} to your aim, resulting in a value of \hs{5}.
+\item {\Tt{}\nwlinkedidentq{forward}{NW2dtzue-38STh2-2}\nwendquote}\hs{ 8} adds \hs{8} to your horizontal position, a total of \hs{13}. Because your aim is \hs{5}, your depth increases by $8*5=40$.
+\item {\Tt{}\nwlinkedidentq{up}{NW2dtzue-38STh2-4}\nwendquote}\hs{ 3} decreases your aim by \hs{3}, resulting in a value of \hs{2}.
+\item {\Tt{}\nwlinkedidentq{down}{NW2dtzue-38STh2-3}\nwendquote}\hs{ 8} adds \hs{8} to your aim, resulting in a value of \hs{10}.
+\item {\Tt{}\nwlinkedidentq{forward}{NW2dtzue-38STh2-2}\nwendquote}\hs{ 2} adds \hs{2} to your horizontal position, a total of \hs{15}. Because your aim is \hs{10}, your depth increases by $2*10=20$ to a total of \hs{60}.
+\end{itemize}
+
+After following these new instructions, you would have a horizontal position of \hs{15} and a depth of \hs{60}. (Multiplying these produces \hs{900}.)
+
+Using this new interpretation of the commands, calculate the horizontal position and depth you would have after following the planned course. \textbf{What do you get if you multiply your final horizontal position by your final depth?}
+\nwenddocs{}\nwfilename{_src/2021/haskell/02.nw}\nwbegindocs{0}\newpage
+\subsection{Haskell solution}
+
+A {\Tt{}\nwlinkedidentq{Direction}{NW2dtzue-1OzTRH-1}\nwendquote} is a change in horizontal position and a change in depth,
+represented by \hrefootnote{https://hackage.haskell.org/package/linear/docs/Linear-V2.html\#t:V2}{a 2-dimensional vector}, \hrefootnote{https://hackage.haskell.org/package/base/docs/Data-Monoid.html\#t:Sum}{monoidal under addition}.
+
+\nwenddocs{}\nwbegincode{1}\sublabel{NW2dtzue-1OzTRH-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2dtzue-1OzTRH-1}}}\moddef{Define some data types~{\nwtagstyle{}\subpageref{NW2dtzue-1OzTRH-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2dtzue-1375sF-1}}\nwprevnextdefs{\relax}{NW2dtzue-1OzTRH-2}\nwenddeflinemarkup
+newtype \nwlinkedidentc{Direction}{NW2dtzue-1OzTRH-1} = \nwlinkedidentc{Direction}{NW2dtzue-1OzTRH-1} \{unDirection :: V2 Int\}
+  deriving stock (Eq, Show)
+  deriving
+    (Semigroup, Monoid)
+    via (Sum (V2 Int))
+
+\nwindexdefn{\nwixident{Direction}}{Direction}{NW2dtzue-1OzTRH-1}\eatline
+\nwalsodefined{\\{NW2dtzue-1OzTRH-2}\\{NW2dtzue-1OzTRH-3}}\nwused{\\{NW2dtzue-1375sF-1}}\nwidentdefs{\\{{\nwixident{Direction}}{Direction}}}\nwendcode{}\nwbegindocs{2}\nwdocspar
+The {\Tt{}\LA{}known directions~{\nwtagstyle{}\subpageref{NW2dtzue-38STh2-1}}\RA{}\nwendquote} are {\Tt{}\nwlinkedidentq{forward}{NW2dtzue-38STh2-2}\nwendquote}, {\Tt{}\nwlinkedidentq{down}{NW2dtzue-38STh2-3}\nwendquote}, and {\Tt{}\nwlinkedidentq{up}{NW2dtzue-38STh2-4}\nwendquote}.
+
+\nwenddocs{}\nwbegincode{3}\sublabel{NW2dtzue-38STh2-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2dtzue-38STh2-1}}}\moddef{known directions~{\nwtagstyle{}\subpageref{NW2dtzue-38STh2-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2dtzue-1r7xob-1}}\nwprevnextdefs{\relax}{NW2dtzue-38STh2-2}\nwenddeflinemarkup
+\nwlinkedidentc{forward}{NW2dtzue-38STh2-2}, \nwlinkedidentc{down}{NW2dtzue-38STh2-3}, \nwlinkedidentc{up}{NW2dtzue-38STh2-4} :: Int -> \nwlinkedidentc{Direction}{NW2dtzue-1OzTRH-1}
+\nwalsodefined{\\{NW2dtzue-38STh2-2}\\{NW2dtzue-38STh2-3}\\{NW2dtzue-38STh2-4}}\nwused{\\{NW2dtzue-1r7xob-1}}\nwidentuses{\\{{\nwixident{Direction}}{Direction}}\\{{\nwixident{down}}{down}}\\{{\nwixident{forward}}{forward}}\\{{\nwixident{up}}{up}}}\nwindexuse{\nwixident{Direction}}{Direction}{NW2dtzue-38STh2-1}\nwindexuse{\nwixident{down}}{down}{NW2dtzue-38STh2-1}\nwindexuse{\nwixident{forward}}{forward}{NW2dtzue-38STh2-1}\nwindexuse{\nwixident{up}}{up}{NW2dtzue-38STh2-1}\nwendcode{}\nwbegindocs{4}\nwdocspar
+
+{\Tt{}\nwlinkedidentq{forward}{NW2dtzue-38STh2-2}\nwendquote}\hs{ x} increases the horizontal position by \hs{x} units.
+
+\nwenddocs{}\nwbegincode{5}\sublabel{NW2dtzue-38STh2-2}\nwmargintag{{\nwtagstyle{}\subpageref{NW2dtzue-38STh2-2}}}\moddef{known directions~{\nwtagstyle{}\subpageref{NW2dtzue-38STh2-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2dtzue-1r7xob-1}}\nwprevnextdefs{NW2dtzue-38STh2-1}{NW2dtzue-38STh2-3}\nwenddeflinemarkup
+\nwlinkedidentc{forward}{NW2dtzue-38STh2-2} = \nwlinkedidentc{Direction}{NW2dtzue-1OzTRH-1} . flip V2 0
+\nwindexdefn{\nwixident{forward}}{forward}{NW2dtzue-38STh2-2}\eatline
+\nwused{\\{NW2dtzue-1r7xob-1}}\nwidentdefs{\\{{\nwixident{forward}}{forward}}}\nwidentuses{\\{{\nwixident{Direction}}{Direction}}}\nwindexuse{\nwixident{Direction}}{Direction}{NW2dtzue-38STh2-2}\nwendcode{}\nwbegindocs{6}\nwdocspar
+{\Tt{}\nwlinkedidentq{down}{NW2dtzue-38STh2-3}\nwendquote}\hs{ x} increases the depth by \hs{x} units.
+
+\nwenddocs{}\nwbegincode{7}\sublabel{NW2dtzue-38STh2-3}\nwmargintag{{\nwtagstyle{}\subpageref{NW2dtzue-38STh2-3}}}\moddef{known directions~{\nwtagstyle{}\subpageref{NW2dtzue-38STh2-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2dtzue-1r7xob-1}}\nwprevnextdefs{NW2dtzue-38STh2-2}{NW2dtzue-38STh2-4}\nwenddeflinemarkup
+\nwlinkedidentc{down}{NW2dtzue-38STh2-3} = \nwlinkedidentc{Direction}{NW2dtzue-1OzTRH-1} . V2 0
+\nwindexdefn{\nwixident{down}}{down}{NW2dtzue-38STh2-3}\eatline
+\nwused{\\{NW2dtzue-1r7xob-1}}\nwidentdefs{\\{{\nwixident{down}}{down}}}\nwidentuses{\\{{\nwixident{Direction}}{Direction}}}\nwindexuse{\nwixident{Direction}}{Direction}{NW2dtzue-38STh2-3}\nwendcode{}\nwbegindocs{8}\nwdocspar
+{\Tt{}\nwlinkedidentq{up}{NW2dtzue-38STh2-4}\nwendquote}\hs{ x} decreases the depth by \hs{x} units, i.e. {\Tt{}\nwlinkedidentq{down}{NW2dtzue-38STh2-3}\nwendquote} with a \hs{negate}d \hs{x}.
+
+\nwenddocs{}\nwbegincode{9}\sublabel{NW2dtzue-38STh2-4}\nwmargintag{{\nwtagstyle{}\subpageref{NW2dtzue-38STh2-4}}}\moddef{known directions~{\nwtagstyle{}\subpageref{NW2dtzue-38STh2-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2dtzue-1r7xob-1}}\nwprevnextdefs{NW2dtzue-38STh2-3}{\relax}\nwenddeflinemarkup
+\nwlinkedidentc{up}{NW2dtzue-38STh2-4} = \nwlinkedidentc{down}{NW2dtzue-38STh2-3} . negate
+\nwindexdefn{\nwixident{up}}{up}{NW2dtzue-38STh2-4}\eatline
+\nwused{\\{NW2dtzue-1r7xob-1}}\nwidentdefs{\\{{\nwixident{up}}{up}}}\nwidentuses{\\{{\nwixident{down}}{down}}}\nwindexuse{\nwixident{down}}{down}{NW2dtzue-38STh2-4}\nwendcode{}\nwbegindocs{10}\nwdocspar
+Define a {\Tt{}\nwlinkedidentq{Direction}{NW2dtzue-1OzTRH-1}\nwendquote} parser using the {\Tt{}\LA{}known directions~{\nwtagstyle{}\subpageref{NW2dtzue-38STh2-1}}\RA{}\nwendquote}.
+
+\nwenddocs{}\nwbegincode{11}\sublabel{NW2dtzue-1r7xob-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2dtzue-1r7xob-1}}}\moddef{Define a Direction parser~{\nwtagstyle{}\subpageref{NW2dtzue-1r7xob-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2dtzue-1375sF-1}}\nwenddeflinemarkup
+\nwlinkedidentc{direction}{NW2dtzue-1r7xob-1} :: Parser \nwlinkedidentc{Direction}{NW2dtzue-1OzTRH-1}
+\nwlinkedidentc{direction}{NW2dtzue-1r7xob-1} = dir <*> (fromInteger <$> natural)
+  where
+    dir =
+      symbol "\nwlinkedidentc{forward}{NW2dtzue-38STh2-2}" $> \nwlinkedidentc{forward}{NW2dtzue-38STh2-2}
+        <|> symbol "\nwlinkedidentc{down}{NW2dtzue-38STh2-3}" $> \nwlinkedidentc{down}{NW2dtzue-38STh2-3}
+        <|> symbol "\nwlinkedidentc{up}{NW2dtzue-38STh2-4}" $> \nwlinkedidentc{up}{NW2dtzue-38STh2-4}
+
+\LA{}known directions~{\nwtagstyle{}\subpageref{NW2dtzue-38STh2-1}}\RA{}
+\nwindexdefn{\nwixident{direction}}{direction}{NW2dtzue-1r7xob-1}\eatline
+\nwused{\\{NW2dtzue-1375sF-1}}\nwidentdefs{\\{{\nwixident{direction}}{direction}}}\nwidentuses{\\{{\nwixident{Direction}}{Direction}}\\{{\nwixident{down}}{down}}\\{{\nwixident{forward}}{forward}}\\{{\nwixident{up}}{up}}}\nwindexuse{\nwixident{Direction}}{Direction}{NW2dtzue-1r7xob-1}\nwindexuse{\nwixident{down}}{down}{NW2dtzue-1r7xob-1}\nwindexuse{\nwixident{forward}}{forward}{NW2dtzue-1r7xob-1}\nwindexuse{\nwixident{up}}{up}{NW2dtzue-1r7xob-1}\nwendcode{}\nwbegindocs{12}\nwdocspar
+The puzzle input is a list of {\Tt{}\nwlinkedidentq{Direction}{NW2dtzue-1OzTRH-1}\nwendquote}s.
+
+\nwenddocs{}\nwbegincode{13}\sublabel{NW2dtzue-2ga90v-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2dtzue-2ga90v-1}}}\moddef{Parse the input~{\nwtagstyle{}\subpageref{NW2dtzue-2ga90v-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
+\nwlinkedidentc{getInput}{NW2dtzue-2ga90v-1} :: IO [\nwlinkedidentc{Direction}{NW2dtzue-1OzTRH-1}]
+\nwlinkedidentc{getInput}{NW2dtzue-2ga90v-1} = parseInput (some \nwlinkedidentc{direction}{NW2dtzue-1r7xob-1}) $(inputFilePath)
+\nwindexdefn{\nwixident{getInput}}{getInput}{NW2dtzue-2ga90v-1}\eatline
+\nwnotused{Parse the input}\nwidentdefs{\\{{\nwixident{getInput}}{getInput}}}\nwidentuses{\\{{\nwixident{Direction}}{Direction}}\\{{\nwixident{direction}}{direction}}}\nwindexuse{\nwixident{Direction}}{Direction}{NW2dtzue-2ga90v-1}\nwindexuse{\nwixident{direction}}{direction}{NW2dtzue-2ga90v-1}\nwendcode{}\nwbegindocs{14}\nwdocspar
+
+\newthought{The general solution} of the puzzle is to sum a list of additive monoids, extract the final position, and compute the \hs{product} of the horizontal position and depth.
+
+\nwenddocs{}\nwbegincode{15}\sublabel{NW2dtzue-1ULoeY-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2dtzue-1ULoeY-1}}}\moddef{Solve the puzzle~{\nwtagstyle{}\subpageref{NW2dtzue-1ULoeY-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2dtzue-1375sF-1}}\nwenddeflinemarkup
+\nwlinkedidentc{solve}{NW2dtzue-1ULoeY-1} :: Monoid m => (m -> V2 Int) -> [m] -> Int
+\nwlinkedidentc{solve}{NW2dtzue-1ULoeY-1} extract = product . extract . mconcat
+\nwindexdefn{\nwixident{solve}}{solve}{NW2dtzue-1ULoeY-1}\eatline
+\nwused{\\{NW2dtzue-1375sF-1}}\nwidentdefs{\\{{\nwixident{solve}}{solve}}}\nwendcode{}\nwbegindocs{16}\nwdocspar
+
+\newthought{For Part One,} the additive monoid is {\Tt{}\nwlinkedidentq{Direction}{NW2dtzue-1OzTRH-1}\nwendquote}.
+
+\nwenddocs{}\nwbegincode{17}\sublabel{NW2dtzue-4G9gVP-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2dtzue-4G9gVP-1}}}\moddef{Solve Part One~{\nwtagstyle{}\subpageref{NW2dtzue-4G9gVP-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2dtzue-1375sF-1}}\nwenddeflinemarkup
+\nwlinkedidentc{partOne}{NW2dtzue-4G9gVP-1} :: [\nwlinkedidentc{Direction}{NW2dtzue-1OzTRH-1}] -> Int
+\nwlinkedidentc{partOne}{NW2dtzue-4G9gVP-1} = \nwlinkedidentc{solve}{NW2dtzue-1ULoeY-1} unDirection
+\nwindexdefn{\nwixident{partOne}}{partOne}{NW2dtzue-4G9gVP-1}\eatline
+\nwused{\\{NW2dtzue-1375sF-1}}\nwidentdefs{\\{{\nwixident{partOne}}{partOne}}}\nwidentuses{\\{{\nwixident{Direction}}{Direction}}\\{{\nwixident{solve}}{solve}}}\nwindexuse{\nwixident{Direction}}{Direction}{NW2dtzue-4G9gVP-1}\nwindexuse{\nwixident{solve}}{solve}{NW2dtzue-4G9gVP-1}\nwendcode{}\nwbegindocs{18}\nwdocspar
+
+\newthought{For Part Two,} the additive monoid is {\Tt{}\nwlinkedidentq{Aim}{NW2dtzue-1OzTRH-2}\nwendquote}, i.e. an integer.
+
+\nwenddocs{}\nwbegincode{19}\sublabel{NW2dtzue-1OzTRH-2}\nwmargintag{{\nwtagstyle{}\subpageref{NW2dtzue-1OzTRH-2}}}\moddef{Define some data types~{\nwtagstyle{}\subpageref{NW2dtzue-1OzTRH-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2dtzue-1375sF-1}}\nwprevnextdefs{NW2dtzue-1OzTRH-1}{NW2dtzue-1OzTRH-3}\nwenddeflinemarkup
+newtype \nwlinkedidentc{Aim}{NW2dtzue-1OzTRH-2} = \nwlinkedidentc{Aim}{NW2dtzue-1OzTRH-2} Int
+  deriving stock (Eq, Show)
+  deriving
+    (Semigroup, Monoid)
+    via (Sum Int)
+
+\nwindexdefn{\nwixident{Aim}}{Aim}{NW2dtzue-1OzTRH-2}\eatline
+\nwused{\\{NW2dtzue-1375sF-1}}\nwidentdefs{\\{{\nwixident{Aim}}{Aim}}}\nwendcode{}\nwbegindocs{20}\nwdocspar
+{\Tt{}\nwlinkedidentq{forward}{NW2dtzue-38STh2-2}\nwendquote}\hs{ x} increases the horizontal position by \hs{x} units and increases the depth by the aim multiplied by \hs{x}, forming a \hrefootnote{https://hackage.haskell.org/package/monoid-extras/docs/Data-Monoid-SemiDirectProduct.html\#t:Semi}{semi-direct product} of {\Tt{}\nwlinkedidentq{Direction}{NW2dtzue-1OzTRH-1}\nwendquote} (the sub-monoid) and {\Tt{}\nwlinkedidentq{Aim}{NW2dtzue-1OzTRH-2}\nwendquote} (the quotient monoid).
+
+Define how {\Tt{}\nwlinkedidentq{Aim}{NW2dtzue-1OzTRH-2}\nwendquote} acts on {\Tt{}\nwlinkedidentq{Direction}{NW2dtzue-1OzTRH-1}\nwendquote}.
+
+\nwenddocs{}\nwbegincode{21}\sublabel{NW2dtzue-1OzTRH-3}\nwmargintag{{\nwtagstyle{}\subpageref{NW2dtzue-1OzTRH-3}}}\moddef{Define some data types~{\nwtagstyle{}\subpageref{NW2dtzue-1OzTRH-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2dtzue-1375sF-1}}\nwprevnextdefs{NW2dtzue-1OzTRH-2}{\relax}\nwenddeflinemarkup
+instance Action \nwlinkedidentc{Aim}{NW2dtzue-1OzTRH-2} \nwlinkedidentc{Direction}{NW2dtzue-1OzTRH-1} where
+  act (\nwlinkedidentc{Aim}{NW2dtzue-1OzTRH-2} a) (\nwlinkedidentc{Direction}{NW2dtzue-1OzTRH-1} (V2 x y)) = \nwlinkedidentc{Direction}{NW2dtzue-1OzTRH-1} (V2 x (y + a * x))
+\nwused{\\{NW2dtzue-1375sF-1}}\nwidentuses{\\{{\nwixident{Aim}}{Aim}}\\{{\nwixident{Direction}}{Direction}}}\nwindexuse{\nwixident{Aim}}{Aim}{NW2dtzue-1OzTRH-3}\nwindexuse{\nwixident{Direction}}{Direction}{NW2dtzue-1OzTRH-3}\nwendcode{}\nwbegindocs{22}\nwdocspar
+
+Use the \hs{Action} to construct the semi-direct product {\Tt{}\nwlinkedidentq{Direction}{NW2dtzue-1OzTRH-1}\nwendquote}$\ \rtimes\ ${\Tt{}\nwlinkedidentq{Aim}{NW2dtzue-1OzTRH-2}\nwendquote}.
+
+\nwenddocs{}\nwbegincode{23}\sublabel{NW2dtzue-4XKPl9-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2dtzue-4XKPl9-1}}}\moddef{Define the semi-direct product~{\nwtagstyle{}\subpageref{NW2dtzue-4XKPl9-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2dtzue-2ZOhXn-1}}\nwprevnextdefs{\relax}{NW2dtzue-4XKPl9-2}\nwenddeflinemarkup
+\nwlinkedidentc{lift}{NW2dtzue-4XKPl9-1} :: \nwlinkedidentc{Direction}{NW2dtzue-1OzTRH-1} -> Semi \nwlinkedidentc{Direction}{NW2dtzue-1OzTRH-1} \nwlinkedidentc{Aim}{NW2dtzue-1OzTRH-2}
+\nwindexdefn{\nwixident{lift}}{lift}{NW2dtzue-4XKPl9-1}\eatline
+\nwalsodefined{\\{NW2dtzue-4XKPl9-2}\\{NW2dtzue-4XKPl9-3}\\{NW2dtzue-4XKPl9-4}}\nwused{\\{NW2dtzue-2ZOhXn-1}}\nwidentdefs{\\{{\nwixident{lift}}{lift}}}\nwidentuses{\\{{\nwixident{Aim}}{Aim}}\\{{\nwixident{Direction}}{Direction}}}\nwindexuse{\nwixident{Aim}}{Aim}{NW2dtzue-4XKPl9-1}\nwindexuse{\nwixident{Direction}}{Direction}{NW2dtzue-4XKPl9-1}\nwendcode{}\nwbegindocs{24}\nwdocspar
+
+{\Tt{}\nwlinkedidentq{forward}{NW2dtzue-38STh2-2}\nwendquote}, i.e. a {\Tt{}\nwlinkedidentq{Direction}{NW2dtzue-1OzTRH-1}\nwendquote} with a depth change of \hs{0}, doesn't affect the aim.
+
+\nwenddocs{}\nwbegincode{25}\sublabel{NW2dtzue-4XKPl9-2}\nwmargintag{{\nwtagstyle{}\subpageref{NW2dtzue-4XKPl9-2}}}\moddef{Define the semi-direct product~{\nwtagstyle{}\subpageref{NW2dtzue-4XKPl9-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2dtzue-2ZOhXn-1}}\nwprevnextdefs{NW2dtzue-4XKPl9-1}{NW2dtzue-4XKPl9-3}\nwenddeflinemarkup
+\nwlinkedidentc{lift}{NW2dtzue-4XKPl9-1} dir@(\nwlinkedidentc{Direction}{NW2dtzue-1OzTRH-1} (V2 _ 0)) = inject dir
+\nwused{\\{NW2dtzue-2ZOhXn-1}}\nwidentuses{\\{{\nwixident{Direction}}{Direction}}\\{{\nwixident{lift}}{lift}}}\nwindexuse{\nwixident{Direction}}{Direction}{NW2dtzue-4XKPl9-2}\nwindexuse{\nwixident{lift}}{lift}{NW2dtzue-4XKPl9-2}\nwendcode{}\nwbegindocs{26}\nwdocspar
+
+{\Tt{}\nwlinkedidentq{up}{NW2dtzue-38STh2-4}\nwendquote} or {\Tt{}\nwlinkedidentq{down}{NW2dtzue-38STh2-3}\nwendquote}, i.e. a {\Tt{}\nwlinkedidentq{Direction}{NW2dtzue-1OzTRH-1}\nwendquote} with a horizontal change of \hs{0} and a non-zero depth change \hs{y}, results in an aim change of \hs{y} units.
+
+\nwenddocs{}\nwbegincode{27}\sublabel{NW2dtzue-4XKPl9-3}\nwmargintag{{\nwtagstyle{}\subpageref{NW2dtzue-4XKPl9-3}}}\moddef{Define the semi-direct product~{\nwtagstyle{}\subpageref{NW2dtzue-4XKPl9-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2dtzue-2ZOhXn-1}}\nwprevnextdefs{NW2dtzue-4XKPl9-2}{NW2dtzue-4XKPl9-4}\nwenddeflinemarkup
+\nwlinkedidentc{lift}{NW2dtzue-4XKPl9-1} (\nwlinkedidentc{Direction}{NW2dtzue-1OzTRH-1} (V2 0 y)) = embed (\nwlinkedidentc{Aim}{NW2dtzue-1OzTRH-2} y)
+\nwused{\\{NW2dtzue-2ZOhXn-1}}\nwidentuses{\\{{\nwixident{Aim}}{Aim}}\\{{\nwixident{Direction}}{Direction}}\\{{\nwixident{lift}}{lift}}}\nwindexuse{\nwixident{Aim}}{Aim}{NW2dtzue-4XKPl9-3}\nwindexuse{\nwixident{Direction}}{Direction}{NW2dtzue-4XKPl9-3}\nwindexuse{\nwixident{lift}}{lift}{NW2dtzue-4XKPl9-3}\nwendcode{}\nwbegindocs{28}\nwdocspar
+
+Since {\Tt{}\nwlinkedidentq{Direction}{NW2dtzue-1OzTRH-1}\nwendquote} is not specific enough to prevent them, add a catch-all clause to handle invalid directions, e.g. {\Tt{}\nwlinkedidentq{forward}{NW2dtzue-38STh2-2}\nwendquote} and {\Tt{}\nwlinkedidentq{up}{NW2dtzue-38STh2-4}\nwendquote} simultaneously.
+
+\nwenddocs{}\nwbegincode{29}\sublabel{NW2dtzue-4XKPl9-4}\nwmargintag{{\nwtagstyle{}\subpageref{NW2dtzue-4XKPl9-4}}}\moddef{Define the semi-direct product~{\nwtagstyle{}\subpageref{NW2dtzue-4XKPl9-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2dtzue-2ZOhXn-1}}\nwprevnextdefs{NW2dtzue-4XKPl9-3}{\relax}\nwenddeflinemarkup
+\nwlinkedidentc{lift}{NW2dtzue-4XKPl9-1} _ = error "Invalid \nwlinkedidentc{direction}{NW2dtzue-1r7xob-1}"
+\nwused{\\{NW2dtzue-2ZOhXn-1}}\nwidentuses{\\{{\nwixident{direction}}{direction}}\\{{\nwixident{lift}}{lift}}}\nwindexuse{\nwixident{direction}}{direction}{NW2dtzue-4XKPl9-4}\nwindexuse{\nwixident{lift}}{lift}{NW2dtzue-4XKPl9-4}\nwendcode{}\nwbegindocs{30}\nwdocspar
+
+To solve Part Two, {\Tt{}\nwlinkedidentq{lift}{NW2dtzue-4XKPl9-1}\nwendquote} each {\Tt{}\nwlinkedidentq{Direction}{NW2dtzue-1OzTRH-1}\nwendquote} in the input to {\Tt{}\nwlinkedidentq{Direction}{NW2dtzue-1OzTRH-1}\nwendquote}$\ \rtimes\ ${\Tt{}\nwlinkedidentq{Aim}{NW2dtzue-1OzTRH-2}\nwendquote}, forgetting the {\Tt{}\nwlinkedidentq{Aim}{NW2dtzue-1OzTRH-2}\nwendquote} tag to extract the final position.
+
+\nwenddocs{}\nwbegincode{31}\sublabel{NW2dtzue-2ZOhXn-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2dtzue-2ZOhXn-1}}}\moddef{Solve Part Two~{\nwtagstyle{}\subpageref{NW2dtzue-2ZOhXn-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2dtzue-1375sF-1}}\nwenddeflinemarkup
+\nwlinkedidentc{partTwo}{NW2dtzue-2ZOhXn-1} :: [\nwlinkedidentc{Direction}{NW2dtzue-1OzTRH-1}] -> Int
+\nwlinkedidentc{partTwo}{NW2dtzue-2ZOhXn-1} = \nwlinkedidentc{solve}{NW2dtzue-1ULoeY-1} (unDirection . untag) . map \nwlinkedidentc{lift}{NW2dtzue-4XKPl9-1}
+  where
+    \LA{}Define the semi-direct product~{\nwtagstyle{}\subpageref{NW2dtzue-4XKPl9-1}}\RA{}
+\nwindexdefn{\nwixident{partTwo}}{partTwo}{NW2dtzue-2ZOhXn-1}\eatline
+\nwused{\\{NW2dtzue-1375sF-1}}\nwidentdefs{\\{{\nwixident{partTwo}}{partTwo}}}\nwidentuses{\\{{\nwixident{Direction}}{Direction}}\\{{\nwixident{lift}}{lift}}\\{{\nwixident{solve}}{solve}}}\nwindexuse{\nwixident{Direction}}{Direction}{NW2dtzue-2ZOhXn-1}\nwindexuse{\nwixident{lift}}{lift}{NW2dtzue-2ZOhXn-1}\nwindexuse{\nwixident{solve}}{solve}{NW2dtzue-2ZOhXn-1}\nwendcode{}\nwbegindocs{32}\nwdocspar
+
+\newthought{Bring it} all together.
+
+\nwenddocs{}\nwbegincode{33}\sublabel{NW2dtzue-1375sF-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2dtzue-1375sF-1}}}\moddef{Day02.hs~{\nwtagstyle{}\subpageref{NW2dtzue-1375sF-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
+\{-# LANGUAGE DerivingVia #-\}
+\{-# LANGUAGE MultiParamTypeClasses #-\}
+
+module AdventOfCode.Year2021.Day02 where
+
+import AdventOfCode.Input (parseInput)
+import AdventOfCode.TH (defaultMain, inputFilePath)
+import Control.Applicative ((<|>))
+import Data.Functor (($>))
+import Data.Monoid.Action (Action (..))
+import Data.Monoid.SemiDirectProduct.Strict (Semi, embed, inject, untag)
+import Data.Semigroup (Sum (..))
+import Linear (V2 (..))
+import Text.Trifecta (Parser, natural, some, symbol)
+
+\LA{}Define some data types~{\nwtagstyle{}\subpageref{NW2dtzue-1OzTRH-1}}\RA{}
+
+main :: IO ()
+main = $(defaultMain)
+
+\nwlinkedidentc{getInput}{NW2dtzue-2ga90v-1} :: IO [\nwlinkedidentc{Direction}{NW2dtzue-1OzTRH-1}]
+\nwlinkedidentc{getInput}{NW2dtzue-2ga90v-1} = parseInput (some \nwlinkedidentc{direction}{NW2dtzue-1r7xob-1}) $(inputFilePath)
+
+example :: [\nwlinkedidentc{Direction}{NW2dtzue-1OzTRH-1}]
+example =
+  [ \nwlinkedidentc{forward}{NW2dtzue-38STh2-2} 5,
+    \nwlinkedidentc{down}{NW2dtzue-38STh2-3} 5,
+    \nwlinkedidentc{forward}{NW2dtzue-38STh2-2} 8,
+    \nwlinkedidentc{up}{NW2dtzue-38STh2-4} 3,
+    \nwlinkedidentc{down}{NW2dtzue-38STh2-3} 8,
+    \nwlinkedidentc{forward}{NW2dtzue-38STh2-2} 2
+  ]
+
+\LA{}Solve Part One~{\nwtagstyle{}\subpageref{NW2dtzue-4G9gVP-1}}\RA{}
+
+\LA{}Solve Part Two~{\nwtagstyle{}\subpageref{NW2dtzue-2ZOhXn-1}}\RA{}
+
+\LA{}Solve the puzzle~{\nwtagstyle{}\subpageref{NW2dtzue-1ULoeY-1}}\RA{}
+
+\LA{}Define a Direction parser~{\nwtagstyle{}\subpageref{NW2dtzue-1r7xob-1}}\RA{}
+\nwnotused{Day02.hs}\nwidentuses{\\{{\nwixident{Direction}}{Direction}}\\{{\nwixident{direction}}{direction}}\\{{\nwixident{down}}{down}}\\{{\nwixident{forward}}{forward}}\\{{\nwixident{getInput}}{getInput}}\\{{\nwixident{up}}{up}}}\nwindexuse{\nwixident{Direction}}{Direction}{NW2dtzue-1375sF-1}\nwindexuse{\nwixident{direction}}{direction}{NW2dtzue-1375sF-1}\nwindexuse{\nwixident{down}}{down}{NW2dtzue-1375sF-1}\nwindexuse{\nwixident{forward}}{forward}{NW2dtzue-1375sF-1}\nwindexuse{\nwixident{getInput}}{getInput}{NW2dtzue-1375sF-1}\nwindexuse{\nwixident{up}}{up}{NW2dtzue-1375sF-1}\nwendcode{}\nwbegindocs{34}\nwdocspar
+\nwenddocs{}
+
+\nwixlogsorted{c}{{Day02.hs}{NW2dtzue-1375sF-1}{\nwixd{NW2dtzue-1375sF-1}}}%
+\nwixlogsorted{c}{{Define a Direction parser}{NW2dtzue-1r7xob-1}{\nwixd{NW2dtzue-1r7xob-1}\nwixu{NW2dtzue-1375sF-1}}}%
+\nwixlogsorted{c}{{Define some data types}{NW2dtzue-1OzTRH-1}{\nwixd{NW2dtzue-1OzTRH-1}\nwixd{NW2dtzue-1OzTRH-2}\nwixd{NW2dtzue-1OzTRH-3}\nwixu{NW2dtzue-1375sF-1}}}%
+\nwixlogsorted{c}{{Define the semi-direct product}{NW2dtzue-4XKPl9-1}{\nwixd{NW2dtzue-4XKPl9-1}\nwixd{NW2dtzue-4XKPl9-2}\nwixd{NW2dtzue-4XKPl9-3}\nwixd{NW2dtzue-4XKPl9-4}\nwixu{NW2dtzue-2ZOhXn-1}}}%
+\nwixlogsorted{c}{{known directions}{NW2dtzue-38STh2-1}{\nwixd{NW2dtzue-38STh2-1}\nwixd{NW2dtzue-38STh2-2}\nwixd{NW2dtzue-38STh2-3}\nwixd{NW2dtzue-38STh2-4}\nwixu{NW2dtzue-1r7xob-1}}}%
+\nwixlogsorted{c}{{Parse the input}{NW2dtzue-2ga90v-1}{\nwixd{NW2dtzue-2ga90v-1}}}%
+\nwixlogsorted{c}{{Solve Part One}{NW2dtzue-4G9gVP-1}{\nwixd{NW2dtzue-4G9gVP-1}\nwixu{NW2dtzue-1375sF-1}}}%
+\nwixlogsorted{c}{{Solve Part Two}{NW2dtzue-2ZOhXn-1}{\nwixd{NW2dtzue-2ZOhXn-1}\nwixu{NW2dtzue-1375sF-1}}}%
+\nwixlogsorted{c}{{Solve the puzzle}{NW2dtzue-1ULoeY-1}{\nwixd{NW2dtzue-1ULoeY-1}\nwixu{NW2dtzue-1375sF-1}}}%
+\nwixlogsorted{i}{{\nwixident{Aim}}{Aim}}%
+\nwixlogsorted{i}{{\nwixident{Direction}}{Direction}}%
+\nwixlogsorted{i}{{\nwixident{direction}}{direction}}%
+\nwixlogsorted{i}{{\nwixident{down}}{down}}%
+\nwixlogsorted{i}{{\nwixident{forward}}{forward}}%
+\nwixlogsorted{i}{{\nwixident{getInput}}{getInput}}%
+\nwixlogsorted{i}{{\nwixident{lift}}{lift}}%
+\nwixlogsorted{i}{{\nwixident{partOne}}{partOne}}%
+\nwixlogsorted{i}{{\nwixident{partTwo}}{partTwo}}%
+\nwixlogsorted{i}{{\nwixident{solve}}{solve}}%
+\nwixlogsorted{i}{{\nwixident{up}}{up}}%

@@ -1,4 +1,331 @@
-\nwfilename{_src/day/2021/02.nw}\nwbegindocs{0}\newpage% ===> this file was generated automatically by noweave --- better not edit it
+\nwfilename{_src/day/2019/01.nw}\nwbegindocs{0}\newpage% ===> this file was generated automatically by noweave --- better not edit it
+\chapter{Day 1: The Tyranny of the Rocket Equation}
+\todoo{Copy description}
+\marginnote{\url{https://adventofcode.com/2019/day/1}}
+\nwenddocs{}\nwfilename{_src/gap/2019/01.nw}\nwbegindocs{0}\section{GAP Solution}
+
+\begin{marginfigure}
+\[
+ \text{fuel} := \text{mass} \backslash 3 - 2
+\]
+\end{marginfigure}
+\nwenddocs{}\nwbegincode{1}\sublabel{NW2vDOcF-3gOu99-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2vDOcF-3gOu99-1}}}\moddef{Day01.g~{\nwtagstyle{}\subpageref{NW2vDOcF-3gOu99-1}}}\endmoddef\nwstartdeflinemarkup\nwprevnextdefs{\relax}{NW2vDOcF-3gOu99-2}\nwenddeflinemarkup
+FuelRequiredModule := function( mass )
+    return Int( Float( mass / 3 ) ) - 2;
+end;;
+
+
+\nwalsodefined{\\{NW2vDOcF-3gOu99-2}\\{NW2vDOcF-3gOu99-3}\\{NW2vDOcF-3gOu99-4}}\nwnotused{Day01.g}\nwendcode{}\nwbegindocs{2}\nwdocspar
+
+\nwenddocs{}\nwbegincode{3}\sublabel{NW2vDOcF-3gOu99-2}\nwmargintag{{\nwtagstyle{}\subpageref{NW2vDOcF-3gOu99-2}}}\moddef{Day01.g~{\nwtagstyle{}\subpageref{NW2vDOcF-3gOu99-1}}}\plusendmoddef\nwstartdeflinemarkup\nwprevnextdefs{NW2vDOcF-3gOu99-1}{NW2vDOcF-3gOu99-3}\nwenddeflinemarkup
+PartOne := function( )
+    local input, line, mass, sum;;
+    sum := 0;
+    input := InputTextFile ( "./input/day01.txt" );
+    line := ReadLine( input );
+    repeat
+        mass := Int( Chomp( line ) );
+        sum := sum + FuelRequiredModule( mass );
+        line := ReadLine( input );
+    until line = fail or IsEndOfStream( input );
+    return sum;
+end;;
+
+
+\nwendcode{}\nwbegindocs{4}\nwdocspar
+
+\nwenddocs{}\nwbegincode{5}\sublabel{NW2vDOcF-3gOu99-3}\nwmargintag{{\nwtagstyle{}\subpageref{NW2vDOcF-3gOu99-3}}}\moddef{Day01.g~{\nwtagstyle{}\subpageref{NW2vDOcF-3gOu99-1}}}\plusendmoddef\nwstartdeflinemarkup\nwprevnextdefs{NW2vDOcF-3gOu99-2}{NW2vDOcF-3gOu99-4}\nwenddeflinemarkup
+TotalFuelRequiredModule := function( mass )
+    local fuel;;
+    fuel := FuelRequiredModule( mass );
+    if IsPosInt( fuel ) then
+        return fuel + TotalFuelRequiredModule( fuel );
+    else
+        return 0;
+    fi;
+end;;
+
+
+\nwendcode{}\nwbegindocs{6}\nwdocspar
+
+\nwenddocs{}\nwbegincode{7}\sublabel{NW2vDOcF-3gOu99-4}\nwmargintag{{\nwtagstyle{}\subpageref{NW2vDOcF-3gOu99-4}}}\moddef{Day01.g~{\nwtagstyle{}\subpageref{NW2vDOcF-3gOu99-1}}}\plusendmoddef\nwstartdeflinemarkup\nwprevnextdefs{NW2vDOcF-3gOu99-3}{\relax}\nwenddeflinemarkup
+PartTwo := function( )
+    local input, line, mass, sum;;
+    sum := 0;
+    input := InputTextFile ( "./input/day01.txt" );
+    line := ReadLine( input );
+    repeat
+        mass := Int( Chomp( line ) );
+        sum := sum + TotalFuelRequiredModule( mass );
+        line := ReadLine( input );
+    until line = fail or IsEndOfStream( input );
+    return sum;
+end;;
+\nwendcode{}\nwbegindocs{8}\nwdocspar
+\nwenddocs{}\nwfilename{_src/day/2019/04.nw}\nwbegindocs{0}\newpage
+\chapter{Day 4: Secure Container}
+\todoo{Copy description}
+\marginnote{\url{https://adventofcode.com/2019/day/4}}
+\nwenddocs{}\nwfilename{_src/haskell/2019/04.nw}\nwbegindocs{0}\section{Haskell Solution}
+
+\subsection{Input}
+
+My puzzle input was the range \text{236491-713787}, which I converted into a
+list of lists of \hs{digits}.
+
+\nwenddocs{}\nwbegincode{1}\sublabel{NW2iNnUA-1GvnV-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2iNnUA-1GvnV-1}}}\moddef{Input~{\nwtagstyle{}\subpageref{NW2iNnUA-1GvnV-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2iNnUA-15Rjc8-1}}\nwenddeflinemarkup
+input :: [[Int]]
+input = digits 10 <$> [236491 .. 713787]
+\nwused{\\{NW2iNnUA-15Rjc8-1}}\nwendcode{}\nwbegindocs{2}\nwdocspar
+
+
+\subsection{Part One}
+
+For part one, there must be two adjacent digits that are the same, i.e. there
+exists at least one \hs{group} of \hs{length} \hs{>= 2}.
+
+\nwenddocs{}\nwbegincode{3}\sublabel{NW2iNnUA-2cQo0j-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2iNnUA-2cQo0j-1}}}\moddef{has a double~{\nwtagstyle{}\subpageref{NW2iNnUA-2cQo0j-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
+any ((>= 2) . length) . group
+\nwnotused{has a double}\nwendcode{}\nwbegindocs{4}\nwdocspar
+
+It must also be the case that the \hs{digits} never decrease,
+i.e. the password \hs{isSorted}.
+
+\nwenddocs{}\nwbegincode{5}\sublabel{NW2iNnUA-2iOjQS-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2iNnUA-2iOjQS-1}}}\moddef{Part One~{\nwtagstyle{}\subpageref{NW2iNnUA-2iOjQS-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2iNnUA-15Rjc8-1}\\{NW2fbesT-19Srvv-1}}\nwprevnextdefs{\relax}{NW2fbesT-2iOjQS-1}\nwenddeflinemarkup
+\nwlinkedidentc{partOne}{NW2fbesT-2iOjQS-4} :: Int
+\nwlinkedidentc{partOne}{NW2fbesT-2iOjQS-4} = length $ filter isPossiblePassword input
+  where
+    isPossiblePassword :: [Int] -> Bool
+    isPossiblePassword = liftM2 (&&) isSorted hasDouble
+    hasDouble :: Eq a => [a] -> Bool
+    hasDouble = any ((>= 2) . length) . group
+\nwalsodefined{\\{NW2fbesT-2iOjQS-1}\\{NW2fbesT-2iOjQS-2}\\{NW2fbesT-2iOjQS-3}\\{NW2fbesT-2iOjQS-4}}\nwused{\\{NW2iNnUA-15Rjc8-1}\\{NW2fbesT-19Srvv-1}}\nwidentuses{\\{{\nwixident{partOne}}{partOne}}}\nwindexuse{\nwixident{partOne}}{partOne}{NW2iNnUA-2iOjQS-1}\nwendcode{}\nwbegindocs{6}\nwdocspar
+
+
+\subsection{Part Two}
+
+For part two, the password still \hs{isSorted}, but must also have a strict
+double, i.e. at least one \hs{group} of \hs{length} \hs{== 2}.
+
+\nwenddocs{}\nwbegincode{7}\sublabel{NW2iNnUA-ntEfn-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2iNnUA-ntEfn-1}}}\moddef{has a strict double~{\nwtagstyle{}\subpageref{NW2iNnUA-ntEfn-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
+any ((== 2) . length) . group
+\nwnotused{has a strict double}\nwendcode{}\nwbegindocs{8}\nwdocspar
+
+\nwenddocs{}\nwbegincode{9}\sublabel{NW2iNnUA-4P9qKy-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2iNnUA-4P9qKy-1}}}\moddef{Part Two~{\nwtagstyle{}\subpageref{NW2iNnUA-4P9qKy-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2iNnUA-15Rjc8-1}\\{NW2fbesT-19Srvv-1}}\nwprevnextdefs{\relax}{NW2fbesT-4P9qKy-1}\nwenddeflinemarkup
+\nwlinkedidentc{partTwo}{NW2fbesT-4P9qKy-1} :: Int
+\nwlinkedidentc{partTwo}{NW2fbesT-4P9qKy-1} = length $ filter isPossiblePassword input
+  where
+    isPossiblePassword :: [Int] -> Bool
+    isPossiblePassword = liftM2 (&&) isSorted hasDouble
+    hasDouble :: Eq a => [a] -> Bool
+    hasDouble = any ((== 2) . length) . group
+\nwalsodefined{\\{NW2fbesT-4P9qKy-1}}\nwused{\\{NW2iNnUA-15Rjc8-1}\\{NW2fbesT-19Srvv-1}}\nwidentuses{\\{{\nwixident{partTwo}}{partTwo}}}\nwindexuse{\nwixident{partTwo}}{partTwo}{NW2iNnUA-4P9qKy-1}\nwendcode{}\nwbegindocs{10}\nwdocspar
+
+
+\subsection{Full Solution}
+
+\nwenddocs{}\nwbegincode{11}\sublabel{NW2iNnUA-15Rjc8-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2iNnUA-15Rjc8-1}}}\moddef{Day04.hs~{\nwtagstyle{}\subpageref{NW2iNnUA-15Rjc8-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
+module AdventOfCode.Year2019.Day04 where
+
+import Control.Monad (liftM2)
+import Data.Digits (digits)
+import Data.List (group)
+import Data.List.Ordered (isSorted)
+
+\LA{}Input~{\nwtagstyle{}\subpageref{NW2iNnUA-1GvnV-1}}\RA{}
+
+\LA{}Part One~{\nwtagstyle{}\subpageref{NW2iNnUA-2iOjQS-1}}\RA{}
+
+\LA{}Part Two~{\nwtagstyle{}\subpageref{NW2iNnUA-4P9qKy-1}}\RA{}
+\nwnotused{Day04.hs}\nwendcode{}\nwbegindocs{12}\nwdocspar
+\nwenddocs{}\nwfilename{_src/day/2019/08.nw}\nwbegindocs{0}\newpage
+\chapter{Day 8: }\todor{Add missing title}
+\todoo{Copy description}
+\marginnote{\url{https://adventofcode.com/2019/day/8}}
+\nwenddocs{}\nwfilename{_src/haskell/2019/08.nw}\nwbegindocs{0}\section{Haskell solution}
+
+\subsection{Pixels}
+
+
+A pixel can be black, white, or transparent.
+
+\nwenddocs{}\nwbegincode{1}\sublabel{NW2fbesT-2M5oYw-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2fbesT-2M5oYw-1}}}\moddef{Define a Pixel data type~{\nwtagstyle{}\subpageref{NW2fbesT-2M5oYw-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2fbesT-19Srvv-1}}\nwenddeflinemarkup
+data \nwlinkedidentc{Pixel}{NW2fbesT-2M5oYw-1}
+  = \nwlinkedidentc{Black}{NW2fbesT-2M5oYw-1}
+  | \nwlinkedidentc{White}{NW2fbesT-2M5oYw-1}
+  | \nwlinkedidentc{Transparent}{NW2fbesT-2M5oYw-1}
+  deriving (Enum, Eq)
+\nwindexdefn{\nwixident{Pixel}}{Pixel}{NW2fbesT-2M5oYw-1}\eatline
+\nwindexdefn{\nwixident{Black}}{Black}{NW2fbesT-2M5oYw-1}\eatline
+\nwindexdefn{\nwixident{White}}{White}{NW2fbesT-2M5oYw-1}\eatline
+\nwindexdefn{\nwixident{Transparent}}{Transparent}{NW2fbesT-2M5oYw-1}\eatline
+\nwused{\\{NW2fbesT-19Srvv-1}}\nwidentdefs{\\{{\nwixident{Black}}{Black}}\\{{\nwixident{Pixel}}{Pixel}}\\{{\nwixident{Transparent}}{Transparent}}\\{{\nwixident{White}}{White}}}\nwendcode{}\nwbegindocs{2}\nwdocspar
+
+Show black pixels as spaces, white ones as hashes, and transparent as dots.
+
+\nwenddocs{}\nwbegincode{3}\sublabel{NW2fbesT-QyGx2-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2fbesT-QyGx2-1}}}\moddef{Implement \hs{Show} for \code{}Pixel\edoc{}~{\nwtagstyle{}\subpageref{NW2fbesT-QyGx2-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2fbesT-19Srvv-1}}\nwenddeflinemarkup
+instance Show \nwlinkedidentc{Pixel}{NW2fbesT-2M5oYw-1} where
+  show \nwlinkedidentc{Black}{NW2fbesT-2M5oYw-1} = " "
+  show \nwlinkedidentc{White}{NW2fbesT-2M5oYw-1} = "#"
+  show \nwlinkedidentc{Transparent}{NW2fbesT-2M5oYw-1} = "."
+\nwused{\\{NW2fbesT-19Srvv-1}}\nwidentuses{\\{{\nwixident{Black}}{Black}}\\{{\nwixident{Pixel}}{Pixel}}\\{{\nwixident{Transparent}}{Transparent}}\\{{\nwixident{White}}{White}}}\nwindexuse{\nwixident{Black}}{Black}{NW2fbesT-QyGx2-1}\nwindexuse{\nwixident{Pixel}}{Pixel}{NW2fbesT-QyGx2-1}\nwindexuse{\nwixident{Transparent}}{Transparent}{NW2fbesT-QyGx2-1}\nwindexuse{\nwixident{White}}{White}{NW2fbesT-QyGx2-1}\nwendcode{}\nwbegindocs{4}\nwdocspar
+
+
+\subsection{Type aliases}
+
+Define a {\Tt{}\nwlinkedidentq{Layer}{NW2fbesT-LSl4Q-1}\nwendquote} as a list of {\Tt{}\nwlinkedidentq{Row}{NW2fbesT-LSl4Q-1}\nwendquote}s, and a {\Tt{}\nwlinkedidentq{Row}{NW2fbesT-LSl4Q-1}\nwendquote} as a list of {\Tt{}\nwlinkedidentq{Pixel}{NW2fbesT-2M5oYw-1}\nwendquote}s.
+
+\nwenddocs{}\nwbegincode{5}\sublabel{NW2fbesT-LSl4Q-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2fbesT-LSl4Q-1}}}\moddef{Define a few convenient type aliases~{\nwtagstyle{}\subpageref{NW2fbesT-LSl4Q-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2fbesT-19Srvv-1}}\nwenddeflinemarkup
+type \nwlinkedidentc{Image}{NW2fbesT-LSl4Q-1} = [\nwlinkedidentc{Layer}{NW2fbesT-LSl4Q-1}]
+
+type \nwlinkedidentc{Layer}{NW2fbesT-LSl4Q-1} = [\nwlinkedidentc{Row}{NW2fbesT-LSl4Q-1}]
+
+type \nwlinkedidentc{Row}{NW2fbesT-LSl4Q-1} = [\nwlinkedidentc{Pixel}{NW2fbesT-2M5oYw-1}]
+\nwindexdefn{\nwixident{Image}}{Image}{NW2fbesT-LSl4Q-1}\eatline
+\nwindexdefn{\nwixident{Layer}}{Layer}{NW2fbesT-LSl4Q-1}\eatline
+\nwindexdefn{\nwixident{Row}}{Row}{NW2fbesT-LSl4Q-1}\eatline
+\nwused{\\{NW2fbesT-19Srvv-1}}\nwidentdefs{\\{{\nwixident{Image}}{Image}}\\{{\nwixident{Layer}}{Layer}}\\{{\nwixident{Row}}{Row}}}\nwidentuses{\\{{\nwixident{Pixel}}{Pixel}}}\nwindexuse{\nwixident{Pixel}}{Pixel}{NW2fbesT-LSl4Q-1}\nwendcode{}\nwbegindocs{6}\nwdocspar
+
+\subsection{Parsers}
+
+Parse an {\Tt{}\nwlinkedidentq{Image}{NW2fbesT-LSl4Q-1}\nwendquote}, i.e. one or more {\Tt{}\nwlinkedidentq{Layer}{NW2fbesT-LSl4Q-1}\nwendquote}s comprised of \hs{height}
+{\Tt{}\nwlinkedidentq{Row}{NW2fbesT-LSl4Q-1}\nwendquote}s of \hs{width} {\Tt{}\nwlinkedidentq{Pixel}{NW2fbesT-2M5oYw-1}\nwendquote}s.
+
+\nwenddocs{}\nwbegincode{7}\sublabel{NW2fbesT-4aeb4o-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2fbesT-4aeb4o-1}}}\moddef{Parse an image~{\nwtagstyle{}\subpageref{NW2fbesT-4aeb4o-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2fbesT-19Srvv-1}}\nwenddeflinemarkup
+\nwlinkedidentc{image}{NW2fbesT-4aeb4o-1} :: Int -> Int -> Parser \nwlinkedidentc{Image}{NW2fbesT-LSl4Q-1}
+\nwlinkedidentc{image}{NW2fbesT-4aeb4o-1} width height = some layer
+  where
+    layer :: Parser \nwlinkedidentc{Layer}{NW2fbesT-LSl4Q-1}
+    layer = count height row
+    row :: Parser \nwlinkedidentc{Row}{NW2fbesT-LSl4Q-1}
+    row = count width pixel
+\nwindexdefn{\nwixident{image}}{image}{NW2fbesT-4aeb4o-1}\eatline
+\nwused{\\{NW2fbesT-19Srvv-1}}\nwidentdefs{\\{{\nwixident{image}}{image}}}\nwidentuses{\\{{\nwixident{Image}}{Image}}\\{{\nwixident{Layer}}{Layer}}\\{{\nwixident{Row}}{Row}}}\nwindexuse{\nwixident{Image}}{Image}{NW2fbesT-4aeb4o-1}\nwindexuse{\nwixident{Layer}}{Layer}{NW2fbesT-4aeb4o-1}\nwindexuse{\nwixident{Row}}{Row}{NW2fbesT-4aeb4o-1}\nwendcode{}\nwbegindocs{8}\nwdocspar
+
+Parse an encoded black, white, or transparent pixel.
+
+\nwenddocs{}\nwbegincode{9}\sublabel{NW2fbesT-1aCFXy-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2fbesT-1aCFXy-1}}}\moddef{Parse a pixel~{\nwtagstyle{}\subpageref{NW2fbesT-1aCFXy-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2fbesT-19Srvv-1}}\nwenddeflinemarkup
+pixel :: Parser \nwlinkedidentc{Pixel}{NW2fbesT-2M5oYw-1}
+pixel =
+  (char '0' *> pure \nwlinkedidentc{Black}{NW2fbesT-2M5oYw-1} <?> "A black pixel")
+    <|> (char '1' *> pure \nwlinkedidentc{White}{NW2fbesT-2M5oYw-1} <?> "A white pixel")
+    <|> (char '2' *> pure \nwlinkedidentc{Transparent}{NW2fbesT-2M5oYw-1} <?> "A transparent pixel")
+\nwused{\\{NW2fbesT-19Srvv-1}}\nwidentuses{\\{{\nwixident{Black}}{Black}}\\{{\nwixident{Pixel}}{Pixel}}\\{{\nwixident{Transparent}}{Transparent}}\\{{\nwixident{White}}{White}}}\nwindexuse{\nwixident{Black}}{Black}{NW2fbesT-1aCFXy-1}\nwindexuse{\nwixident{Pixel}}{Pixel}{NW2fbesT-1aCFXy-1}\nwindexuse{\nwixident{Transparent}}{Transparent}{NW2fbesT-1aCFXy-1}\nwindexuse{\nwixident{White}}{White}{NW2fbesT-1aCFXy-1}\nwendcode{}\nwbegindocs{10}\nwdocspar
+
+\subsection{Part One}
+
+\nwenddocs{}\nwbegincode{11}\sublabel{NW2fbesT-2iOjQS-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2fbesT-2iOjQS-1}}}\moddef{Part One~{\nwtagstyle{}\subpageref{NW2iNnUA-2iOjQS-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2iNnUA-15Rjc8-1}\\{NW2fbesT-19Srvv-1}}\nwprevnextdefs{NW2iNnUA-2iOjQS-1}{NW2fbesT-2iOjQS-2}\nwenddeflinemarkup
+\nwlinkedidentc{partOne}{NW2fbesT-2iOjQS-4} :: IO Int
+\nwlinkedidentc{partOne}{NW2fbesT-2iOjQS-4} =
+  do
+    \LA{}Parse a $25 \times 6$ \code{}image\edoc{} from the input~{\nwtagstyle{}\subpageref{NW2fbesT-276JRG-1}}\RA{}
+\nwused{\\{NW2iNnUA-15Rjc8-1}\\{NW2fbesT-19Srvv-1}}\nwidentuses{\\{{\nwixident{partOne}}{partOne}}}\nwindexuse{\nwixident{partOne}}{partOne}{NW2fbesT-2iOjQS-1}\nwendcode{}\nwbegindocs{12}\nwdocspar
+
+
+\nwenddocs{}\nwbegincode{13}\sublabel{NW2fbesT-276JRG-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2fbesT-276JRG-1}}}\moddef{Parse a $25 \times 6$ \code{}image\edoc{} from the input~{\nwtagstyle{}\subpageref{NW2fbesT-276JRG-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2fbesT-2iOjQS-1}}\nwenddeflinemarkup
+layers <- parseInput (\nwlinkedidentc{image}{NW2fbesT-4aeb4o-1} 25 6) "input/2019/day08.txt"
+\nwused{\\{NW2fbesT-2iOjQS-1}}\nwidentuses{\\{{\nwixident{image}}{image}}}\nwindexuse{\nwixident{image}}{image}{NW2fbesT-276JRG-1}\nwendcode{}\nwbegindocs{14}\nwdocspar
+
+
+Find the \hs{layer} with the fewest zeros\todoo{sp?}, i.e. {\Tt{}\nwlinkedidentq{Black}{NW2fbesT-2M5oYw-1}\nwendquote} pixels.
+
+\nwenddocs{}\nwbegincode{15}\sublabel{NW2fbesT-2iOjQS-2}\nwmargintag{{\nwtagstyle{}\subpageref{NW2fbesT-2iOjQS-2}}}\moddef{Part One~{\nwtagstyle{}\subpageref{NW2iNnUA-2iOjQS-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2iNnUA-15Rjc8-1}\\{NW2fbesT-19Srvv-1}}\nwprevnextdefs{NW2fbesT-2iOjQS-1}{NW2fbesT-2iOjQS-3}\nwenddeflinemarkup
+    let layer = head $ sortBy (compare `on` numberOf \nwlinkedidentc{Black}{NW2fbesT-2M5oYw-1}) layers
+\nwused{\\{NW2iNnUA-15Rjc8-1}\\{NW2fbesT-19Srvv-1}}\nwidentuses{\\{{\nwixident{Black}}{Black}}}\nwindexuse{\nwixident{Black}}{Black}{NW2fbesT-2iOjQS-2}\nwendcode{}\nwbegindocs{16}\nwdocspar
+
+
+Return the product of the number of ones ({\Tt{}\nwlinkedidentq{White}{NW2fbesT-2M5oYw-1}\nwendquote} pixels) and the number of
+twos ({\Tt{}\nwlinkedidentq{Transparent}{NW2fbesT-2M5oYw-1}\nwendquote} pixels) in that \hs{layer}.
+
+\nwenddocs{}\nwbegincode{17}\sublabel{NW2fbesT-2iOjQS-3}\nwmargintag{{\nwtagstyle{}\subpageref{NW2fbesT-2iOjQS-3}}}\moddef{Part One~{\nwtagstyle{}\subpageref{NW2iNnUA-2iOjQS-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2iNnUA-15Rjc8-1}\\{NW2fbesT-19Srvv-1}}\nwprevnextdefs{NW2fbesT-2iOjQS-2}{NW2fbesT-2iOjQS-4}\nwenddeflinemarkup
+    let ones = numberOf \nwlinkedidentc{White}{NW2fbesT-2M5oYw-1} layer
+    let twos = numberOf \nwlinkedidentc{Transparent}{NW2fbesT-2M5oYw-1} layer
+    pure $ ones * twos
+\nwused{\\{NW2iNnUA-15Rjc8-1}\\{NW2fbesT-19Srvv-1}}\nwidentuses{\\{{\nwixident{Transparent}}{Transparent}}\\{{\nwixident{White}}{White}}}\nwindexuse{\nwixident{Transparent}}{Transparent}{NW2fbesT-2iOjQS-3}\nwindexuse{\nwixident{White}}{White}{NW2fbesT-2iOjQS-3}\nwendcode{}\nwbegindocs{18}\nwdocspar
+
+
+Return the number of elements equivalent to a given one, in a given list of
+lists of elements of the same type. More specifically, return the number of
+{\Tt{}\nwlinkedidentq{Pixel}{NW2fbesT-2M5oYw-1}\nwendquote}s of a given color in a given {\Tt{}\nwlinkedidentq{Layer}{NW2fbesT-LSl4Q-1}\nwendquote}.
+
+\todoo{There's gotta be a Data.List function for this..}
+
+\nwenddocs{}\nwbegincode{19}\sublabel{NW2fbesT-2iOjQS-4}\nwmargintag{{\nwtagstyle{}\subpageref{NW2fbesT-2iOjQS-4}}}\moddef{Part One~{\nwtagstyle{}\subpageref{NW2iNnUA-2iOjQS-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2iNnUA-15Rjc8-1}\\{NW2fbesT-19Srvv-1}}\nwprevnextdefs{NW2fbesT-2iOjQS-3}{\relax}\nwenddeflinemarkup
+  where
+    numberOf :: Eq a => a -> [[a]] -> Int
+    numberOf x = sum . fmap (length . filter (== x))
+\nwindexdefn{\nwixident{partOne}}{partOne}{NW2fbesT-2iOjQS-4}\eatline
+\nwused{\\{NW2iNnUA-15Rjc8-1}\\{NW2fbesT-19Srvv-1}}\nwidentdefs{\\{{\nwixident{partOne}}{partOne}}}\nwendcode{}\nwbegindocs{20}\nwdocspar
+
+\subsection{Part Two}
+
+\nwenddocs{}\nwbegincode{21}\sublabel{NW2fbesT-4P9qKy-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2fbesT-4P9qKy-1}}}\moddef{Part Two~{\nwtagstyle{}\subpageref{NW2iNnUA-4P9qKy-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2iNnUA-15Rjc8-1}\\{NW2fbesT-19Srvv-1}}\nwprevnextdefs{NW2iNnUA-4P9qKy-1}{\relax}\nwenddeflinemarkup
+\nwlinkedidentc{partTwo}{NW2fbesT-4P9qKy-1} :: IO String
+\nwlinkedidentc{partTwo}{NW2fbesT-4P9qKy-1} =
+  do
+    layers <- parseInput (\nwlinkedidentc{image}{NW2fbesT-4aeb4o-1} 25 6) "input/2019/day08.txt"
+    pure
+      $ unlines . map (concatMap show)
+      $ foldl decodeLayer (transparentLayer 25 6) layers
+  where
+    decodeLayer :: \nwlinkedidentc{Layer}{NW2fbesT-LSl4Q-1} -> \nwlinkedidentc{Layer}{NW2fbesT-LSl4Q-1} -> \nwlinkedidentc{Layer}{NW2fbesT-LSl4Q-1}
+    decodeLayer = zipWith (zipWith decodePixel)
+    decodePixel :: \nwlinkedidentc{Pixel}{NW2fbesT-2M5oYw-1} -> \nwlinkedidentc{Pixel}{NW2fbesT-2M5oYw-1} -> \nwlinkedidentc{Pixel}{NW2fbesT-2M5oYw-1}
+    decodePixel \nwlinkedidentc{Transparent}{NW2fbesT-2M5oYw-1} below = below
+    decodePixel above _ = above
+\nwindexdefn{\nwixident{partTwo}}{partTwo}{NW2fbesT-4P9qKy-1}\eatline
+\nwused{\\{NW2iNnUA-15Rjc8-1}\\{NW2fbesT-19Srvv-1}}\nwidentdefs{\\{{\nwixident{partTwo}}{partTwo}}}\nwidentuses{\\{{\nwixident{image}}{image}}\\{{\nwixident{Layer}}{Layer}}\\{{\nwixident{Pixel}}{Pixel}}\\{{\nwixident{Transparent}}{Transparent}}}\nwindexuse{\nwixident{image}}{image}{NW2fbesT-4P9qKy-1}\nwindexuse{\nwixident{Layer}}{Layer}{NW2fbesT-4P9qKy-1}\nwindexuse{\nwixident{Pixel}}{Pixel}{NW2fbesT-4P9qKy-1}\nwindexuse{\nwixident{Transparent}}{Transparent}{NW2fbesT-4P9qKy-1}\nwendcode{}\nwbegindocs{22}\nwdocspar
+
+\subsection{Miscellaneous}
+
+\nwenddocs{}\nwbegincode{23}\sublabel{NW2fbesT-dIQyV-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2fbesT-dIQyV-1}}}\moddef{A transparent layer~{\nwtagstyle{}\subpageref{NW2fbesT-dIQyV-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2fbesT-19Srvv-1}}\nwenddeflinemarkup
+transparentLayer :: Int -> Int -> \nwlinkedidentc{Layer}{NW2fbesT-LSl4Q-1}
+transparentLayer width height = replicate height (replicate width \nwlinkedidentc{Transparent}{NW2fbesT-2M5oYw-1})
+\nwused{\\{NW2fbesT-19Srvv-1}}\nwidentuses{\\{{\nwixident{Layer}}{Layer}}\\{{\nwixident{Transparent}}{Transparent}}}\nwindexuse{\nwixident{Layer}}{Layer}{NW2fbesT-dIQyV-1}\nwindexuse{\nwixident{Transparent}}{Transparent}{NW2fbesT-dIQyV-1}\nwendcode{}\nwbegindocs{24}\nwdocspar
+
+
+\subsection{Full solution}
+
+\nwenddocs{}\nwbegincode{25}\sublabel{NW2fbesT-19Srvv-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2fbesT-19Srvv-1}}}\moddef{Day08.hs~{\nwtagstyle{}\subpageref{NW2fbesT-19Srvv-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
+module AdventOfCode.Year2019.Day08
+  ( \nwlinkedidentc{main}{NW2fbesT-19Srvv-1},
+    \nwlinkedidentc{partOne}{NW2fbesT-2iOjQS-4},
+    \nwlinkedidentc{partTwo}{NW2fbesT-4P9qKy-1},
+  )
+where
+
+import AdventOfCode.Util (parseInput)
+import Control.Applicative ((<|>))
+import Data.Function (on)
+import Data.List (sortBy)
+import Text.Trifecta ((<?>), Parser, char, count, some)
+
+\LA{}Define a Pixel data type~{\nwtagstyle{}\subpageref{NW2fbesT-2M5oYw-1}}\RA{}
+
+\LA{}Implement \hs{Show} for \code{}Pixel\edoc{}~{\nwtagstyle{}\subpageref{NW2fbesT-QyGx2-1}}\RA{}
+
+\LA{}Define a few convenient type aliases~{\nwtagstyle{}\subpageref{NW2fbesT-LSl4Q-1}}\RA{}
+
+\nwlinkedidentc{main}{NW2fbesT-19Srvv-1} :: IO ()
+\nwlinkedidentc{main}{NW2fbesT-19Srvv-1} =
+  do
+    putStrLn "[2019] Day 8: Space \nwlinkedidentc{Image}{NW2fbesT-LSl4Q-1} Format"
+    putStr "Part One: "
+    print =<< \nwlinkedidentc{partOne}{NW2fbesT-2iOjQS-4}
+    putStrLn "Part Two: "
+    putStrLn =<< \nwlinkedidentc{partTwo}{NW2fbesT-4P9qKy-1}
+
+\LA{}Part One~{\nwtagstyle{}\subpageref{NW2iNnUA-2iOjQS-1}}\RA{}
+
+\LA{}Part Two~{\nwtagstyle{}\subpageref{NW2iNnUA-4P9qKy-1}}\RA{}
+
+\LA{}Parse an image~{\nwtagstyle{}\subpageref{NW2fbesT-4aeb4o-1}}\RA{}
+
+\LA{}Parse a pixel~{\nwtagstyle{}\subpageref{NW2fbesT-1aCFXy-1}}\RA{}
+
+\LA{}A transparent layer~{\nwtagstyle{}\subpageref{NW2fbesT-dIQyV-1}}\RA{}
+\nwindexdefn{\nwixident{main}}{main}{NW2fbesT-19Srvv-1}\eatline
+\nwnotused{Day08.hs}\nwidentdefs{\\{{\nwixident{main}}{main}}}\nwidentuses{\\{{\nwixident{Image}}{Image}}\\{{\nwixident{partOne}}{partOne}}\\{{\nwixident{partTwo}}{partTwo}}}\nwindexuse{\nwixident{Image}}{Image}{NW2fbesT-19Srvv-1}\nwindexuse{\nwixident{partOne}}{partOne}{NW2fbesT-19Srvv-1}\nwindexuse{\nwixident{partTwo}}{partTwo}{NW2fbesT-19Srvv-1}\nwendcode{}\nwfilename{_src/day/2021/02.nw}\nwbegindocs{0}\newpage
 \chapter{Day 2: Dive!}
 \marginnote{\url{https://adventofcode.com/2021/day/2}}
 
@@ -129,7 +456,7 @@ The puzzle input is a list of {\Tt{}\nwlinkedidentq{Direction}{NW2Kouyk-1OzTRH-1
 \nwindexdefn{\nwixident{getInput}}{getInput}{NW2Kouyk-2ga90v-1}\eatline
 \nwnotused{Parse the input}\nwidentdefs{\\{{\nwixident{getInput}}{getInput}}}\nwidentuses{\\{{\nwixident{Direction}}{Direction}}\\{{\nwixident{direction}}{direction}}}\nwindexuse{\nwixident{Direction}}{Direction}{NW2Kouyk-2ga90v-1}\nwindexuse{\nwixident{direction}}{direction}{NW2Kouyk-2ga90v-1}\nwendcode{}\nwbegindocs{14}\nwdocspar
 
-\section {General solution}
+\subsection{General solution}
 
 The general solution of the puzzle is to sum a list of additive monoids, extract the final position, and compute the \hs{product} of the horizontal position and depth.
 
@@ -144,8 +471,8 @@ The general solution of the puzzle is to sum a list of additive monoids, extract
 For Part One, the additive monoid is {\Tt{}\nwlinkedidentq{Direction}{NW2Kouyk-1OzTRH-1}\nwendquote}.
 
 \nwenddocs{}\nwbegincode{17}\sublabel{NW2Kouyk-4G9gVP-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2Kouyk-4G9gVP-1}}}\moddef{Solve Part One~{\nwtagstyle{}\subpageref{NW2Kouyk-4G9gVP-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2Kouyk-1375sF-1}}\nwenddeflinemarkup
-\nwlinkedidentc{partOne}{NW2Kouyk-4G9gVP-1} :: [\nwlinkedidentc{Direction}{NW2Kouyk-1OzTRH-1}] -> Int
-\nwlinkedidentc{partOne}{NW2Kouyk-4G9gVP-1} = \nwlinkedidentc{solve}{NW2Kouyk-1ULoeY-1} unDirection
+\nwlinkedidentc{partOne}{NW2fbesT-2iOjQS-4} :: [\nwlinkedidentc{Direction}{NW2Kouyk-1OzTRH-1}] -> Int
+\nwlinkedidentc{partOne}{NW2fbesT-2iOjQS-4} = \nwlinkedidentc{solve}{NW2Kouyk-1ULoeY-1} unDirection
 \nwindexdefn{\nwixident{partOne}}{partOne}{NW2Kouyk-4G9gVP-1}\eatline
 \nwused{\\{NW2Kouyk-1375sF-1}}\nwidentdefs{\\{{\nwixident{partOne}}{partOne}}}\nwidentuses{\\{{\nwixident{Direction}}{Direction}}\\{{\nwixident{solve}}{solve}}}\nwindexuse{\nwixident{Direction}}{Direction}{NW2Kouyk-4G9gVP-1}\nwindexuse{\nwixident{solve}}{solve}{NW2Kouyk-4G9gVP-1}\nwendcode{}\nwbegindocs{18}\nwdocspar
 
@@ -199,8 +526,8 @@ Since {\Tt{}\nwlinkedidentq{Direction}{NW2Kouyk-1OzTRH-1}\nwendquote} is not spe
 To solve Part Two, lift each {\Tt{}\nwlinkedidentq{Direction}{NW2Kouyk-1OzTRH-1}\nwendquote} in the input to {\Tt{}\nwlinkedidentq{Direction}{NW2Kouyk-1OzTRH-1}\nwendquote}$\ \rtimes_\phi\ ${\Tt{}\nwlinkedidentq{Aim}{NW2Kouyk-1OzTRH-2}\nwendquote}. To extract the final position, forget the {\Tt{}\nwlinkedidentq{Aim}{NW2Kouyk-1OzTRH-2}\nwendquote} tag.
 
 \nwenddocs{}\nwbegincode{31}\sublabel{NW2Kouyk-2ZOhXn-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2Kouyk-2ZOhXn-1}}}\moddef{Solve Part Two~{\nwtagstyle{}\subpageref{NW2Kouyk-2ZOhXn-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2Kouyk-1375sF-1}}\nwenddeflinemarkup
-\nwlinkedidentc{partTwo}{NW2Kouyk-2ZOhXn-1} :: [\nwlinkedidentc{Direction}{NW2Kouyk-1OzTRH-1}] -> Int
-\nwlinkedidentc{partTwo}{NW2Kouyk-2ZOhXn-1} = \nwlinkedidentc{solve}{NW2Kouyk-1ULoeY-1} (unDirection . untag) . map \nwlinkedidentc{phi}{NW2Kouyk-4XKPl9-1}
+\nwlinkedidentc{partTwo}{NW2fbesT-4P9qKy-1} :: [\nwlinkedidentc{Direction}{NW2Kouyk-1OzTRH-1}] -> Int
+\nwlinkedidentc{partTwo}{NW2fbesT-4P9qKy-1} = \nwlinkedidentc{solve}{NW2Kouyk-1ULoeY-1} (unDirection . untag) . map \nwlinkedidentc{phi}{NW2Kouyk-4XKPl9-1}
   where
     \LA{}Define the semi-direct product~{\nwtagstyle{}\subpageref{NW2Kouyk-4XKPl9-1}}\RA{}
 \nwindexdefn{\nwixident{partTwo}}{partTwo}{NW2Kouyk-2ZOhXn-1}\eatline
@@ -225,8 +552,8 @@ import Text.Trifecta (Parser, natural, some, symbol)
 
 \LA{}Define some data types~{\nwtagstyle{}\subpageref{NW2Kouyk-1OzTRH-1}}\RA{}
 
-main :: IO ()
-main = $(defaultMain)
+\nwlinkedidentc{main}{NW2fbesT-19Srvv-1} :: IO ()
+\nwlinkedidentc{main}{NW2fbesT-19Srvv-1} = $(defaultMain)
 
 \nwlinkedidentc{getInput}{NW2Kouyk-2ga90v-1} :: IO [\nwlinkedidentc{Direction}{NW2Kouyk-1OzTRH-1}]
 \nwlinkedidentc{getInput}{NW2Kouyk-2ga90v-1} = parseInput (some \nwlinkedidentc{direction}{NW2Kouyk-1r7xob-1}) $(inputFilePath)
@@ -248,26 +575,50 @@ example =
 \LA{}Solve the puzzle~{\nwtagstyle{}\subpageref{NW2Kouyk-1ULoeY-1}}\RA{}
 
 \LA{}Define a Direction parser~{\nwtagstyle{}\subpageref{NW2Kouyk-1r7xob-1}}\RA{}
-\nwnotused{Day02.hs}\nwidentuses{\\{{\nwixident{Direction}}{Direction}}\\{{\nwixident{direction}}{direction}}\\{{\nwixident{down}}{down}}\\{{\nwixident{forward}}{forward}}\\{{\nwixident{getInput}}{getInput}}\\{{\nwixident{up}}{up}}}\nwindexuse{\nwixident{Direction}}{Direction}{NW2Kouyk-1375sF-1}\nwindexuse{\nwixident{direction}}{direction}{NW2Kouyk-1375sF-1}\nwindexuse{\nwixident{down}}{down}{NW2Kouyk-1375sF-1}\nwindexuse{\nwixident{forward}}{forward}{NW2Kouyk-1375sF-1}\nwindexuse{\nwixident{getInput}}{getInput}{NW2Kouyk-1375sF-1}\nwindexuse{\nwixident{up}}{up}{NW2Kouyk-1375sF-1}\nwendcode{}\nwbegindocs{34}\nwdocspar
+\nwnotused{Day02.hs}\nwidentuses{\\{{\nwixident{Direction}}{Direction}}\\{{\nwixident{direction}}{direction}}\\{{\nwixident{down}}{down}}\\{{\nwixident{forward}}{forward}}\\{{\nwixident{getInput}}{getInput}}\\{{\nwixident{main}}{main}}\\{{\nwixident{up}}{up}}}\nwindexuse{\nwixident{Direction}}{Direction}{NW2Kouyk-1375sF-1}\nwindexuse{\nwixident{direction}}{direction}{NW2Kouyk-1375sF-1}\nwindexuse{\nwixident{down}}{down}{NW2Kouyk-1375sF-1}\nwindexuse{\nwixident{forward}}{forward}{NW2Kouyk-1375sF-1}\nwindexuse{\nwixident{getInput}}{getInput}{NW2Kouyk-1375sF-1}\nwindexuse{\nwixident{main}}{main}{NW2Kouyk-1375sF-1}\nwindexuse{\nwixident{up}}{up}{NW2Kouyk-1375sF-1}\nwendcode{}\nwbegindocs{34}\nwdocspar
 \nwenddocs{}
 
+\nwixlogsorted{c}{{A transparent layer}{NW2fbesT-dIQyV-1}{\nwixd{NW2fbesT-dIQyV-1}\nwixu{NW2fbesT-19Srvv-1}}}%
+\nwixlogsorted{c}{{Day01.g}{NW2vDOcF-3gOu99-1}{\nwixd{NW2vDOcF-3gOu99-1}\nwixd{NW2vDOcF-3gOu99-2}\nwixd{NW2vDOcF-3gOu99-3}\nwixd{NW2vDOcF-3gOu99-4}}}%
 \nwixlogsorted{c}{{Day02.hs}{NW2Kouyk-1375sF-1}{\nwixd{NW2Kouyk-1375sF-1}}}%
+\nwixlogsorted{c}{{Day04.hs}{NW2iNnUA-15Rjc8-1}{\nwixd{NW2iNnUA-15Rjc8-1}}}%
+\nwixlogsorted{c}{{Day08.hs}{NW2fbesT-19Srvv-1}{\nwixd{NW2fbesT-19Srvv-1}}}%
 \nwixlogsorted{c}{{Define a Direction parser}{NW2Kouyk-1r7xob-1}{\nwixd{NW2Kouyk-1r7xob-1}\nwixu{NW2Kouyk-1375sF-1}}}%
+\nwixlogsorted{c}{{Define a few convenient type aliases}{NW2fbesT-LSl4Q-1}{\nwixd{NW2fbesT-LSl4Q-1}\nwixu{NW2fbesT-19Srvv-1}}}%
+\nwixlogsorted{c}{{Define a Pixel data type}{NW2fbesT-2M5oYw-1}{\nwixd{NW2fbesT-2M5oYw-1}\nwixu{NW2fbesT-19Srvv-1}}}%
 \nwixlogsorted{c}{{Define some data types}{NW2Kouyk-1OzTRH-1}{\nwixd{NW2Kouyk-1OzTRH-1}\nwixd{NW2Kouyk-1OzTRH-2}\nwixd{NW2Kouyk-1OzTRH-3}\nwixu{NW2Kouyk-1375sF-1}}}%
 \nwixlogsorted{c}{{Define the semi-direct product}{NW2Kouyk-4XKPl9-1}{\nwixd{NW2Kouyk-4XKPl9-1}\nwixd{NW2Kouyk-4XKPl9-2}\nwixd{NW2Kouyk-4XKPl9-3}\nwixd{NW2Kouyk-4XKPl9-4}\nwixu{NW2Kouyk-2ZOhXn-1}}}%
+\nwixlogsorted{c}{{has a double}{NW2iNnUA-2cQo0j-1}{\nwixd{NW2iNnUA-2cQo0j-1}}}%
+\nwixlogsorted{c}{{has a strict double}{NW2iNnUA-ntEfn-1}{\nwixd{NW2iNnUA-ntEfn-1}}}%
+\nwixlogsorted{c}{{Implement \hs{Show} for \code{}Pixel\edoc{}}{NW2fbesT-QyGx2-1}{\nwixd{NW2fbesT-QyGx2-1}\nwixu{NW2fbesT-19Srvv-1}}}%
+\nwixlogsorted{c}{{Input}{NW2iNnUA-1GvnV-1}{\nwixd{NW2iNnUA-1GvnV-1}\nwixu{NW2iNnUA-15Rjc8-1}}}%
 \nwixlogsorted{c}{{known directions}{NW2Kouyk-38STh2-1}{\nwixd{NW2Kouyk-38STh2-1}\nwixd{NW2Kouyk-38STh2-2}\nwixd{NW2Kouyk-38STh2-3}\nwixd{NW2Kouyk-38STh2-4}\nwixu{NW2Kouyk-1r7xob-1}}}%
+\nwixlogsorted{c}{{Parse a $25 \times 6$ \code{}image\edoc{} from the input}{NW2fbesT-276JRG-1}{\nwixu{NW2fbesT-2iOjQS-1}\nwixd{NW2fbesT-276JRG-1}}}%
+\nwixlogsorted{c}{{Parse a pixel}{NW2fbesT-1aCFXy-1}{\nwixd{NW2fbesT-1aCFXy-1}\nwixu{NW2fbesT-19Srvv-1}}}%
+\nwixlogsorted{c}{{Parse an image}{NW2fbesT-4aeb4o-1}{\nwixd{NW2fbesT-4aeb4o-1}\nwixu{NW2fbesT-19Srvv-1}}}%
 \nwixlogsorted{c}{{Parse the input}{NW2Kouyk-2ga90v-1}{\nwixd{NW2Kouyk-2ga90v-1}}}%
+\nwixlogsorted{c}{{Part One}{NW2iNnUA-2iOjQS-1}{\nwixd{NW2iNnUA-2iOjQS-1}\nwixu{NW2iNnUA-15Rjc8-1}\nwixd{NW2fbesT-2iOjQS-1}\nwixd{NW2fbesT-2iOjQS-2}\nwixd{NW2fbesT-2iOjQS-3}\nwixd{NW2fbesT-2iOjQS-4}\nwixu{NW2fbesT-19Srvv-1}}}%
+\nwixlogsorted{c}{{Part Two}{NW2iNnUA-4P9qKy-1}{\nwixd{NW2iNnUA-4P9qKy-1}\nwixu{NW2iNnUA-15Rjc8-1}\nwixd{NW2fbesT-4P9qKy-1}\nwixu{NW2fbesT-19Srvv-1}}}%
 \nwixlogsorted{c}{{Solve Part One}{NW2Kouyk-4G9gVP-1}{\nwixd{NW2Kouyk-4G9gVP-1}\nwixu{NW2Kouyk-1375sF-1}}}%
 \nwixlogsorted{c}{{Solve Part Two}{NW2Kouyk-2ZOhXn-1}{\nwixd{NW2Kouyk-2ZOhXn-1}\nwixu{NW2Kouyk-1375sF-1}}}%
 \nwixlogsorted{c}{{Solve the puzzle}{NW2Kouyk-1ULoeY-1}{\nwixd{NW2Kouyk-1ULoeY-1}\nwixu{NW2Kouyk-1375sF-1}}}%
 \nwixlogsorted{i}{{\nwixident{Aim}}{Aim}}%
+\nwixlogsorted{i}{{\nwixident{Black}}{Black}}%
 \nwixlogsorted{i}{{\nwixident{Direction}}{Direction}}%
 \nwixlogsorted{i}{{\nwixident{direction}}{direction}}%
 \nwixlogsorted{i}{{\nwixident{down}}{down}}%
 \nwixlogsorted{i}{{\nwixident{forward}}{forward}}%
 \nwixlogsorted{i}{{\nwixident{getInput}}{getInput}}%
+\nwixlogsorted{i}{{\nwixident{Image}}{Image}}%
+\nwixlogsorted{i}{{\nwixident{image}}{image}}%
+\nwixlogsorted{i}{{\nwixident{Layer}}{Layer}}%
+\nwixlogsorted{i}{{\nwixident{main}}{main}}%
 \nwixlogsorted{i}{{\nwixident{partOne}}{partOne}}%
 \nwixlogsorted{i}{{\nwixident{partTwo}}{partTwo}}%
 \nwixlogsorted{i}{{\nwixident{phi}}{phi}}%
+\nwixlogsorted{i}{{\nwixident{Pixel}}{Pixel}}%
+\nwixlogsorted{i}{{\nwixident{Row}}{Row}}%
 \nwixlogsorted{i}{{\nwixident{solve}}{solve}}%
+\nwixlogsorted{i}{{\nwixident{Transparent}}{Transparent}}%
 \nwixlogsorted{i}{{\nwixident{up}}{up}}%
+\nwixlogsorted{i}{{\nwixident{White}}{White}}%

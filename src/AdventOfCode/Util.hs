@@ -17,9 +17,12 @@ module AdventOfCode.Util
     adjacencies,
     neighborsOf,
     holes,
+    (<&&>),
+    (<||>),
   )
 where
 
+import Control.Applicative (liftA2)
 import Control.Arrow (second, (>>>))
 import Control.Comonad.Store (experiment)
 import Control.Lens (holesOf)
@@ -98,3 +101,13 @@ neighborsOf = Set.fromList . flip map adjacencies . (+)
 holes :: [a] -> [(a, [a])]
 holes [] = []
 holes (x : xs) = (x, xs) : map (second (x :)) (holes xs)
+
+(<&&>) :: Applicative f => f Bool -> f Bool -> f Bool
+(<&&>) = liftA2 (&&)
+
+infixr 3 <&&> -- same as (&&)
+
+(<||>) :: Applicative f => f Bool -> f Bool -> f Bool
+(<||>) = liftA2 (||)
+
+infixr 2 <||> -- same as (||)

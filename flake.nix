@@ -84,7 +84,9 @@
 
       devShell = pkgs.mkShell {
         FONTCONFIG_FILE = pkgs.makeFontsConf {
-          fontDirectories = [ pkgs.iosevka ];
+          fontDirectories = [
+            (pkgs.nerdfonts.override { fonts = [ "Iosevka" ]; })
+          ];
         };
 
         buildInputs = with pkgs; [
