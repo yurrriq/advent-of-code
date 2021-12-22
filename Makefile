@@ -34,12 +34,8 @@ all: ${SRCS} ${PDF}
 
 
 .PHONY: build
-build: default.nix $(wildcard src/**.hs) $(wildcard app/**.hs)
-	@ nix build -f $<
-
-
-default.nix: package.yaml VERSION
-	@ cabal2nix . --maintainer yurrriq --hpack >$@
+build: flake.nix $(wildcard src/**.hs) $(wildcard app/**.hs)
+	@ nix build
 
 
 escape_underscores := 'sed "/^@use /s/_/\\\\_/g;/^@defn /s/_/\\\\_/g"'
@@ -75,27 +71,6 @@ src/AdventOfCode/Util.hs: _src/haskell/Util.nw
 	@ mkdir -p $(@D)
 	notangle -R'$(@F)' $< ${cpif} $@
 
-
-# compiler := ghc862
-compiler := default
-
-.PHONY: build ghci shell
-
-
-build: default.nix
-	nix-$@ --argstr compiler ${compiler}
-
-
-ghci: default.nix
-	nix-shell --argstr compiler ${compiler} --command ghci
-
-
-shell: default.nix
-	nix-$@ --argstr compiler ${compiler}
-
-
-default.nix: package.yaml
-	cabal2nix --maintainer yurrriq --shell . >$@
 
 output/day%.txt: app/day%/Main.hs src/Day%.hs input/day%.txt
 	$$(nix-build --argstr compiler ${compiler} --no-out-link)/bin/day$* >$@

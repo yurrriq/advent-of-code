@@ -4,11 +4,12 @@
 (tool-bar-mode 0)
 
 (require 'package)
-(setq-default frames-only-mode t
-              indent-tabs-mode nil
-              inhibit-splash-screen t
-              package-archives nil
-              package-enable-at-startup nil)
+(setq-default
+  frames-only-mode t
+  indent-tabs-mode nil
+  inhibit-splash-screen t
+  package-archives nil
+  package-enable-at-startup nil)
 (package-initialize)
 
 (load-theme 'wombat)
@@ -60,9 +61,38 @@
 
 (use-package lsp-haskell)
 
+(use-package multiple-cursors
+  :demand
+  :config (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines))
+
 (use-package nix-mode)
 
+(let ((noweb-load-path
+        (file-name-as-directory
+          (expand-file-name "site-lisp"
+            (expand-file-name "emacs"
+              (expand-file-name "share"
+                (file-name-directory
+                  (directory-file-name
+                    (file-name-directory
+                      (executable-find "noweb"))))))))))
+  (use-package noweb-mode
+    :load-path load-path
+    :mode ("\\.nw\\'")
+    :demand))
+
+(use-package nyan-mode
+  :demand
+  :config (nyan-mode 1))
+
 (use-package paredit)
+
+(use-package smex
+  :demand
+  :config
+  (global-set-key (kbd "M-x") 'smex)
+  (global-set-key (kbd "M-X") 'smex-major-mode-commands)
+  (global-set-key (kbd "C-c C-c M-x") 'execute-extended-command))
 
 (use-package whitespace-cleanup-mode
   :config (global-whitespace-cleanup-mode t))
