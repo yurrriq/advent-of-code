@@ -41,6 +41,8 @@
   (setq-default fill-column 80)
   (global-display-fill-column-indicator-mode))
 
+(use-package gap-mode)
+
 (use-package haskell-mode)
 
 (use-package hl-todo

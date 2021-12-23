@@ -35,8 +35,10 @@
       };
 
       xelatex-noweb = prev.texlive.combine {
+        inherit (prev.texlive) scheme-small;
         inherit noweb;
-        inherit (prev.texlive) scheme-small
+        # Packages for Noweb
+        inherit (prev.texlive)
           braket
           catchfile
           datatool
@@ -61,6 +63,11 @@
           xindy
           xfor
           xstring
+          ;
+        # Packages for GAP
+        inherit (prev.texlive)
+          helvetic
+          enumitem
           ;
       };
     };
@@ -91,7 +98,7 @@
 
         buildInputs = with pkgs; [
           cabal-install
-          # TODO: gap-full
+          gap-full
           ghc
           ghcid
           gitAndTools.pre-commit

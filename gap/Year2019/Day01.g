@@ -6,7 +6,7 @@ end;;
 PartOne := function( )
     local input, line, mass, sum;;
     sum := 0;
-    input := InputTextFile ( "./input/day01.txt" );
+    input := AoC.Year2019.Day01.Input();
     line := ReadLine( input );
     repeat
         mass := Int( Chomp( line ) );
@@ -31,7 +31,7 @@ end;;
 PartTwo := function( )
     local input, line, mass, sum;;
     sum := 0;
-    input := InputTextFile ( "./input/2019/day01.txt" );
+    input := Input(AoC.Year2019.Day01);
     line := ReadLine( input );
     repeat
         mass := Int( Chomp( line ) );
@@ -40,3 +40,6 @@ PartTwo := function( )
     until line = fail or IsEndOfStream( input );
     return sum;
 end;;
+
+
+AoC.Year2019.Day01 := Puzzle( "2019", "01", PartOne, PartTwo );
