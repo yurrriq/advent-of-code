@@ -48,12 +48,12 @@ partOne :: [Direction] -> Int
 partOne = solve unDirection
 
 partTwo :: [Direction] -> Int
-partTwo = solve (unDirection . untag) . map phi
+partTwo = solve (unDirection . untag) . map lift
   where
-    phi :: Direction -> Semi Direction Aim
-    phi dir@(Direction (V2 _ 0)) = inject dir
-    phi (Direction (V2 0 y)) = embed (Aim y)
-    phi _ = error "Invalid direction"
+    lift :: Direction -> Semi Direction Aim
+    lift dir@(Direction (V2 _ 0)) = inject dir
+    lift (Direction (V2 0 y)) = embed (Aim y)
+    lift _ = error "Invalid direction"
 
 solve :: Monoid m => (m -> V2 Int) -> [m] -> Int
 solve extract = product . extract . mconcat
