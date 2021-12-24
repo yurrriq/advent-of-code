@@ -382,6 +382,9 @@ executables:
   aoc-2021-day08:
     <<: *executable
     main: AdventOfCode.Year2021.Day08
+    dependencies:
+    - data-ordlist
+    - fast-digits
 _benchmark: &benchmark
   ghc-options:
   - -threaded
