@@ -1,0 +1,75 @@
+\subsection{Haskell solution}
+
+\newthought{The input} is just a list of natural numbers.
+
+<<Parse the input.>>=
+getInput :: IO [Integer]
+getInput = parseInput (some natural) $(inputFilePath)
+@
+
+\newthought{The general solution} is to count pairwise increases.
+
+<<Count pairwise increases.>>=
+countPairwiseIncreases :: Ord a => Int -> [a] -> Int
+countPairwiseIncreases n =
+  count (== LT)
+    . uncurry (zipWith compare)
+    . (id &&& drop n)
+@
+
+\newthought{For example,} in the following list there are seven pairwise increases.
+
+<<Example>>=
+example :: [Integer]
+example = [199, 200, 208, 210, 200, 207, 240, 269, 260, 263]
+@
+
+\begin{minted}{haskell}
+  λ> countPairwiseIncreases 1 example
+  7
+\end{minted}
+
+The seven pairwise increases are as follows:
+
+\begin{minted}{haskell}
+  [(199,200), (200, 208), (208, 210), (200, 207), (207, 240), (240, 269), (260, 263)]
+\end{minted}
+
+\newthought{For Part One}, simply count pairwise increases.
+
+<<Solve Part One.>>=
+partOne :: [Integer] -> Int
+partOne = countPairwiseIncreases 1
+@
+
+\newthought{For Part Two}, count pairwise increases with an offset of \hs{3}.
+
+<<Solve Part Two.>>=
+partTwo :: [Integer] -> Int
+partTwo = countPairwiseIncreases 3
+@
+
+\newthought{Bring it} all together.
+
+<<Day01.hs>>=
+module AdventOfCode.Year2021.Day01 where
+
+import AdventOfCode.Input (parseInput)
+import AdventOfCode.TH (defaultMain, inputFilePath)
+import AdventOfCode.Util (count)
+import Control.Arrow ((&&&))
+import Text.Trifecta (natural, some)
+
+main :: IO ()
+main = $(defaultMain)
+
+<<Parse the input.>>
+
+<<Example>>
+
+<<Solve Part One.>>
+
+<<Solve Part Two.>>
+
+<<Count pairwise increases.>>
+@

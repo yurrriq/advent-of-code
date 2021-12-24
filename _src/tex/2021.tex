@@ -1,4 +1,83 @@
-\nwfilename{_src/2021/day/02.nw}\nwbegindocs{0}\newpage% ===> this file was generated automatically by noweave --- better not edit it
+\nwfilename{_src/2021/day/01.nw}\nwbegindocs{0}\newpage% ===> this file was generated automatically by noweave --- better not edit it
+\section{Day 1: Sonar Sweep}
+\todoo{Copy description}
+\marginnote{\url{https://adventofcode.com/2021/day/1}}
+\nwenddocs{}\nwfilename{_src/2021/haskell/01.nw}\nwbegindocs{0}\subsection{Haskell solution}
+
+\newthought{The input} is just a list of natural numbers.
+
+\nwenddocs{}\nwbegincode{1}\sublabel{NW2fQ2fr-2S9BvQ-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2fQ2fr-2S9BvQ-1}}}\moddef{Parse the input.~{\nwtagstyle{}\subpageref{NW2fQ2fr-2S9BvQ-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2fQ2fr-12NRmi-1}}\nwenddeflinemarkup
+\nwlinkedidentc{getInput}{NW2dtzue-2ga90v-1} :: IO [Integer]
+\nwlinkedidentc{getInput}{NW2dtzue-2ga90v-1} = parseInput (some natural) $(inputFilePath)
+\nwused{\\{NW2fQ2fr-12NRmi-1}}\nwidentuses{\\{{\nwixident{getInput}}{getInput}}}\nwindexuse{\nwixident{getInput}}{getInput}{NW2fQ2fr-2S9BvQ-1}\nwendcode{}\nwbegindocs{2}\nwdocspar
+
+\newthought{The general solution} is to count pairwise increases.
+
+\nwenddocs{}\nwbegincode{3}\sublabel{NW2fQ2fr-1DYA9Y-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2fQ2fr-1DYA9Y-1}}}\moddef{Count pairwise increases.~{\nwtagstyle{}\subpageref{NW2fQ2fr-1DYA9Y-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2fQ2fr-12NRmi-1}}\nwenddeflinemarkup
+countPairwiseIncreases :: Ord a => Int -> [a] -> Int
+countPairwiseIncreases n =
+  count (== LT)
+    . uncurry (zipWith compare)
+    . (id &&& drop n)
+\nwused{\\{NW2fQ2fr-12NRmi-1}}\nwendcode{}\nwbegindocs{4}\nwdocspar
+
+\newthought{For example,} in the following list there are seven pairwise increases.
+
+\nwenddocs{}\nwbegincode{5}\sublabel{NW2fQ2fr-23nbvF-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2fQ2fr-23nbvF-1}}}\moddef{Example~{\nwtagstyle{}\subpageref{NW2fQ2fr-23nbvF-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2fQ2fr-12NRmi-1}}\nwenddeflinemarkup
+example :: [Integer]
+example = [199, 200, 208, 210, 200, 207, 240, 269, 260, 263]
+\nwused{\\{NW2fQ2fr-12NRmi-1}}\nwendcode{}\nwbegindocs{6}\nwdocspar
+
+\begin{minted}{haskell}
+  λ> countPairwiseIncreases 1 example
+  7
+\end{minted}
+
+The seven pairwise increases are as follows:
+
+\begin{minted}{haskell}
+  [(199,200), (200, 208), (208, 210), (200, 207), (207, 240), (240, 269), (260, 263)]
+\end{minted}
+
+\newthought{For Part One}, simply count pairwise increases.
+
+\nwenddocs{}\nwbegincode{7}\sublabel{NW2fQ2fr-3ajnFh-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2fQ2fr-3ajnFh-1}}}\moddef{Solve Part One.~{\nwtagstyle{}\subpageref{NW2fQ2fr-3ajnFh-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2fQ2fr-12NRmi-1}}\nwenddeflinemarkup
+\nwlinkedidentc{partOne}{NW2dtzue-4G9gVP-1} :: [Integer] -> Int
+\nwlinkedidentc{partOne}{NW2dtzue-4G9gVP-1} = countPairwiseIncreases 1
+\nwused{\\{NW2fQ2fr-12NRmi-1}}\nwidentuses{\\{{\nwixident{partOne}}{partOne}}}\nwindexuse{\nwixident{partOne}}{partOne}{NW2fQ2fr-3ajnFh-1}\nwendcode{}\nwbegindocs{8}\nwdocspar
+
+\newthought{For Part Two}, count pairwise increases with an offset of \hs{3}.
+
+\nwenddocs{}\nwbegincode{9}\sublabel{NW2fQ2fr-3nTTD5-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2fQ2fr-3nTTD5-1}}}\moddef{Solve Part Two.~{\nwtagstyle{}\subpageref{NW2fQ2fr-3nTTD5-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW2fQ2fr-12NRmi-1}}\nwenddeflinemarkup
+\nwlinkedidentc{partTwo}{NW2dtzue-2ZOhXn-1} :: [Integer] -> Int
+\nwlinkedidentc{partTwo}{NW2dtzue-2ZOhXn-1} = countPairwiseIncreases 3
+\nwused{\\{NW2fQ2fr-12NRmi-1}}\nwidentuses{\\{{\nwixident{partTwo}}{partTwo}}}\nwindexuse{\nwixident{partTwo}}{partTwo}{NW2fQ2fr-3nTTD5-1}\nwendcode{}\nwbegindocs{10}\nwdocspar
+
+\newthought{Bring it} all together.
+
+\nwenddocs{}\nwbegincode{11}\sublabel{NW2fQ2fr-12NRmi-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW2fQ2fr-12NRmi-1}}}\moddef{Day01.hs~{\nwtagstyle{}\subpageref{NW2fQ2fr-12NRmi-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
+module AdventOfCode.Year2021.Day01 where
+
+import AdventOfCode.Input (parseInput)
+import AdventOfCode.TH (defaultMain, inputFilePath)
+import AdventOfCode.Util (count)
+import Control.Arrow ((&&&))
+import Text.Trifecta (natural, some)
+
+main :: IO ()
+main = $(defaultMain)
+
+\LA{}Parse the input.~{\nwtagstyle{}\subpageref{NW2fQ2fr-2S9BvQ-1}}\RA{}
+
+\LA{}Example~{\nwtagstyle{}\subpageref{NW2fQ2fr-23nbvF-1}}\RA{}
+
+\LA{}Solve Part One.~{\nwtagstyle{}\subpageref{NW2fQ2fr-3ajnFh-1}}\RA{}
+
+\LA{}Solve Part Two.~{\nwtagstyle{}\subpageref{NW2fQ2fr-3nTTD5-1}}\RA{}
+
+\LA{}Count pairwise increases.~{\nwtagstyle{}\subpageref{NW2fQ2fr-1DYA9Y-1}}\RA{}
+\nwnotused{Day01.hs}\nwendcode{}\nwbegindocs{12}\nwdocspar
+\nwenddocs{}\nwfilename{_src/2021/day/02.nw}\nwbegindocs{0}\newpage
 \section{Day 2: Dive!}
 \marginnote{\url{https://adventofcode.com/2021/day/2}}
 
@@ -246,14 +325,20 @@ example =
 \nwnotused{Day02.hs}\nwidentuses{\\{{\nwixident{Direction}}{Direction}}\\{{\nwixident{direction}}{direction}}\\{{\nwixident{down}}{down}}\\{{\nwixident{forward}}{forward}}\\{{\nwixident{getInput}}{getInput}}\\{{\nwixident{up}}{up}}}\nwindexuse{\nwixident{Direction}}{Direction}{NW2dtzue-1375sF-1}\nwindexuse{\nwixident{direction}}{direction}{NW2dtzue-1375sF-1}\nwindexuse{\nwixident{down}}{down}{NW2dtzue-1375sF-1}\nwindexuse{\nwixident{forward}}{forward}{NW2dtzue-1375sF-1}\nwindexuse{\nwixident{getInput}}{getInput}{NW2dtzue-1375sF-1}\nwindexuse{\nwixident{up}}{up}{NW2dtzue-1375sF-1}\nwendcode{}\nwbegindocs{34}\nwdocspar
 \nwenddocs{}
 
+\nwixlogsorted{c}{{Count pairwise increases.}{NW2fQ2fr-1DYA9Y-1}{\nwixd{NW2fQ2fr-1DYA9Y-1}\nwixu{NW2fQ2fr-12NRmi-1}}}%
+\nwixlogsorted{c}{{Day01.hs}{NW2fQ2fr-12NRmi-1}{\nwixd{NW2fQ2fr-12NRmi-1}}}%
 \nwixlogsorted{c}{{Day02.hs}{NW2dtzue-1375sF-1}{\nwixd{NW2dtzue-1375sF-1}}}%
 \nwixlogsorted{c}{{Define a Direction parser}{NW2dtzue-1r7xob-1}{\nwixd{NW2dtzue-1r7xob-1}\nwixu{NW2dtzue-1375sF-1}}}%
 \nwixlogsorted{c}{{Define some data types}{NW2dtzue-1OzTRH-1}{\nwixd{NW2dtzue-1OzTRH-1}\nwixd{NW2dtzue-1OzTRH-2}\nwixd{NW2dtzue-1OzTRH-3}\nwixu{NW2dtzue-1375sF-1}}}%
 \nwixlogsorted{c}{{Define the semi-direct product}{NW2dtzue-4XKPl9-1}{\nwixd{NW2dtzue-4XKPl9-1}\nwixd{NW2dtzue-4XKPl9-2}\nwixd{NW2dtzue-4XKPl9-3}\nwixd{NW2dtzue-4XKPl9-4}\nwixu{NW2dtzue-2ZOhXn-1}}}%
+\nwixlogsorted{c}{{Example}{NW2fQ2fr-23nbvF-1}{\nwixd{NW2fQ2fr-23nbvF-1}\nwixu{NW2fQ2fr-12NRmi-1}}}%
 \nwixlogsorted{c}{{known directions}{NW2dtzue-38STh2-1}{\nwixd{NW2dtzue-38STh2-1}\nwixd{NW2dtzue-38STh2-2}\nwixd{NW2dtzue-38STh2-3}\nwixd{NW2dtzue-38STh2-4}\nwixu{NW2dtzue-1r7xob-1}}}%
 \nwixlogsorted{c}{{Parse the input}{NW2dtzue-2ga90v-1}{\nwixd{NW2dtzue-2ga90v-1}}}%
+\nwixlogsorted{c}{{Parse the input.}{NW2fQ2fr-2S9BvQ-1}{\nwixd{NW2fQ2fr-2S9BvQ-1}\nwixu{NW2fQ2fr-12NRmi-1}}}%
 \nwixlogsorted{c}{{Solve Part One}{NW2dtzue-4G9gVP-1}{\nwixd{NW2dtzue-4G9gVP-1}\nwixu{NW2dtzue-1375sF-1}}}%
+\nwixlogsorted{c}{{Solve Part One.}{NW2fQ2fr-3ajnFh-1}{\nwixd{NW2fQ2fr-3ajnFh-1}\nwixu{NW2fQ2fr-12NRmi-1}}}%
 \nwixlogsorted{c}{{Solve Part Two}{NW2dtzue-2ZOhXn-1}{\nwixd{NW2dtzue-2ZOhXn-1}\nwixu{NW2dtzue-1375sF-1}}}%
+\nwixlogsorted{c}{{Solve Part Two.}{NW2fQ2fr-3nTTD5-1}{\nwixd{NW2fQ2fr-3nTTD5-1}\nwixu{NW2fQ2fr-12NRmi-1}}}%
 \nwixlogsorted{c}{{Solve the puzzle}{NW2dtzue-1ULoeY-1}{\nwixd{NW2dtzue-1ULoeY-1}\nwixu{NW2dtzue-1375sF-1}}}%
 \nwixlogsorted{i}{{\nwixident{Aim}}{Aim}}%
 \nwixlogsorted{i}{{\nwixident{Direction}}{Direction}}%
