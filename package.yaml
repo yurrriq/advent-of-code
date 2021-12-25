@@ -383,7 +383,6 @@ executables:
     <<: *executable
     main: AdventOfCode.Year2021.Day08
     dependencies:
-    - data-ordlist
     - fast-digits
 _benchmark: &benchmark
   ghc-options:
