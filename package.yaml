@@ -384,6 +384,11 @@ executables:
     main: AdventOfCode.Year2021.Day08
     dependencies:
     - fast-digits
+  aoc-2021-day09:
+    <<: *executable
+    main: AdventOfCode.Year2021.Day09
+    dependencies:
+    - linear
 _benchmark: &benchmark
   ghc-options:
   - -threaded
