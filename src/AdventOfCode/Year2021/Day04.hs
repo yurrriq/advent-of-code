@@ -10,8 +10,8 @@ import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (defaultMainMaybe, inputFilePath)
 import Control.Arrow (first)
 import Control.Lens (ifoldl')
-import Data.Functor.Foldable (ana, hylo)
-import Data.Functor.Foldable.TH (makeBaseFunctor)
+import Data.Functor.Foldable (Base, Corecursive (embed), Recursive (project), ana, hylo)
+-- import Data.Functor.Foldable.TH (makeBaseFunctor)
 import Data.IntMap (IntMap)
 import qualified Data.IntMap as IM
 import Data.IntSet (IntSet)
@@ -32,7 +32,27 @@ data Bingo
   | Lost
   deriving (Eq, Show)
 
-makeBaseFunctor ''Bingo
+-- FIXME: For some reason Nix doesn't seem to like this, so splice in place.
+-- START: makeBasefunctor ''Bingo
+data BingoF r
+  = CallF r
+  | WonF Int
+  | LostF
+  deriving (Functor, Foldable, Traversable)
+
+type instance Base Bingo = BingoF
+
+instance Recursive Bingo where
+  project (Call x) = CallF x
+  project (Won x) = WonF x
+  project Lost = LostF
+
+instance Corecursive Bingo where
+  embed (CallF x) = Call x
+  embed (WonF x) = Won x
+  embed LostF = Lost
+
+-- END: makeBaseFunctor ''Bingo
 
 -- | Keep track of the list of numbers to call, and the set of squares marked.
 data BingoState = BingoState

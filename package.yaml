@@ -35,7 +35,7 @@ library:
   - -fwarn-incomplete-patterns
   source-dirs: src
   dependencies:
-  - aeson
+  - aeson >= 1.5 && < 1.6
   - arithmoi
   - combinat
   - comonad
