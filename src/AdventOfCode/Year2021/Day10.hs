@@ -8,6 +8,8 @@ import Control.Applicative ((<|>))
 import Data.Either (fromLeft)
 import Data.Foldable (foldlM)
 import Data.Functor (($>))
+import Data.List (sort)
+import Data.Maybe (mapMaybe)
 import Text.Trifecta (Parser, char, newline, sepEndBy, some)
 
 data Bracket
@@ -44,11 +46,20 @@ partOne = sum . map (fromLeft 0 . foldlM go [])
     go [] next = Right [next]
     go (Left lhs : rest) (Right rhs)
       | lhs == rhs = Right rest
-      | otherwise = Left (scoreIllegalBracket rhs)
+      | otherwise = Left (scoreBracket (Right rhs))
     go stack next = Right (next : stack)
 
 partTwo :: [[Either Bracket Bracket]] -> Int
-partTwo = undefined
+partTwo =
+  medianOdd
+    . map (foldl ((+) . (5 *)) 0 . map scoreBracket)
+    . mapMaybe (foldlM go [])
+  where
+    go [] next = Just [next]
+    go (Left lhs : rest) (Right rhs)
+      | lhs == rhs = Just rest
+      | otherwise = Nothing
+    go stack next = Just (next : stack)
 
 bracket :: Parser (Either Bracket Bracket)
 bracket =
@@ -61,9 +72,20 @@ bracket =
     <|> char '<' $> Left Angle
     <|> char '>' $> Right Angle
 
-scoreIllegalBracket :: Bracket -> Int
-scoreIllegalBracket = \case
-  Paren -> 3
-  Square -> 57
-  Curly -> 1197
-  Angle -> 25137
+scoreBracket :: Either Bracket Bracket -> Int
+scoreBracket = either autocomplete illegal
+  where
+    autocomplete = \case
+      Paren -> 1
+      Square -> 2
+      Curly -> 3
+      Angle -> 4
+    illegal = \case
+      Paren -> 3
+      Square -> 57
+      Curly -> 1197
+      Angle -> 25137
+
+-- length must be odd
+medianOdd :: Ord a => [a] -> a
+medianOdd xs = sort xs !! (length xs `div` 2)
