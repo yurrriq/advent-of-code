@@ -82,13 +82,7 @@
       };
     in
     {
-      defaultPackage =
-        pkgs.haskellPackages.callCabal2nix
-          "advent-of-code"
-          (pkgs.nix-gitignore.gitignoreSource [ ] ./.)
-          { };
-
-      devShell = pkgs.mkShell {
+      devShells.default = pkgs.mkShell {
         FONTCONFIG_FILE = pkgs.makeFontsConf {
           fontDirectories = [
             (pkgs.nerdfonts.override { fonts = [ "Iosevka" ]; })
@@ -122,13 +116,21 @@
           picat
           python3
           python3Packages.pygments
-          self.defaultPackage.${system}.env.nativeBuildInputs
+          rnix-lsp
+          self.packages.${system}.advent-of-code.env.nativeBuildInputs
           which
           xelatex-noweb
         ];
       };
 
-      packages.advent-of-code = self.defaultPackage.${system};
+      packages = {
+        advent-of-code = pkgs.haskellPackages.callCabal2nix
+          "advent-of-code"
+          (pkgs.nix-gitignore.gitignoreSource [ ] ./.)
+          { };
+
+        default = self.packages.${system}.advent-of-code;
+      };
     }
   );
 }
