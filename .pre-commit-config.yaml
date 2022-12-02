@@ -27,7 +27,7 @@ repos:
   rev: v1.0.6
 - hooks:
   - description: Prettify Haskell code with ormolu
-    entry: "ormolu --mode inplace"
+    entry: "ormolu --ghc-opt -XTemplateHaskell --mode inplace"
     exclude: 'TH\.hs$'
     files: '.+\.hs$'
     id: ormolu
