@@ -1,10 +1,4 @@
-module AdventOfCode.Year2022.Day01
-  ( main,
-    getInput,
-    partOne,
-    partTwo,
-  )
-where
+module AdventOfCode.Year2022.Day01 where
 
 import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (defaultMain, inputFilePath)

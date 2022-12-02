@@ -8,7 +8,6 @@ module AdventOfCode.Year2021.Day11 where
 import AdventOfCode.Input (parseInput, parseString)
 import AdventOfCode.TH (defaultMain, inputFilePath)
 import AdventOfCode.Util (neighborsOf)
-import Control.Arrow (first, second, (>>>))
 import Control.Lens (ifoldl')
 import Data.Char (digitToInt)
 import Data.Foldable (forM_)
@@ -17,7 +16,6 @@ import Data.Map (Map)
 import qualified Data.Map as M
 import Data.Set (Set)
 import qualified Data.Set as S
-import Data.Traversable (forM)
 import Linear (V2 (..))
 import Text.Trifecta (Parser, digit, newline, sepEndBy, some)
 
@@ -74,9 +72,9 @@ grid :: Parser (Map (V2 Int) Int)
 grid = mkGrid <$> some (digitToInt <$> digit) `sepEndBy` newline
 
 mkGrid :: [[a]] -> Map (V2 Int) a
-mkGrid = ifoldl' (ifoldl' . go) M.empty
+mkGrid = ifoldl' (ifoldl' . f) M.empty
   where
-    go y x = flip (M.insert (V2 x y))
+    f y x = flip (M.insert (V2 x y))
 
 -- FIXME: generalize
 neighborsInRange :: (Ix a, Num a) => (V2 a, V2 a) -> V2 a -> Set (V2 a)
