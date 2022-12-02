@@ -8,7 +8,9 @@ where
 
 import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (defaultMain, inputFilePath)
-import Text.Trifecta (Parser, decimal, newline, sepBy, some)
+import Data.List (sortBy)
+import Data.Ord (Down (..), comparing)
+import Text.Trifecta hiding (parseString)
 
 main :: IO ()
 main = $(defaultMain)
@@ -20,7 +22,7 @@ partOne :: [[Integer]] -> Integer
 partOne = maximum . map sum
 
 partTwo :: [[Integer]] -> Integer
-partTwo = undefined
+partTwo = sum . take 3 . sortBy (comparing Down) . map sum
 
 inventory :: Parser [[Integer]]
 inventory = elfInventory `sepBy` newline
