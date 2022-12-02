@@ -22,7 +22,15 @@
 
 (setq-default use-package-always-ensure t)
 
-(use-package company)
+(use-package company
+  :custom
+  (company-idle-begin 0.5)
+  :bind
+  (:map company-active-map
+    ("C-n" . company-select-next)
+    ("C-p" . company-select-previous)
+    ("M-<" . company-select-first)
+    ("M->" . company-select-last)))
 
 (use-package crux
   :config
@@ -43,7 +51,8 @@
 
 (use-package gap-mode)
 
-(use-package haskell-mode)
+(use-package haskell-mode
+  :hook (haskell-mode . interactive-haskell-mode))
 
 (use-package hl-todo
   :demand
@@ -54,7 +63,12 @@
   :commands (lsp lsp-deferred)
   :config
   (advice-add 'lsp :before #'direnv-update-environment)
-  (setq lsp-modeline-code-actions-enable nil))
+  (add-to-list 'lsp-language-id-configuration '(nix-mode . "nix"))
+  (setq lsp-modeline-code-actions-enable nil)
+  (lsp-register-client
+    (make-lsp-client :new-connection (lsp-stdio-connection '("rnix-lsp"))
+      :major-modes '(nix-mode)
+      :server-id 'nix)))
 
 (use-package lsp-ui
   :hook (haskell-mode . lsp-ui-mode)
@@ -87,7 +101,19 @@
   :demand
   :config (nyan-mode 1))
 
-(use-package paredit)
+(use-package ormolu
+  :hook (haskell-mode . ormolu-format-on-save-mode)
+  :bind
+  (:map haskell-mode-map
+    ("C-c r" . ormolu-format-buffer))
+  :config
+  (setq ormolu-extra-args '("--ghc-opt" "-XTemplateHaskell")))
+
+(use-package paredit
+  :hook (emacs-lisp-mode . paredit-mode))
+
+(use-package rainbow-delimiters
+  :hook (prog-mode . rainbow-delimiters-mode))
 
 (use-package smex
   :demand

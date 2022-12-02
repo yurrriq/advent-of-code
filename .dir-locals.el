@@ -4,9 +4,4 @@
 ((gap-mode
    (gap-indent-step . 2)
    (gap-start-options "-E" "-f" "-b" "-m" "2m")
-   (gap-executable . "gap"))
-  (haskell-mode
-    . ((eval
-         . (progn
-             ;; (call-interactively 'lsp-workspace-folders-add)
-             (interactive-haskell-mode))))))
+   (gap-executable . "gap")))
