@@ -4,8 +4,7 @@
   inputs = {
     emacs-overlay.url = "github:nix-community/emacs-overlay";
     flake-utils.url = "github:numtide/flake-utils";
-    # FIXME: nixpkgs.url = "github:nixos/nixpkgs/release-21.05";
-    nixpkgs.url = "github:nixos/nixpkgs/1d7058d8";
+    nixpkgs.url = "github:nixos/nixpkgs/release-22.11";
   };
 
   outputs = { self, emacs-overlay, flake-utils, nixpkgs }: {
