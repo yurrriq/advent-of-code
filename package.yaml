@@ -424,6 +424,10 @@ benchmarks:
     <<: *benchmark
     main: Bench.hs
     source-dirs: bench/AdventOfCode/Year2021/Day02
+  aoc-2022-day02-bench:
+    <<: *benchmark
+    main: Bench.hs
+    source-dirs: bench/AdventOfCode/Year2022/Day02
 tests:
   advent-of-code-test:
     main: Main.hs
