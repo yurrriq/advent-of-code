@@ -1,98 +1,52 @@
+{-# LANGUAGE DataKinds #-}
+
 module AdventOfCode.Year2022.Day02 where
 
 import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (defaultMain, inputFilePath)
+import Data.Finite (Finite, getFinite)
 import Data.Functor (($>))
-import Data.Monoid (Sum (..))
+import Data.Monoid (Sum (..), getSum)
 import Text.Trifecta (Parser, char, choice, newline, sepEndBy, space)
 
-data Opponent
-  = A
-  | B
-  | C
-  deriving (Eq, Enum, Show)
-
-data Player
-  = X
-  | Y
-  | Z
-  deriving (Eq, Enum, Show)
-
-data Choice
-  = Rock
-  | Paper
-  | Scissors
-  deriving (Eq, Enum, Show)
-
-data Outcome
-  = Loss
-  | Draw
-  | Win
-  deriving (Eq, Enum, Show)
+type Z3 = Finite 3
 
 main :: IO ()
 main = $(defaultMain)
 
-getInput :: IO [(Opponent, Player)]
+getInput :: IO [(Z3, Z3)]
 getInput = parseInput strategyGuide $(inputFilePath)
 
-partOne :: [(Opponent, Player)] -> Int
-partOne = followGuide score
+partOne :: [(Z3, Z3)] -> Integer
+partOne = followGuide snd scoreOutcome
   where
-    score opponent player = scoreChoice player' + scoreOutcome outcome
-      where
-        opponent' = coerceEnum opponent
-        player' = coerceEnum player
-        outcome = decideRound opponent' player'
+    scoreOutcome (opponent, player) = player + (1 - opponent)
 
-partTwo :: [(Opponent, Player)] -> Int
-partTwo = followGuide score
+partTwo :: [(Z3, Z3)] -> Integer
+partTwo = followGuide scoreShape snd
   where
-    score opponent outcome = scoreChoice player + scoreOutcome outcome'
-      where
-        player = translate (coerceEnum opponent) outcome'
-        outcome' = coerceEnum outcome
+    scoreShape (opponent, outcome) = outcome - (1 - opponent)
 
-    translate Rock Loss = Scissors
-    translate Rock Win = Paper
-    translate Paper Loss = Rock
-    translate Paper Win = Scissors
-    translate Scissors Loss = Paper
-    translate Scissors Win = Rock
-    translate x Draw = x
+followGuide :: ((Z3, Z3) -> Z3) -> ((Z3, Z3) -> Z3) -> [(Z3, Z3)] -> Integer
+followGuide scoreShape scoreOutcome =
+  getSum . foldMap (Sum . followAdvice scoreShape scoreOutcome)
 
-followGuide :: (Opponent -> Player -> Int) -> [(Opponent, Player)] -> Int
-followGuide score = getSum . foldMap (Sum . uncurry score)
+followAdvice :: ((Z3, Z3) -> Z3) -> ((Z3, Z3) -> Z3) -> (Z3, Z3) -> Integer
+followAdvice scoreShape scoreOutcome guide =
+  1 + getFinite (scoreShape guide) + 3 * getFinite (scoreOutcome guide)
 
-strategyGuide :: Parser [(Opponent, Player)]
-strategyGuide = ((,) <$> opponent <*> player) `sepEndBy` newline
+strategyGuide :: Parser [(Z3, Z3)]
+strategyGuide = ((,) <$> opponent <*> advice) `sepEndBy` newline
   where
     opponent =
       choice
-        [ (char 'A' <* space) $> A,
-          (char 'B' <* space) $> B,
-          (char 'C' <* space) $> C
+        [ (char 'A' <* space) $> 0,
+          (char 'B' <* space) $> 1,
+          (char 'C' <* space) $> 2
         ]
-    player =
+    advice =
       choice
-        [ char 'X' $> X,
-          char 'Y' $> Y,
-          char 'Z' $> Z
+        [ char 'X' $> 0,
+          char 'Y' $> 1,
+          char 'Z' $> 2
         ]
-
-decideRound :: Choice -> Choice -> Outcome
-decideRound Rock Paper = Win
-decideRound Paper Scissors = Win
-decideRound Scissors Rock = Win
-decideRound opponent player
-  | opponent == player = Draw
-  | otherwise = Loss
-
-scoreChoice :: Choice -> Int
-scoreChoice = succ . fromEnum
-
-scoreOutcome :: Outcome -> Int
-scoreOutcome = (3 *) . fromEnum
-
-coerceEnum :: (Enum a, Enum b) => a -> b
-coerceEnum = toEnum . fromEnum
