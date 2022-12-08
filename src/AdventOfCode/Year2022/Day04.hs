@@ -12,7 +12,7 @@ partOne :: [((Integer, Integer), (Integer, Integer))] -> Int
 partOne = length . filter (\(ab, cd) -> ab `fullyContains` cd || cd `fullyContains` ab)
 
 partTwo :: [((Integer, Integer), (Integer, Integer))] -> Int
-partTwo = undefined
+partTwo = length . filter (\(ab, cd) -> ab `overlaps` cd || cd `overlaps` ab)
 
 getInput :: IO [((Integer, Integer), (Integer, Integer))]
 getInput = parseInput assignmentPairs $(inputFilePath)
@@ -27,6 +27,11 @@ fullyContains :: Ix a => (a, a) -> (a, a) -> Bool
 fullyContains (a, b) (c, d) = inRange (a, b) c && inRange (a, b) d
 
 infix 4 `fullyContains`
+
+overlaps :: Ix a => (a, a) -> (a, a) -> Bool
+overlaps (a, b) (c, d) = inRange (a, b) c || inRange (a, b) d
+
+infix 4 `overlaps`
 
 example :: IO [((Integer, Integer), (Integer, Integer))]
 example =
