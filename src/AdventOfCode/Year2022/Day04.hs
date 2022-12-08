@@ -2,17 +2,26 @@ module AdventOfCode.Year2022.Day04 where
 
 import AdventOfCode.Input (parseInput, parseString)
 import AdventOfCode.TH (defaultMain, inputFilePath)
-import Data.Ix (Ix, inRange)
+import Control.Applicative (liftA2)
+import Data.Ix (inRange)
+import Data.Tuple (swap)
 import Text.Trifecta (Parser, char, comma, decimal, newline, sepEndBy)
 
 main :: IO ()
 main = $(defaultMain)
 
 partOne :: [((Integer, Integer), (Integer, Integer))] -> Int
-partOne = length . filter (\(ab, cd) -> ab `fullyContains` cd || cd `fullyContains` ab)
+partOne = day03 fullyContains
+  where
+    fullyContains (ab, (c, d)) = inRange ab c && inRange ab d
 
 partTwo :: [((Integer, Integer), (Integer, Integer))] -> Int
-partTwo = length . filter (\(ab, cd) -> ab `overlaps` cd || cd `overlaps` ab)
+partTwo = day03 overlaps
+  where
+    overlaps (ab, (c, d)) = inRange ab c || inRange ab d
+
+day03 :: ((a, a) -> Bool) -> [(a, a)] -> Int
+day03 f = length . filter (liftA2 (||) f (f . swap))
 
 getInput :: IO [((Integer, Integer), (Integer, Integer))]
 getInput = parseInput assignmentPairs $(inputFilePath)
@@ -22,16 +31,6 @@ assignmentPairs = assignmentPair `sepEndBy` newline
   where
     assignmentPair = (,) <$> (assignment <* comma) <*> assignment
     assignment = (,) <$> (decimal <* char '-') <*> decimal
-
-fullyContains :: Ix a => (a, a) -> (a, a) -> Bool
-fullyContains (a, b) (c, d) = inRange (a, b) c && inRange (a, b) d
-
-infix 4 `fullyContains`
-
-overlaps :: Ix a => (a, a) -> (a, a) -> Bool
-overlaps (a, b) (c, d) = inRange (a, b) c || inRange (a, b) d
-
-infix 4 `overlaps`
 
 example :: IO [((Integer, Integer), (Integer, Integer))]
 example =
