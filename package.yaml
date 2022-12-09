@@ -411,6 +411,9 @@ executables:
   aoc-2022-day04:
     <<: *executable
     main: AdventOfCode.Year2022.Day04
+  aoc-2022-day05:
+    <<: *executable
+    main: AdventOfCode.Year2022.Day05
 _benchmark: &benchmark
   ghc-options:
   - -threaded

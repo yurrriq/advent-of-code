@@ -4,7 +4,8 @@ repos:
   - id: check-useless-excludes
   repo: meta
 - hooks:
-  - id: trailing-whitespace
+  - exclude: input/2022/day05.txt
+    id: trailing-whitespace
   - exclude: VERSION$
     id: end-of-file-fixer
   - files: ^.pre-commit-config.yaml$
