@@ -27,10 +27,10 @@ main :: IO ()
 main = $(defaultMain)
 
 partOne :: (IntMap [Char], [(Int, (Int, Int))]) -> String
-partOne = map head . IM.elems . uncurry rearrange
+partOne = map head . IM.elems . uncurry (rearrange reverse)
 
 partTwo :: (IntMap [Char], [(Int, (Int, Int))]) -> String
-partTwo = undefined
+partTwo = map head . IM.elems . uncurry (rearrange id)
 
 getInput :: IO (IntMap [Char], [(Int, (Int, Int))])
 getInput = parseInput input $(inputFilePath)
@@ -61,10 +61,10 @@ rearrangement =
 posInt :: Parser Int
 posInt = token (fromInteger <$> decimal)
 
-rearrange :: IntMap [Char] -> [(Int, (Int, Int))] -> IntMap [Char]
-rearrange stacks [] = stacks
-rearrange stacks ((howMany, (from, to)) : rearrangements) =
-  rearrange (IM.insert from ys (IM.adjust (reverse xs ++) to stacks)) rearrangements
+rearrange :: ([Char] -> [Char]) -> IntMap [Char] -> [(Int, (Int, Int))] -> IntMap [Char]
+rearrange f stacks [] = stacks
+rearrange f stacks ((howMany, (from, to)) : rearrangements) =
+  rearrange f (IM.insert from ys (IM.adjust (f xs ++) to stacks)) rearrangements
   where
     (xs, ys) = splitAt howMany (stacks ! from)
 
