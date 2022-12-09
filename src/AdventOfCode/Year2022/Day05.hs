@@ -27,10 +27,13 @@ main :: IO ()
 main = $(defaultMain)
 
 partOne :: (IntMap [Char], [(Int, (Int, Int))]) -> String
-partOne = map head . IM.elems . uncurry (rearrange reverse)
+partOne = day05 reverse
 
 partTwo :: (IntMap [Char], [(Int, (Int, Int))]) -> String
-partTwo = map head . IM.elems . uncurry (rearrange id)
+partTwo = day05 id
+
+day05 :: ([Char] -> [Char]) -> (IntMap [Char], [(Int, (Int, Int))]) -> String
+day05 f = map head . IM.elems . uncurry (rearrange f)
 
 getInput :: IO (IntMap [Char], [(Int, (Int, Int))])
 getInput = parseInput input $(inputFilePath)
