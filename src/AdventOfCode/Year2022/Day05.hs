@@ -36,10 +36,10 @@ day05 :: ([Char] -> [Char]) -> (IntMap [Char], [(Int, (Int, Int))]) -> String
 day05 f = map head . IM.elems . uncurry (rearrange f)
 
 getInput :: IO (IntMap [Char], [(Int, (Int, Int))])
-getInput = parseInput input $(inputFilePath)
+getInput = parseInput drawing $(inputFilePath)
 
-input :: Parser (IntMap [Char], [(Int, (Int, Int))])
-input = (,) <$> (stacks <* labels <* newline) <*> some rearrangement
+drawing :: Parser (IntMap [Char], [(Int, (Int, Int))])
+drawing = (,) <$> (stacks <* labels <* newline) <*> some rearrangement
   where
     labels = void (label `sepBy` char ' ' <* newline)
     label = decimal `surroundedBy` char ' '
@@ -65,7 +65,7 @@ posInt :: Parser Int
 posInt = token (fromInteger <$> decimal)
 
 rearrange :: ([Char] -> [Char]) -> IntMap [Char] -> [(Int, (Int, Int))] -> IntMap [Char]
-rearrange f stacks [] = stacks
+rearrange _ stacks [] = stacks
 rearrange f stacks ((howMany, (from, to)) : rearrangements) =
   rearrange f (IM.insert from ys (IM.adjust (f xs ++) to stacks)) rearrangements
   where
@@ -73,7 +73,7 @@ rearrange f stacks ((howMany, (from, to)) : rearrangements) =
 
 example :: IO (IntMap [Char], [(Int, (Int, Int))])
 example =
-  parseString input $
+  parseString drawing $
     unlines
       [ "    [D]    ",
         "[N] [C]    ",
