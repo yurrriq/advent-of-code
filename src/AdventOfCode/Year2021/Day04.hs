@@ -1,6 +1,5 @@
 {-# LANGUAGE DeriveTraversable #-}
 {-# LANGUAGE LambdaCase #-}
-{-# LANGUAGE TupleSections #-}
 {-# LANGUAGE TypeFamilies #-}
 {-# OPTIONS_GHC -Wno-name-shadowing #-}
 
@@ -10,8 +9,8 @@ import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (defaultMainMaybe, inputFilePath)
 import Control.Arrow (first)
 import Control.Lens (ifoldl')
-import Data.Functor.Foldable (Base, Corecursive (embed), Recursive (project), ana, hylo)
--- import Data.Functor.Foldable.TH (makeBaseFunctor)
+import Data.Functor.Foldable (ana, hylo)
+import Data.Functor.Foldable.TH (makeBaseFunctor)
 import Data.IntMap (IntMap)
 import qualified Data.IntMap as IM
 import Data.IntSet (IntSet)
@@ -25,34 +24,17 @@ import Text.Trifecta (Parser, commaSep, count, natural, some)
 -- Squares are numbered left to right and top to bottom.
 type Board = IntMap Int
 
--- | A Bingo game is either ready to call a number, won with a score, or lost.
+-- | A Bingo game has three potential states.
 data Bingo
-  = Call Bingo
-  | Won Int
-  | Lost
+  = -- | Ready to call a number.
+    Call Bingo
+  | -- | Won with a score.
+    Won Int
+  | -- | Lost.
+    Lost
   deriving (Eq, Show)
 
--- FIXME: For some reason Nix doesn't seem to like this, so splice in place.
--- START: makeBasefunctor ''Bingo
-data BingoF r
-  = CallF r
-  | WonF Int
-  | LostF
-  deriving (Functor, Foldable, Traversable)
-
-type instance Base Bingo = BingoF
-
-instance Recursive Bingo where
-  project (Call x) = CallF x
-  project (Won x) = WonF x
-  project Lost = LostF
-
-instance Corecursive Bingo where
-  embed (CallF x) = Call x
-  embed (WonF x) = Won x
-  embed LostF = Lost
-
--- END: makeBaseFunctor ''Bingo
+makeBaseFunctor ''Bingo
 
 -- | Keep track of the list of numbers to call, and the set of squares marked.
 data BingoState = BingoState
@@ -64,11 +46,14 @@ data BingoState = BingoState
 main :: IO ()
 main = $(defaultMainMaybe)
 
+-- | The input is a list of numbers to call and list of bingo boards.
 getInput :: IO ([Int], [Board])
 getInput = parseInput input $(inputFilePath)
   where
     input = (,) <$> calls <*> some (board 5)
 
+-- | Given a list of called numbers and a list of boards, compute the score of
+-- the 'Board' that wins first.
 partOne :: ([Int], [Board]) -> Maybe Int
 partOne (calls, boards) = step allGames
   where
@@ -80,6 +65,8 @@ partOne (calls, boards) = step allGames
       Lost -> Left Nothing
     allGames = map (flip ana (BingoState calls IS.empty) . bingoCoalg 5) boards
 
+-- | Given a list of called numbers and a list of boar ds, compute the score of
+-- the 'Board' that wins last.
 partTwo :: ([Int], [Board]) -> Maybe Int
 partTwo (calls, boards) =
   fmap snd
@@ -96,14 +83,18 @@ bingoAlg = \case
 
 bingoCoalg :: Int -> Board -> BingoState -> BingoF BingoState
 bingoCoalg _ _ (BingoState [] _) = LostF
-bingoCoalg k board (BingoState (call : calls) marked) =
-  case (`IS.insert` marked) <$> IM.lookup call board of
-    Nothing -> CallF (BingoState calls marked)
-    Just marked' ->
-      if isWinner k marked'
-        then WonF (calculateScore call marked' board)
-        else CallF (BingoState calls marked')
+bingoCoalg k board (BingoState (call : calls) alreadyMarked) =
+  maybe callNext (checkIfWon . mark) (IM.lookup call board)
+  where
+    mark square = IS.insert square alreadyMarked
+    checkIfWon marked
+      | isWinner k marked = WonF (calculateScore call marked board)
+      | otherwise = CallF (BingoState calls marked)
+    callNext = CallF (BingoState calls alreadyMarked)
 
+-- | Given the last called number, a set of marked squares, and a board,
+-- calculate the score, i.e. the product of the last called number and the sum
+-- of the unmarked numbers on the board.
 calculateScore :: Int -> IntSet -> Board -> Int
 calculateScore lastCall marked =
   (lastCall *)
@@ -111,9 +102,13 @@ calculateScore lastCall marked =
     . IM.keys
     . IM.filter (`IS.notMember` marked)
 
+-- | Given a size @k@, and a set of marked squares, determine if all squares in
+-- any row or any column of a \(k \times k\) 'Board' are marked.
 isWinner :: Int -> IntSet -> Bool
-isWinner k = flip any (runs k) . flip IS.isSubsetOf
+isWinner k marked = any (`IS.isSubsetOf` marked) (runs k)
 
+-- | The complete list of winning sets of square numbers on a \(k \times k\)
+-- 'Board'.
 runs :: Int -> [IntSet]
 runs k =
   map IS.fromList . concat $
@@ -123,9 +118,11 @@ runs k =
       | n <- [0 .. k - 1]
     ]
 
+-- | A list of numbers to call.
 calls :: Parser [Int]
 calls = commaSep (fromInteger <$> natural)
 
+-- | A \(k \times k\) bingo 'Board'.
 board :: Int -> Parser Board
 board k = mkBoard <$> count k (count k (fromInteger <$> natural))
   where
