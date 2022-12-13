@@ -414,6 +414,11 @@ executables:
   aoc-2022-day05:
     <<: *executable
     main: AdventOfCode.Year2022.Day05
+  aoc-2022-day06:
+    <<: *executable
+    main: AdventOfCode.Year2022.Day06
+    dependencies:
+    - vector-sized
 _benchmark: &benchmark
   ghc-options:
   - -threaded
