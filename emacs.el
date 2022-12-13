@@ -77,6 +77,11 @@
 
 (use-package lsp-haskell)
 
+(use-package magit
+  :demand
+  :config
+  (global-set-key (kbd "C-c g") 'magit-file-dispatch))
+
 (use-package multiple-cursors
   :demand
   :config (global-set-key (kbd "C-S-c C-S-c") 'mc/edit-lines))
