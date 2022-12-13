@@ -1,10 +1,9 @@
 module AdventOfCode.Year2022.Day06 where
 
-import AdventOfCode.Input (parseInput)
+import AdventOfCode.Input (rawInput)
 import AdventOfCode.TH (defaultMainMaybe, inputFilePath)
 import Data.List (findIndex, tails)
 import qualified Data.Set as Set
-import Text.Trifecta (letter, some)
 
 main :: IO ()
 main = $(defaultMainMaybe)
@@ -23,4 +22,4 @@ day06 n =
     . tails
 
 getInput :: IO [Char]
-getInput = parseInput (some letter) $(inputFilePath)
+getInput = rawInput $(inputFilePath)
