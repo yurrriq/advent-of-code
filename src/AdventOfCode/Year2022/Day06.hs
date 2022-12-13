@@ -1,44 +1,26 @@
 module AdventOfCode.Year2022.Day06 where
 
-import AdventOfCode.Input (parseInput, parseString)
-import AdventOfCode.TH (inputFilePath)
-import Control.Applicative (liftA2)
-import Data.Char (isAlpha)
-import Text.Trifecta (Parser, letter, manyTill, satisfy, some, try)
+import AdventOfCode.Input (parseInput)
+import AdventOfCode.TH (defaultMainMaybe, inputFilePath)
+import Data.List (findIndex, tails)
+import qualified Data.Set as Set
+import Text.Trifecta (letter, some)
 
 main :: IO ()
-main =
-  do
-    input <- getInput
-    putStr "Part One: "
-    n <- partOne input
-    print n
-    putStr "Part Two: "
-    m <- (n +) <$> partTwo (drop n input)
-    print m
+main = $(defaultMainMaybe)
 
-partOne :: String -> IO Int
-partOne = parseString (findSop 4)
+partOne :: [Char] -> Maybe Int
+partOne = day06 4
 
-partTwo :: String -> IO Int
-partTwo = parseString (findSop 14)
+partTwo :: [Char] -> Maybe Int
+partTwo = day06 14
 
-getInput :: IO String
+day06 :: Int -> [Char] -> Maybe Int
+day06 n =
+  fmap (n +)
+    . findIndex ((n ==) . Set.size . Set.fromList)
+    . map (take n)
+    . tails
+
+getInput :: IO [Char]
 getInput = parseInput (some letter) $(inputFilePath)
-
-findSop :: Int -> Parser Int
-findSop n = (n +) . length <$> manyTill letter (try (sop n))
-
-sop :: Int -> Parser [Char]
-sop = go []
-  where
-    go seen 0 = pure (reverse seen)
-    go seen n =
-      do
-        c <- satisfy (isAlpha <&&> (`notElem` seen))
-        go (c : seen) (n - 1)
-
-(<&&>) :: Applicative f => f Bool -> f Bool -> f Bool
-(<&&>) = liftA2 (&&)
-
-infixr 3 <&&>
