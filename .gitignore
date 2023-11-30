@@ -328,3 +328,5 @@ erl_crash.dump
 logs
 rebar.lock
 .DS_Store
+
+/.pre-commit-config.yaml

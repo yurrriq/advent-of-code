@@ -4,11 +4,11 @@ Thanks to [Justin Le](https://github.com/mstksg) for teaching me some
 [neat group theory
 tricks](https://blog.jle.im/entry/alchemical-groups.html)\!
 
-``` sourceCode literate haskell
+```sourceCode literate haskell
 {-# LANGUAGE DataKinds #-}
 ```
 
-``` sourceCode literate haskell
+```sourceCode literate haskell
 module Day05 (
   partOne,
   partTwo
@@ -17,7 +17,7 @@ module Day05 (
 
 ## Imports
 
-``` sourceCode literate haskell
+```sourceCode literate haskell
 import           Data.Algebra.Free (foldMapFree, returnFree)
 import           Data.Char         (isLower, ord, toLower)
 import           Data.Function     (on)
@@ -35,11 +35,11 @@ Units’ types are represented by letters…
 
 </blockquote>
 
-``` sourceCode literate haskell
+```sourceCode literate haskell
 type Unit = Finite 26
 ```
 
-``` sourceCode literate haskell
+```sourceCode literate haskell
 fromChar :: Char -> Maybe (Either Unit Unit)
 fromChar c | isLower c = Left  <$> unit
            | otherwise = Right <$> unit
@@ -57,12 +57,12 @@ embeds generators into a [free
 algebra](https://en.wikipedia.org/wiki/Free_algebra)
 ([`FreeAlgebra`](https://hackage.haskell.org/package/free-algebras-0.6.0.0/docs/Data-Algebra-Free.html#t:FreeAlgebra)).
 
-``` sourceCode literate haskell
+```sourceCode literate haskell
 inject :: Char -> FG.FreeGroupL Unit
 inject = foldMap (either returnFree (invert . returnFree)) . fromChar
 ```
 
-``` sourceCode literate haskell
+```sourceCode literate haskell
 clean :: Unit -> FG.FreeGroupL Unit -> FG.FreeGroupL Unit
 clean c = foldMapFree go
   where
@@ -71,7 +71,7 @@ clean c = foldMapFree go
          | otherwise = returnFree d
 ```
 
-``` sourceCode literate haskell
+```sourceCode literate haskell
 order :: FG.FreeGroupL a -> Int
 order = length . FG.toList
 ```
@@ -80,14 +80,14 @@ order = length . FG.toList
 
 ### Part One
 
-``` sourceCode literate haskell
+```sourceCode literate haskell
 partOne :: [Char] -> Int
 partOne = order . foldMap inject
 ```
 
 ### Part Two
 
-``` sourceCode literate haskell
+```sourceCode literate haskell
 partTwo :: [Char] -> Int
 partTwo = minimum . cleanedPolymers . foldMap inject
   where

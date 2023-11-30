@@ -67,4 +67,4 @@ buildStraightR :: Int -> Char -> Maybe String
 buildStraightR 0 _ = Just []
 buildStraightR 1 c = Just [c]
 buildStraightR _ 'a' = Nothing
-buildStraightR n c = (c :) <$> buildStraightR (n -1) (pred c)
+buildStraightR n c = (c :) <$> buildStraightR (n - 1) (pred c)

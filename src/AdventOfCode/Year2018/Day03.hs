@@ -68,7 +68,7 @@ isPointOverlapping covered = maybe False (> 1) . flip Map.lookup covered
 
 squaresCovered :: Claim -> [Point]
 squaresCovered (Claim _ (Point x0 y0) (Size w h)) =
-  [Point x1 y1 | x1 <- [x0 .. x0 + w -1], y1 <- [y0 .. y0 + h -1]]
+  [Point x1 y1 | x1 <- [x0 .. x0 + w - 1], y1 <- [y0 .. y0 + h - 1]]
 
 -- ------------------------------------------------------------------- [ Parts ]
 

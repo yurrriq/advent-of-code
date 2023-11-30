@@ -3,21 +3,21 @@ name: Build the flake
 on:
   push:
     branches:
-    - main
+      - main
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-    - name: Checkout
-      uses: actions/checkout@v2
-    - name: Install Nix
-      uses: cachix/install-nix-action@v18
-      with:
-        extra_nix_config: |
-          access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
-    - uses: cachix/cachix-action@v12
-      with:
-        name: yurrriq
-        skipPush: true
-    - run: nix build --show-trace --verbose
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Install Nix
+        uses: cachix/install-nix-action@v18
+        with:
+          extra_nix_config: |
+            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+      - uses: cachix/cachix-action@v12
+        with:
+          name: yurrriq
+          skipPush: true
+      - run: nix build --show-trace --verbose

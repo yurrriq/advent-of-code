@@ -51,7 +51,7 @@ instance Show Grid where
           [ maybe "." (show . HM.size) (HM.lookup (x, y) asteroids)
             | x <- [0 .. width - 1]
           ]
-        | y <- [0 .. height -1]
+        | y <- [0 .. height - 1]
       ]
 
 type Location = (Int, Int)
