@@ -7,8 +7,8 @@
       url = "github:nix-community/emacs-overlay";
     };
     flake-parts.url = "github:hercules-ci/flake-parts";
-    nixpkgs.url = "github:nixos/nixpkgs/release-22.11";
-    nixpkgs-stable.follows = "nixpkgs";
+    nixpkgs.url = "github:nixos/nixpkgs/release-22.11"; # FIXME
+    nixpkgs-stable.follows = "nixpkgs"; # FIXME
     pre-commit-hooks-nix = {
       inputs = {
         nixpkgs.follows = "nixpkgs";
@@ -30,6 +30,7 @@
         ./nix/emacs.nix
         ./nix/haskell.nix
         ./nix/noweb.nix
+        ./nix/ocaml.nix
       ];
 
       systems = [
@@ -65,6 +66,7 @@
             self'.devShells.emacs
             self'.devShells.haskell
             self'.devShells.noweb
+            self'.devShells.ocaml
           ];
 
           nativeBuildInputs = with pkgs; [

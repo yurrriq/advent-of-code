@@ -17,6 +17,8 @@
 (global-set-key (kbd "C-x C-k") 'kill-this-buffer)
 (global-set-key (kbd "s-u") 'revert-buffer)
 
+(set-face-attribute 'default nil :family "Iosevka Nerd Font" :height 110)
+
 (eval-when-compile
   (require 'use-package))
 
@@ -40,6 +42,8 @@
   :config
   (direnv-mode))
 
+(use-package dune)
+
 (use-package editorconfig
   :config
   (editorconfig-mode 1))
@@ -48,6 +52,8 @@
   :config
   (setq-default fill-column 80)
   (global-display-fill-column-indicator-mode))
+
+(use-package flycheck)
 
 (use-package gap-mode)
 
@@ -58,20 +64,35 @@
   :demand
   :config (global-hl-todo-mode t))
 
+(use-package ligature
+  :config
+  (ligature-set-ligatures
+   'prog-mode
+   '("-<<" "-<" "-<-" "<--" "<---" "<<-" "<-" "->" "->>" "-->" "--->" "->-" ">-" ">>-"
+     "=<<" "=<" "=<=" "<==" "<<=" "<=" "=>" "=>>" "==>" "===>" "=>=" ">=" ">>="
+     "<->" "<-->" "<--->" "<---->" "<=>" "<==>" "<===>" "<====>" "::" ":::" "__"
+     "<~~" "</" "</>" "/>" "~~>" "==" "!=" "/=" "~=" "<>" "===" "!==" "!===" "=/=" "=!="
+     "<:" ":=" "*=" "*+" "<*" "<*>" "*>" "<|" "<|>" "|>" "<." "<.>" ".>" "+*" "=*" "=:" ":>"
+     "(*" "*)" "/*" "*/" "[|" "|]" "{|" "|}" "++" "+++" "\\/" "/\\" "|-" "-|" "<!--"
+     "<!---"))
+  (global-ligature-mode t))
+
 (use-package lsp-mode
-  :hook ((haskell-mode . lsp-deferred))
+  :hook ((haskell-mode . lsp-deferred)
+         (tuareg-mode . lsp-deferred))
   :commands (lsp lsp-deferred)
   :config
   (advice-add 'lsp :before #'direnv-update-environment)
   (add-to-list 'lsp-language-id-configuration '(nix-mode . "nix"))
   (setq lsp-modeline-code-actions-enable nil)
   (lsp-register-client
-    (make-lsp-client :new-connection (lsp-stdio-connection '("rnix-lsp"))
-      :major-modes '(nix-mode)
-      :server-id 'nix)))
+   (make-lsp-client :new-connection (lsp-stdio-connection '("rnix-lsp"))
+                    :major-modes '(nix-mode)
+                    :server-id 'nix)))
 
 (use-package lsp-ui
-  :hook (haskell-mode . lsp-ui-mode)
+  :hook ((haskell-mode . lsp-ui-mode)
+         (tuareg-mode . lsp-ui-mode))
   :config
   (setq lsp-ui-doc-position 'bottom))
 
@@ -79,8 +100,10 @@
 
 (use-package magit
   :demand
-  :config
-  (global-set-key (kbd "C-c g") 'magit-file-dispatch))
+  :bind
+  (("C-c g" . magit-file-dispatch)
+   ("C-x g" . magit-status)
+   ("C-x C-g" . magit-status)))
 
 (use-package multiple-cursors
   :demand
@@ -106,11 +129,17 @@
   :demand
   :config (nyan-mode 1))
 
+(use-package ocamlformat
+  :init
+  (add-hook 'before-save-hook 'ocamlformat-before-save)
+  :config
+  (setq ocamlformat-enable 'enable-outside-detected-project))
+
 (use-package ormolu
   :hook (haskell-mode . ormolu-format-on-save-mode)
   :bind
   (:map haskell-mode-map
-    ("C-c r" . ormolu-format-buffer))
+        ("C-c r" . ormolu-format-buffer))
   :config
   (setq ormolu-extra-args '("--ghc-opt" "-XTemplateHaskell")))
 
@@ -122,10 +151,14 @@
 
 (use-package smex
   :demand
-  :config
-  (global-set-key (kbd "M-x") 'smex)
-  (global-set-key (kbd "M-X") 'smex-major-mode-commands)
-  (global-set-key (kbd "C-c C-c M-x") 'execute-extended-command))
+  :bind
+  (("M-x" . smex)
+   ("M-X" . smex-major-mode-commands)
+   ("C-c C-c M-x" . execute-extended-command)))
+
+(use-package tuareg
+  :mode (("\\.ml[ily]?$" . tuareg-mode)
+         ("\\.topml$" . tuareg-mode)))
 
 (use-package whitespace-cleanup-mode
   :config (global-whitespace-cleanup-mode t))
