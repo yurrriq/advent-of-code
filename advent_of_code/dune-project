@@ -19,7 +19,11 @@
  (name advent_of_code)
  (synopsis "A short synopsis")
  (description "A longer description")
- (depends ocaml dune base angstrom stdio)
+ (depends
+   angstrom
+   core
+   dune
+   ocaml)
  (tags
   (topics "to describe" your project)))
 
