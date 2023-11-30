@@ -12,7 +12,7 @@
         findlib
         ocaml
         ocaml-lsp
-        # FIXME: ocamlformat
+        pkgs.ocamlformat
         odoc
         ounit
         utop

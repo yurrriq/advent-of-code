@@ -1,2 +1,4 @@
 (library
- (name advent_of_code))
+ (public_name advent_of_code)
+ (modules parse)
+ (libraries base angstrom stdio))
