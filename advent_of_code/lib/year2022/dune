@@ -1,0 +1,5 @@
+(library
+ (name year2022)
+ (public_name advent_of_code.year2022)
+ (modules day01)
+ (libraries angstrom core))

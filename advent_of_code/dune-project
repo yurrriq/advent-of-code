@@ -1,24 +1,24 @@
 (lang dune 3.6)
 
 (name advent_of_code)
+(version 0.0.1)
 
 (generate_opam_files true)
 
-(source
- (github username/reponame))
+(source (github yurrriq/advent-of-code))
 
-(authors "Author Name")
+(authors "Eric Bailey")
 
-(maintainers "Maintainer Name")
+(maintainers "Eric Bailey")
 
-(license LICENSE)
+(license MIT)
 
-(documentation https://url/to/documentation)
+; (documentation https://yurrriq.github.io/advent-of-code/ocaml)
 
 (package
  (name advent_of_code)
- (synopsis "A short synopsis")
- (description "A longer description")
+ (synopsis "Advent of Code")
+ ; (description "A longer description")
  (depends
    angstrom
    core

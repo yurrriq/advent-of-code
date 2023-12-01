@@ -1,4 +1,4 @@
-open Advent_of_code.Day01
+open Year2022.Day01
 open Angstrom
 open Core
 

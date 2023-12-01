@@ -1,0 +1,4 @@
+(executable
+ (public_name aoc-2022-day01)
+ (name day01)
+ (libraries year2022))
