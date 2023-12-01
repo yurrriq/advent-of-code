@@ -29,6 +29,7 @@
         ghc
         ghcid
         haskell-language-server
+        haskellPackages.ormolu
         haskellPackages.pointfree
       ];
     };
