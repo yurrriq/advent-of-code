@@ -1,47 +1,45 @@
 module AdventOfCode.Year2023.Day01 where
 
-import AdventOfCode.Input -- (parseInput)
-import AdventOfCode.TH (defaultMain, inputFilePath)
+import AdventOfCode.Input (parseString, rawInput)
+import AdventOfCode.TH (inputFilePath)
 import Control.Applicative ((<|>))
 import Control.Monad (void)
 import Data.Char (digitToInt)
-import Data.Functor ((<&>))
-import Paths_advent_of_code (getDataFileName)
 import Text.Parser.LookAhead (lookAhead)
-import Text.Trifecta hiding (parseString)
+import Text.Trifecta hiding (digit, parseString)
+import qualified Text.Trifecta as Trifecta
 
--- main :: IO ()
--- main = $(defaultMain)
+main :: IO ()
+main =
+  do
+    input <- rawInput $(inputFilePath)
+    putStr "Part One: "
+    print =<< partOne input
+    putStr "Part Two: "
+    print =<< partTwo input
 
--- partOne :: [String] -> Int
--- partOne = undefined
---   where
+partOne :: String -> IO Int
+partOne = calibrate digit
 
--- partTwo :: [String] -> Int
--- partTwo = undefined
+partTwo :: String -> IO Int
+partTwo = calibrate digitOrSpelledDigit
 
-getInput :: IO [Int]
-getInput = parseInput calibrationDocument $(inputFilePath)
+calibrate :: Parser Int -> String -> IO Int
+calibrate p = sum <.> parseString (calibrationDocument p)
 
--- lines <$> (readFile =<< getDataFileName $(inputFilePath))
+calibrationDocument :: Parser Int -> Parser [Int]
+calibrationDocument p = (calibrationValue <$> some p) `sepEndBy` newline
+  where
+    calibrationValue = (+) <$> (10 *) . head <*> last
 
-calibrationDocument :: Parser [Int]
-calibrationDocument = calibrationValue `sepEndBy` newline
+digit :: Parser Int
+digit = digitToInt <$> Trifecta.digit `surroundedBy` many letter
 
-calibrationValue :: Parser Int
-calibrationValue = some partOneDigit <&> mkCalibrationValue
-
-mkCalibrationValue :: [Char] -> Int
-mkCalibrationValue ds = 10 * digitToInt (head ds) + digitToInt (last ds)
-
-partOneDigit :: Parser Char
-partOneDigit = (many letter *> digit) <* many letter
-
-partTwoDigit :: Parser Char
-partTwoDigit =
+digitOrSpelledDigit :: Parser Int
+digitOrSpelledDigit =
   do
     skipLetters
-    d <- digit <|> spelledDigit
+    d <- (digitToInt <$> Trifecta.digit) <|> (lookAhead spelledDigit <* letter)
     skipLetters
     pure d
   where
@@ -49,22 +47,22 @@ partTwoDigit =
       void . manyTill letter $
         lookAhead
           ( void spelledDigit
-              <|> void digit
+              <|> void Trifecta.digit
               <|> void newline
               <|> eof
           )
 
-spelledDigit :: Parser Char
+spelledDigit :: Parser Int
 spelledDigit =
-  ('1' <$ string "one")
-    <|> ('2' <$ string "two")
-    <|> ('3' <$ string "three")
-    <|> ('4' <$ string "four")
-    <|> ('5' <$ string "five")
-    <|> ('6' <$ string "six")
-    <|> ('7' <$ string "seven")
-    <|> ('8' <$ string "eight")
-    <|> ('9' <$ string "nine")
+  (1 <$ string "one")
+    <|> (2 <$ string "two")
+    <|> (3 <$ string "three")
+    <|> (4 <$ string "four")
+    <|> (5 <$ string "five")
+    <|> (6 <$ string "six")
+    <|> (7 <$ string "seven")
+    <|> (8 <$ string "eight")
+    <|> (9 <$ string "nine")
 
 examples :: [String]
 examples =
@@ -83,3 +81,8 @@ examples =
             "7pqrstsixteen"
           ]
         ]
+
+infixr 9 <.>
+
+(<.>) :: Functor f => (b -> c) -> (a -> f b) -> a -> f c
+(f <.> g) a = f <$> g a
