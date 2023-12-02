@@ -4,8 +4,9 @@ import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (defaultMain, inputFilePath)
 import Control.Applicative ((<|>))
 import Control.Lens (makeLenses, view)
-import Linear (V3 (..))
-import Text.Trifecta hiding (digit, parseString)
+import Data.Function (on)
+import Linear (R1 (_x), R2 (_y), R3 (_z), V3 (..))
+import Text.Trifecta hiding (parseString)
 import Prelude hiding (id)
 
 data Game = Game
@@ -23,7 +24,9 @@ partOne :: [Game] -> Integer
 partOne = sum . map (view id) . filter (isPossible (V3 12 13 14))
 
 partTwo :: [Game] -> Integer
-partTwo = undefined
+partTwo = sum . map (product . foldl1 go . view revelations)
+  where
+    go a b = V3 ((max `on` view _x) a b) ((max `on` view _y) a b) ((max `on` view _z) a b)
 
 getInput :: IO [Game]
 getInput = parseInput (game `sepEndBy` newline) $(inputFilePath)
@@ -37,7 +40,7 @@ game :: Parser Game
 game =
   symbol "Game"
     *> ( Game
-           <$> decimal <* symbol ":"
+           <$> natural <* symbol ":"
            <*> (sum <$> revelation `sepBy` comma) `sepBy` symbol ";"
        )
 
@@ -45,9 +48,9 @@ revelation :: Parser (V3 Integer)
 revelation =
   do
     n <- natural
-    (V3 n 0 0 <$ string "red")
-      <|> (V3 0 n 0 <$ string "green")
-      <|> (V3 0 0 n <$ string "blue")
+    V3 n 0 0 <$ string "red"
+      <|> V3 0 n 0 <$ string "green"
+      <|> V3 0 0 n <$ string "blue"
 
 example :: String
 example =
