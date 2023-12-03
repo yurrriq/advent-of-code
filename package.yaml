@@ -426,6 +426,12 @@ executables:
     dependencies:
       - extra
       - linear
+  aoc-2023-day03:
+    <<: *executable
+    main: AdventOfCode.Year2023.Day03
+    dependencies:
+      - fast-digits
+      - linear
 _benchmark: &benchmark
   ghc-options:
     - -threaded
