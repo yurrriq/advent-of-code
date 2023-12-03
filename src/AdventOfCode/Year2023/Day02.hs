@@ -2,55 +2,45 @@ module AdventOfCode.Year2023.Day02 where
 
 import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (defaultMain, inputFilePath)
-import Control.Applicative ((<|>))
-import Control.Lens (makeLenses, view)
-import Data.Function (on)
-import Linear (R1 (_x), R2 (_y), R3 (_z), V3 (..))
+import Control.Applicative (liftA2, (<|>))
+import Data.List.Extra (sumOn')
+import Data.Traversable (for)
+import Linear (V3 (..))
 import Text.Trifecta hiding (parseString)
 import Prelude hiding (id)
 
-data Game = Game
-  { _id :: Integer,
-    _revelations :: [V3 Integer]
-  }
-  deriving (Eq, Show)
-
-makeLenses ''Game
+newtype Game = Game {unGame :: (Integer, [V3 Integer])}
 
 main :: IO ()
 main = $(defaultMain)
 
 partOne :: [Game] -> Integer
-partOne = sum . map (view id) . filter (isPossible (V3 12 13 14))
+partOne = sumOn' (fst . unGame) . filter (isPossible . snd . unGame)
+  where
+    isPossible = all (and . liftA2 (>=) (V3 12 13 14))
 
 partTwo :: [Game] -> Integer
-partTwo = sum . map (product . foldl1 go . view revelations)
+partTwo = sumOn' (power . snd . unGame)
   where
-    go a b = V3 ((max `on` view _x) a b) ((max `on` view _y) a b) ((max `on` view _z) a b)
+    power = product . foldr (liftA2 max) 0
 
 getInput :: IO [Game]
 getInput = parseInput (game `sepEndBy` newline) $(inputFilePath)
 
-isPossible :: V3 Integer -> Game -> Bool
-isPossible inventory = all (go inventory) . view revelations
-  where
-    go (V3 r g b) (V3 r' g' b') = r >= r' && g >= g' && b >= b'
-
 game :: Parser Game
 game =
-  symbol "Game"
-    *> ( Game
-           <$> natural <* symbol ":"
-           <*> (sum <$> revelation `sepBy` comma) `sepBy` symbol ";"
-       )
+  fmap Game $
+    symbol "Game"
+      *> ( (,)
+             <$> natural <* symbol ":"
+               <*> (sum <$> revelation `sepBy` comma) `sepBy` symbol ";"
+         )
 
 revelation :: Parser (V3 Integer)
 revelation =
-  do
-    n <- natural
-    V3 n 0 0 <$ string "red"
-      <|> V3 0 n 0 <$ string "green"
-      <|> V3 0 0 n <$ string "blue"
+  natural >>= \n ->
+    for (V3 "red" "green" "blue") $
+      \color -> n <$ string color <|> pure 0
 
 example :: String
 example =

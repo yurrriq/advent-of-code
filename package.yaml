@@ -424,6 +424,7 @@ executables:
     <<: *executable
     main: AdventOfCode.Year2023.Day02
     dependencies:
+      - extra
       - linear
 _benchmark: &benchmark
   ghc-options:
