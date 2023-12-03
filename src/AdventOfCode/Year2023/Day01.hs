@@ -2,6 +2,7 @@ module AdventOfCode.Year2023.Day01 where
 
 import AdventOfCode.Input (parseString, rawInput)
 import AdventOfCode.TH (inputFilePath)
+import AdventOfCode.Util ((<.>))
 import Control.Applicative ((<|>))
 import Control.Monad (void)
 import Data.Char (digitToInt)
@@ -81,8 +82,3 @@ examples =
             "7pqrstsixteen"
           ]
         ]
-
-infixr 9 <.>
-
-(<.>) :: Functor f => (b -> c) -> (a -> f b) -> a -> f c
-(f <.> g) a = f <$> g a

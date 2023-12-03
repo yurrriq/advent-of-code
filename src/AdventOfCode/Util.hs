@@ -19,6 +19,7 @@ module AdventOfCode.Util
     holes,
     (<&&>),
     (<||>),
+    (<.>),
   )
 where
 
@@ -111,3 +112,8 @@ infixr 3 <&&> -- same as (&&)
 (<||>) = liftA2 (||)
 
 infixr 2 <||> -- same as (||)
+
+(<.>) :: Functor f => (b -> c) -> (a -> f b) -> a -> f c
+(f <.> g) a = f <$> g a
+
+infixr 9 <.>
