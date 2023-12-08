@@ -111,19 +111,31 @@
 
 (use-package nix-mode)
 
-(let ((noweb-load-path
-        (file-name-as-directory
-          (expand-file-name "site-lisp"
-            (expand-file-name "emacs"
-              (expand-file-name "share"
-                (file-name-directory
-                  (directory-file-name
-                    (file-name-directory
-                      (executable-find "noweb"))))))))))
-  (use-package noweb-mode
-    :load-path load-path
-    :mode ("\\.nw\\'")
-    :demand))
+(eval-and-compile
+  ;;; https://www.emacswiki.org/emacs/ThreadMacroFromClojure
+
+  ;; (defmacro ->> (&rest body)
+  ;;   (let ((result (pop body)))
+  ;;     (dolist (form body result)
+  ;;       (setq result (append form (list result))))))
+
+  (defmacro -> (&rest body)
+    (let ((result (pop body)))
+      (dolist (form body result)
+        (setq result (append (list (car form) result) (cdr form))))))
+
+  (defun yurrriq/noweb-load-path ()
+    (-> (executable-find "noweb")
+      (file-name-directory)
+      (directory-file-name)
+      (file-name-directory)
+      (file-name-concat "share" "emacs" "site-lisp")
+      (file-name-as-directory))))
+
+(use-package noweb-mode
+  :load-path (lambda () (list (yurrriq/noweb-load-path)))
+  :mode ("\\.nw\\'")
+  :demand)
 
 (use-package nyan-mode
   :demand
