@@ -7,7 +7,7 @@ import AdventOfCode.TH (defaultMain, inputFilePath)
 import Control.Arrow ((>>>))
 import Data.IntMap.Strict ((!))
 import qualified Data.IntMap.Strict as IntMap
-import Data.List (intercalate, sortOn)
+import Data.List (sortOn)
 import Data.List.Extra (sumOn')
 import Data.Set (Set)
 import qualified Data.Set as Set
@@ -65,8 +65,7 @@ getExample = parseString (some scratchcard) example
 
 example :: String
 example =
-  intercalate
-    "\n"
+  unlines
     [ "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53",
       "Card 2: 13 32 20 16 61 | 61 30 68 82 17 32 24 19",
       "Card 3:  1 21 53 59 44 | 69 82 63 72 16 21 14  1",
