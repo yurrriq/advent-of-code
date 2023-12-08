@@ -2,21 +2,28 @@
 
 module AdventOfCode.Year2023.Day04 where
 
-import AdventOfCode.Input
+import AdventOfCode.Input (parseInput, parseString)
 import AdventOfCode.TH (defaultMain, inputFilePath)
+import Control.Arrow ((>>>))
+import Control.Monad (void)
 import Data.List (intercalate)
 import Data.List.Extra (sumOn')
+import Data.Set (Set)
+import qualified Data.Set as Set
 import Text.Trifecta hiding (parseString)
 
-newtype Scratchcard
-  = Scratchcard (Int, [Int], [Int])
+newtype Scratchcard = Scratchcard {unScratchcard :: (Set Int, Set Int)}
   deriving (Eq, Ord, Show)
 
 main :: IO ()
 main = $(defaultMain)
 
 partOne :: [Scratchcard] -> Int
-partOne = sumOn' score
+partOne =
+  sumOn' $
+    countWinners >>> \case
+      0 -> 0
+      k -> 2 ^ (k - 1)
 
 partTwo :: [Scratchcard] -> Int
 partTwo = undefined
@@ -24,29 +31,28 @@ partTwo = undefined
 getInput :: IO [Scratchcard]
 getInput = parseInput (some scratchcard) $(inputFilePath)
 
-score :: Scratchcard -> Int
-score (Scratchcard (_, winningNumbers, punterNumbers)) =
-  foldr go 0 punterNumbers
-  where
-    go n
-      | n `elem` winningNumbers = \case
-        0 -> 1
-        z -> 2 * z
-      | otherwise = id
+countWinners :: Scratchcard -> Int
+countWinners = Set.size . uncurry Set.intersection . unScratchcard
 
 scratchcard :: Parser Scratchcard
 scratchcard =
-  Scratchcard
-    <$> ( (,,) <$> (symbol "Card" *> posInt <* symbol ":")
-            <*> (some posInt <* symbol "|")
-            <*> some posInt
-        )
+  do
+    void (symbol "Card" *> posInt <* symbol ":")
+    winningNumbers <- Set.fromList <$> (some posInt <* symbol "|")
+    punterNumbers <- Set.fromList <$> some posInt
+    pure (Scratchcard (winningNumbers, punterNumbers))
 
 posInt :: Parser Int
 posInt = fromInteger <$> natural
 
 partOneExample :: IO Int
-partOneExample = partOne <$> parseString (some scratchcard) example
+partOneExample = partOne <$> getExample
+
+partTwoExample :: IO Int
+partTwoExample = partTwo <$> getExample
+
+getExample :: IO [Scratchcard]
+getExample = parseString (some scratchcard) example
 
 example :: String
 example =
