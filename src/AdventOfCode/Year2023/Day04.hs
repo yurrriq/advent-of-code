@@ -5,16 +5,15 @@ module AdventOfCode.Year2023.Day04 where
 import AdventOfCode.Input (parseInput, parseString)
 import AdventOfCode.TH (defaultMain, inputFilePath)
 import Control.Arrow ((>>>))
-import Control.Monad (void)
 import Data.IntMap.Strict ((!))
 import qualified Data.IntMap.Strict as IntMap
-import Data.List (intercalate)
+import Data.List (intercalate, sortOn)
 import Data.List.Extra (sumOn')
 import Data.Set (Set)
 import qualified Data.Set as Set
 import Text.Trifecta hiding (parseString)
 
-newtype Scratchcard = Scratchcard {unScratchcard :: (Set Int, Set Int)}
+newtype Scratchcard = Scratchcard {unScratchcard :: (Int, (Set Int, Set Int))}
   deriving (Eq, Ord, Show)
 
 main :: IO ()
@@ -28,28 +27,29 @@ partOne =
       k -> 2 ^ (k - 1)
 
 partTwo :: [Scratchcard] -> Int
-partTwo cards = sum . IntMap.elems $ foldl winCopies initial indexedCards
+partTwo cards = sum . IntMap.elems $ foldl winCopies initial sortedCards
   where
-    winCopies copies (i, card) =
+    winCopies copies card@(Scratchcard (i, _)) =
       case countWinners card of
         0 -> copies
         k -> foldl (flip (IntMap.adjust (+ copies ! i))) copies [i + 1 .. i + k]
-    initial = IntMap.fromList [(i, 1) | (i, _) <- indexedCards]
-    indexedCards = zip [1 ..] cards
+    initial = IntMap.fromList [(i, 1) | Scratchcard (i, _) <- cards]
+    sortedCards = sortOn (fst . unScratchcard) cards
 
 getInput :: IO [Scratchcard]
 getInput = parseInput (some scratchcard) $(inputFilePath)
 
 countWinners :: Scratchcard -> Int
-countWinners = Set.size . uncurry Set.intersection . unScratchcard
+countWinners (Scratchcard (_, (winners, numbers))) =
+  Set.size $ winners `Set.intersection` numbers
 
 scratchcard :: Parser Scratchcard
 scratchcard =
   do
-    void (symbol "Card" *> posInt <* symbol ":")
-    winningNumbers <- Set.fromList <$> (some posInt <* symbol "|")
-    punterNumbers <- Set.fromList <$> some posInt
-    pure (Scratchcard (winningNumbers, punterNumbers))
+    i <- symbol "Card" *> posInt <* symbol ":"
+    winners <- Set.fromList <$> (some posInt <* symbol "|")
+    numbers <- Set.fromList <$> some posInt
+    pure (Scratchcard (i, (winners, numbers)))
 
 posInt :: Parser Int
 posInt = fromInteger <$> natural
