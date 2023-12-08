@@ -6,6 +6,8 @@ import AdventOfCode.Input (parseInput, parseString)
 import AdventOfCode.TH (defaultMain, inputFilePath)
 import Control.Arrow ((>>>))
 import Control.Monad (void)
+import Data.IntMap.Strict ((!))
+import qualified Data.IntMap.Strict as IntMap
 import Data.List (intercalate)
 import Data.List.Extra (sumOn')
 import Data.Set (Set)
@@ -26,7 +28,14 @@ partOne =
       k -> 2 ^ (k - 1)
 
 partTwo :: [Scratchcard] -> Int
-partTwo = undefined
+partTwo cards = sum . IntMap.elems $ foldl winCopies initial indexedCards
+  where
+    winCopies copies (i, card) =
+      case countWinners card of
+        0 -> copies
+        k -> foldl (flip (IntMap.adjust (+ copies ! i))) copies [i + 1 .. i + k]
+    initial = IntMap.fromList [(i, 1) | (i, _) <- indexedCards]
+    indexedCards = zip [1 ..] cards
 
 getInput :: IO [Scratchcard]
 getInput = parseInput (some scratchcard) $(inputFilePath)
