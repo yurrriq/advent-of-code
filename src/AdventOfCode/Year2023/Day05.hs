@@ -1,8 +1,10 @@
+{-# LANGUAGE RecordWildCards #-}
+
 module AdventOfCode.Year2023.Day05 where
 
 import AdventOfCode.Input (parseInput, parseString)
 import AdventOfCode.TH (defaultMain, inputFilePath)
-import Data.Ix (inRange)
+import Data.Ix (inRange, range)
 import Data.List (find)
 import Linear.V3 (V3 (..))
 import Text.Trifecta hiding (parseString)
@@ -23,7 +25,10 @@ partOne (Almanac seedz s2ses s2fs f2ws w2ls l2ts t2hs h2ls) =
         Nothing -> input
 
 partTwo :: Almanac -> Int
-partTwo = undefined
+partTwo a@Almanac {..} = partOne (a {almanacSeeds = allSeeds})
+  where
+    allSeeds = concatMap expand (takeNth 2 ((zip <*> tail) almanacSeeds))
+    expand (start, len) = range (start, start + len - 1)
 
 getInput :: IO Almanac
 getInput = parseInput almanac $(inputFilePath)
@@ -96,3 +101,8 @@ example =
   \humidity-to-location map:\n\
   \60 56 37\n\
   \56 93 4\n"
+
+-- | Return a list of every nth element of a given list.
+takeNth :: Int -> [a] -> [a]
+takeNth _ [] = []
+takeNth n xs = head xs : takeNth n (drop n xs)
