@@ -2,10 +2,13 @@ module AdventOfCode.Year2023.Day05 where
 
 import AdventOfCode.Input (parseInput, parseString)
 import AdventOfCode.TH (defaultMain, inputFilePath)
-import Data.Interval (Extended (Finite), (<=..<))
+import Data.Interval (Extended (..), Interval, (<=..<))
+import qualified Data.Interval as Interval
 import Data.IntervalMap.Strict (IntervalMap)
-import qualified Data.IntervalMap.Strict as IntervalMap
+import qualified Data.IntervalMap.Strict as IMap
+import qualified Data.IntervalSet as ISet
 import Data.List (foldl')
+import Data.List.Split (chunksOf)
 import Text.Trifecta hiding (parseString)
 
 main :: IO ()
@@ -15,10 +18,24 @@ partOne :: Almanac -> Int
 partOne (Almanac (seeds, mappings)) =
   minimum $ map (flip (foldl' convert) mappings) seeds
   where
-    convert seed = maybe seed (seed +) . IntervalMap.lookup seed
+    convert seed = maybe seed (seed +) . IMap.lookup seed
 
 partTwo :: Almanac -> Int
-partTwo = undefined
+partTwo (Almanac (seeds, mappings)) =
+  fromFinite . Interval.lowerBound . ISet.span $
+    flip (foldl' convert) mappings $
+      ISet.fromList [mkInterval src len | [src, len] <- chunksOf 2 seeds]
+  where
+    convert iset imap = unmapped <> mapped
+      where
+        unmapped = ISet.difference iset (IMap.keysSet imap)
+        mapped =
+          ISet.fromList
+            [ Interval.mapMonotonic (+ delta) interval
+              | (interval, delta) <-
+                  IMap.toList (IMap.intersectionWith const imap seen)
+            ]
+        seen = IMap.fromList [(interval, ()) | interval <- ISet.toList iset]
 
 getInput :: IO Almanac
 getInput = parseInput almanac $(inputFilePath)
@@ -44,15 +61,23 @@ almanac =
 
 mapping :: Parser (IntervalMap Int Int)
 mapping =
-  fmap IntervalMap.fromList . some $
+  fmap IMap.fromList . some $
     do
       dst <- posInt
       src <- posInt
       len <- posInt
-      pure (Finite src <=..< Finite (src + len), dst - src)
+      pure (mkInterval src len, dst - src)
 
 posInt :: Parser Int
 posInt = fromInteger <$> natural
+
+fromFinite :: Extended r -> r
+fromFinite (Finite x) = x
+fromFinite NegInf = error "left unbounded interval"
+fromFinite PosInf = error "empty interval"
+
+mkInterval :: (Ord r, Num r) => r -> r -> Interval r
+mkInterval src len = Finite src <=..< Finite (src + len)
 
 getExample :: IO Almanac
 getExample = parseString almanac example
