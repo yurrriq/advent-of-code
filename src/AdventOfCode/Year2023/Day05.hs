@@ -1,64 +1,55 @@
-{-# LANGUAGE RecordWildCards #-}
-
 module AdventOfCode.Year2023.Day05 where
 
 import AdventOfCode.Input (parseInput, parseString)
 import AdventOfCode.TH (defaultMain, inputFilePath)
-import Data.Ix (inRange, range)
-import Data.List (find)
-import Linear.V3 (V3 (..))
+import Data.Interval (Extended (Finite), (<=..<))
+import Data.IntervalMap.Strict (IntervalMap)
+import qualified Data.IntervalMap.Strict as IntervalMap
+import Data.List (foldl')
 import Text.Trifecta hiding (parseString)
 
 main :: IO ()
 main = $(defaultMain)
 
 partOne :: Almanac -> Int
-partOne (Almanac seedz s2ses s2fs f2ws w2ls l2ts t2hs h2ls) =
-  minimum $
-    map
-      (go h2ls . go t2hs . go l2ts . go w2ls . go f2ws . go s2fs . go s2ses)
-      seedz
+partOne (Almanac (seeds, mappings)) =
+  minimum $ map (flip (foldl' convert) mappings) seeds
   where
-    go mappings input =
-      case find (\(V3 _ src len) -> inRange (src, src + len) input) mappings of
-        Just (V3 dst src _) -> input + (dst - src)
-        Nothing -> input
+    convert seed = maybe seed (seed +) . IntervalMap.lookup seed
 
 partTwo :: Almanac -> Int
-partTwo a@Almanac {..} = partOne (a {almanacSeeds = allSeeds})
-  where
-    allSeeds = concatMap expand (takeNth 2 ((zip <*> tail) almanacSeeds))
-    expand (start, len) = range (start, start + len - 1)
+partTwo = undefined
 
 getInput :: IO Almanac
 getInput = parseInput almanac $(inputFilePath)
 
-data Almanac = Almanac
-  { almanacSeeds :: [Int],
-    almanacSeedToSoil :: [V3 Int],
-    almanacSoilToFertilizer :: [V3 Int],
-    almanacFertilizerToWater :: [V3 Int],
-    almanacWaterToLight :: [V3 Int],
-    almanacLightToTemperature :: [V3 Int],
-    almanacTemperatureToHumidity :: [V3 Int],
-    almanacHumidityToLocation :: [V3 Int]
-  }
+newtype Almanac = Almanac {unAlmanac :: ([Int], [IntervalMap Int Int])}
   deriving (Show)
 
 almanac :: Parser Almanac
 almanac =
-  Almanac
-    <$> (symbol "seeds:" *> some posInt)
-    <*> (symbol "seed-to-soil map:" *> some mapping)
-    <*> (symbol "soil-to-fertilizer map:" *> some mapping)
-    <*> (symbol "fertilizer-to-water map:" *> some mapping)
-    <*> (symbol "water-to-light map:" *> some mapping)
-    <*> (symbol "light-to-temperature map:" *> some mapping)
-    <*> (symbol "temperature-to-humidity map:" *> some mapping)
-    <*> (symbol "humidity-to-location map:" *> some mapping)
+  do
+    seeds <- symbol "seeds:" *> some posInt
+    mappings <-
+      sequence
+        [ symbol "seed-to-soil map:" *> mapping,
+          symbol "soil-to-fertilizer map:" *> mapping,
+          symbol "fertilizer-to-water map:" *> mapping,
+          symbol "water-to-light map:" *> mapping,
+          symbol "light-to-temperature map:" *> mapping,
+          symbol "temperature-to-humidity map:" *> mapping,
+          symbol "humidity-to-location map:" *> mapping
+        ]
+    pure (Almanac (seeds, mappings))
 
-mapping :: Parser (V3 Int)
-mapping = V3 <$> posInt <*> posInt <*> posInt
+mapping :: Parser (IntervalMap Int Int)
+mapping =
+  fmap IntervalMap.fromList . some $
+    do
+      dst <- posInt
+      src <- posInt
+      len <- posInt
+      pure (Finite src <=..< Finite (src + len), dst - src)
 
 posInt :: Parser Int
 posInt = fromInteger <$> natural
@@ -101,8 +92,3 @@ example =
   \humidity-to-location map:\n\
   \60 56 37\n\
   \56 93 4\n"
-
--- | Return a list of every nth element of a given list.
-takeNth :: Int -> [a] -> [a]
-takeNth _ [] = []
-takeNth n xs = head xs : takeNth n (drop n xs)

@@ -43,6 +43,7 @@ library:
     - conduit
     - containers
     - cryptonite
+    - data-interval
     - data-ordlist
     - dlist
     - extra
@@ -441,6 +442,7 @@ executables:
     <<: *executable
     main: AdventOfCode.Year2023.Day05
     dependencies:
+      - data-interval
       - linear
 _benchmark: &benchmark
   ghc-options:
