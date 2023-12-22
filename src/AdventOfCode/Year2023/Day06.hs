@@ -2,7 +2,6 @@ module AdventOfCode.Year2023.Day06 where
 
 import AdventOfCode.Input (parseInput, parseString)
 import AdventOfCode.TH (defaultMain, inputFilePath)
-import AdventOfCode.Util (count)
 import Data.List.Extra (productOn')
 import Text.Trifecta (Parser, natural, some, symbol)
 
@@ -19,8 +18,13 @@ partTwo races = waysToWin (time, distance)
     distance = read $ concatMap (show . snd) races
 
 waysToWin :: (Int, Int) -> Int
-waysToWin (time, distance) =
-  count (\speed -> (time - speed) * speed > distance) [1 .. time - 1]
+waysToWin (time, distance) = maxTime - minTime + 1
+  where
+    maxTime = floor ((time' + delta) / 2)
+    minTime = ceiling ((time' - delta) / 2)
+    delta, time' :: Double
+    delta = sqrt $ time' ** 2 - 4 * fromIntegral distance
+    time' = fromIntegral time
 
 getInput :: IO [(Int, Int)]
 getInput = parseInput document $(inputFilePath)
