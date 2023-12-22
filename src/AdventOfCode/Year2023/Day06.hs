@@ -3,6 +3,7 @@ module AdventOfCode.Year2023.Day06 where
 import AdventOfCode.Input (parseInput, parseString)
 import AdventOfCode.TH (defaultMain, inputFilePath)
 import AdventOfCode.Util (count)
+import Control.Arrow ((***))
 import Data.Composition ((.:))
 import Data.FastDigits (digits, undigits)
 import Data.List.Extra (productOn')
@@ -18,19 +19,12 @@ partOne :: [Race] -> Int
 partOne = productOn' waysToWin
 
 partTwo :: [Race] -> Int
-partTwo = waysToWin . convert
+partTwo = waysToWin . Race . (undigits' *** undigits') . foldl go ([], [])
   where
-    convert races =
-      let (timeDigits, distanceDigits) = foldl go ([], []) races
-       in Race
-            ( fromInteger (undigits (10 :: Int) (concat timeDigits)),
-              fromInteger (undigits (10 :: Int) (concat distanceDigits))
-            )
-      where
-        go (timeDigits, distanceDigits) (Race (time, distance)) =
-          ( digits 10 (toInteger time) : timeDigits,
-            digits 10 (toInteger distance) : distanceDigits
-          )
+    go (timeDigits, distanceDigits) (Race (time, distance)) =
+      (digits' time : timeDigits, digits' distance : distanceDigits)
+    digits' = digits 10 . toInteger
+    undigits' = fromInteger . undigits (10 :: Int) . concat
 
 waysToWin :: Race -> Int
 waysToWin (Race (time, distance)) =
