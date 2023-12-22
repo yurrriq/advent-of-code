@@ -448,9 +448,7 @@ executables:
     <<: *executable
     main: AdventOfCode.Year2023.Day06
     dependencies:
-      - composition
       - extra
-      - fast-digits
 _benchmark: &benchmark
   ghc-options:
     - -threaded

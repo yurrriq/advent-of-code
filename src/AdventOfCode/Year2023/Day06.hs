@@ -3,46 +3,38 @@ module AdventOfCode.Year2023.Day06 where
 import AdventOfCode.Input (parseInput, parseString)
 import AdventOfCode.TH (defaultMain, inputFilePath)
 import AdventOfCode.Util (count)
-import Control.Arrow ((***))
-import Data.Composition ((.:))
-import Data.FastDigits (digits, undigits)
 import Data.List.Extra (productOn')
-import Text.Trifecta hiding (count, parseString)
-
-newtype Race = Race {unRace :: (Int, Int)}
-  deriving (Eq, Show)
+import Text.Trifecta (Parser, natural, some, symbol)
 
 main :: IO ()
 main = $(defaultMain)
 
-partOne :: [Race] -> Int
+partOne :: [(Int, Int)] -> Int
 partOne = productOn' waysToWin
 
-partTwo :: [Race] -> Int
-partTwo = waysToWin . Race . (undigits' *** undigits') . foldl go ([], [])
+partTwo :: [(Int, Int)] -> Int
+partTwo races = waysToWin (time, distance)
   where
-    go (timeDigits, distanceDigits) (Race (time, distance)) =
-      (digits' time : timeDigits, digits' distance : distanceDigits)
-    digits' = digits 10 . toInteger
-    undigits' = fromInteger . undigits (10 :: Int) . concat
+    time = read $ concatMap (show . fst) races
+    distance = read $ concatMap (show . snd) races
 
-waysToWin :: Race -> Int
-waysToWin (Race (time, distance)) =
+waysToWin :: (Int, Int) -> Int
+waysToWin (time, distance) =
   count (\speed -> (time - speed) * speed > distance) [1 .. time - 1]
 
-getInput :: IO [Race]
+getInput :: IO [(Int, Int)]
 getInput = parseInput document $(inputFilePath)
 
-document :: Parser [Race]
+document :: Parser [(Int, Int)]
 document =
-  zipWith (Race .: (,))
+  zip
     <$> (symbol "Time:" *> some posInt)
     <*> (symbol "Distance:" *> some posInt)
 
 posInt :: Parser Int
 posInt = fromInteger <$> natural
 
-getExample :: IO [Race]
+getExample :: IO [(Int, Int)]
 getExample = parseString document example
 
 example :: String
