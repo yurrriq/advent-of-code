@@ -4,6 +4,7 @@ import AdventOfCode.Input (parseInput, parseString)
 import AdventOfCode.TH (defaultMain, inputFilePath)
 import AdventOfCode.Util (count)
 import Data.Composition ((.:))
+import Data.FastDigits (digits, undigits)
 import Data.List.Extra (productOn')
 import Text.Trifecta hiding (count, parseString)
 
@@ -14,13 +15,26 @@ main :: IO ()
 main = $(defaultMain)
 
 partOne :: [Race] -> Int
-partOne = productOn' (go . unRace)
-  where
-    go (time, distance) =
-      count (\speed -> (time - speed) * speed > distance) [1 .. time - 1]
+partOne = productOn' waysToWin
 
 partTwo :: [Race] -> Int
-partTwo = undefined
+partTwo = waysToWin . convert
+  where
+    convert races =
+      let (timeDigits, distanceDigits) = foldl go ([], []) races
+       in Race
+            ( fromInteger (undigits (10 :: Int) (concat timeDigits)),
+              fromInteger (undigits (10 :: Int) (concat distanceDigits))
+            )
+      where
+        go (timeDigits, distanceDigits) (Race (time, distance)) =
+          ( digits 10 (toInteger time) : timeDigits,
+            digits 10 (toInteger distance) : distanceDigits
+          )
+
+waysToWin :: Race -> Int
+waysToWin (Race (time, distance)) =
+  count (\speed -> (time - speed) * speed > distance) [1 .. time - 1]
 
 getInput :: IO [Race]
 getInput = parseInput document $(inputFilePath)

@@ -450,6 +450,7 @@ executables:
     dependencies:
       - composition
       - extra
+      - fast-digits
 _benchmark: &benchmark
   ghc-options:
     - -threaded
