@@ -444,6 +444,12 @@ executables:
     dependencies:
       - data-interval
       - linear
+  aoc-2023-day06:
+    <<: *executable
+    main: AdventOfCode.Year2023.Day06
+    dependencies:
+      - composition
+      - extra
 _benchmark: &benchmark
   ghc-options:
     - -threaded
