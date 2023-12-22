@@ -39,8 +39,8 @@ game =
 revelation :: Parser (V3 Integer)
 revelation =
   natural >>= \n ->
-    for (V3 "red" "green" "blue") $
-      \color -> n <$ string color <|> pure 0
+    for (V3 "red" "green" "blue") $ \color ->
+      n <$ string color <|> pure 0
 
 example :: String
 example =
