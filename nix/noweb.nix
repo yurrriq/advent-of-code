@@ -53,7 +53,6 @@
       nativeBuildInputs = with pkgs; [
         noweb
         python3Packages.pygments
-        rnix-lsp
         xelatex-noweb
       ];
     };

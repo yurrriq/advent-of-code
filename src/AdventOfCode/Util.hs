@@ -23,7 +23,6 @@ module AdventOfCode.Util
   )
 where
 
-import Control.Applicative (liftA2)
 import Control.Arrow (second, (>>>))
 import Control.Comonad.Store (experiment)
 import Control.Lens (holesOf)
@@ -39,12 +38,12 @@ import Text.Trifecta (Parser, Result (..), parseByteString)
 
 type Frequencies a = Map a Int
 
-frequencies :: Ord a => [a] -> Frequencies a
+frequencies :: (Ord a) => [a] -> Frequencies a
 frequencies = foldr go Map.empty
   where
     go k = Map.insertWith (+) k 1
 
-frequenciesInt :: Foldable t => t Int -> IM.IntMap Int
+frequenciesInt :: (Foldable t) => t Int -> IM.IntMap Int
 frequenciesInt = foldr go IM.empty
   where
     go k = IM.insertWith (+) k 1
@@ -55,7 +54,7 @@ maybeParseByteString p =
     Failure _ -> Nothing
     Success res -> Just res
 
-hammingDistance :: Eq a => [a] -> [a] -> Maybe Integer
+hammingDistance :: (Eq a) => [a] -> [a] -> Maybe Integer
 hammingDistance (x : xs) (y : ys)
   | x /= y = (+ 1) <$> recur
   | otherwise = recur
@@ -64,10 +63,10 @@ hammingDistance (x : xs) (y : ys)
 hammingDistance [] [] = Just 0
 hammingDistance _ _ = Nothing
 
-hammingSimilar :: Eq a => Integer -> [a] -> [a] -> Bool
+hammingSimilar :: (Eq a) => Integer -> [a] -> [a] -> Bool
 hammingSimilar n xs = maybe False (<= n) . hammingDistance xs
 
-findFirstDup :: Ord a => [a] -> Maybe a
+findFirstDup :: (Ord a) => [a] -> Maybe a
 findFirstDup = go Set.empty
   where
     go _ [] = Nothing
@@ -75,7 +74,7 @@ findFirstDup = go Set.empty
       | x `Set.member` seen = Just x
       | otherwise = go (Set.insert x seen) xs
 
-scan :: Monoid m => [m] -> [m]
+scan :: (Monoid m) => [m] -> [m]
 scan = scanl mappend mempty
 
 count :: (a -> Bool) -> [a] -> Int
@@ -84,10 +83,10 @@ count p = length . filter p
 snoc :: [a] -> a -> [a]
 snoc xs x = xs ++ [x]
 
-wigglesum :: Traversable t => (a -> [a]) -> t a -> [t a]
+wigglesum :: (Traversable t) => (a -> [a]) -> t a -> [t a]
 wigglesum wiggle = holesOf traverse >=> experiment wiggle
 
-fix' :: Eq a => (a -> a) -> a -> a
+fix' :: (Eq a) => (a -> a) -> a -> a
 fix' f = fix (\g !x -> let fx = f x in if fx == x then x else g fx)
 
 adjacencies :: (Applicative f, Num a, Eq (f a), Traversable f) => [f a]
@@ -103,17 +102,17 @@ holes :: [a] -> [(a, [a])]
 holes [] = []
 holes (x : xs) = (x, xs) : map (second (x :)) (holes xs)
 
-(<&&>) :: Applicative f => f Bool -> f Bool -> f Bool
+(<&&>) :: (Applicative f) => f Bool -> f Bool -> f Bool
 (<&&>) = liftA2 (&&)
 
 infixr 3 <&&> -- same as (&&)
 
-(<||>) :: Applicative f => f Bool -> f Bool -> f Bool
+(<||>) :: (Applicative f) => f Bool -> f Bool -> f Bool
 (<||>) = liftA2 (||)
 
 infixr 2 <||> -- same as (||)
 
-(<.>) :: Functor f => (b -> c) -> (a -> f b) -> a -> f c
+(<.>) :: (Functor f) => (b -> c) -> (a -> f b) -> a -> f c
 (f <.> g) a = f <$> g a
 
 infixr 9 <.>

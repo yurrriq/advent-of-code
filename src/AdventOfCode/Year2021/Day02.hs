@@ -55,7 +55,7 @@ partTwo = solve (unDirection . untag) . map lift
     lift (Direction (V2 0 y)) = embed (Aim y)
     lift _ = error "Invalid direction"
 
-solve :: Monoid m => (m -> V2 Int) -> [m] -> Int
+solve :: (Monoid m) => (m -> V2 Int) -> [m] -> Int
 solve extract = product . extract . mconcat
 
 direction :: Parser Direction

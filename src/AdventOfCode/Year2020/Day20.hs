@@ -54,17 +54,17 @@ arrange edges layout pieces (hole : holes) =
     ((n, piece), remainingPieces) <- choices pieces
     orientedTile <- orientations piece
     let theTopEdge = topEdge orientedTile
-    guard $
-      maybe
+    guard
+      $ maybe
         (normalizeEdge theTopEdge `Set.member` edges)
         ((theTopEdge ==) . bottomEdge . snd)
-        $ layout !? (_y -~ 1) hole
+      $ layout !? (_y -~ 1) hole
     let theLeftEdge = leftEdge orientedTile
-    guard $
-      maybe
+    guard
+      $ maybe
         (normalizeEdge theLeftEdge `Set.member` edges)
         ((theLeftEdge ==) . rightEdge . snd)
-        $ layout !? (_x -~ 1) hole
+      $ layout !? (_x -~ 1) hole
     arrange edges (Map.insert hole (n, orientedTile) layout) remainingPieces holes
 
 findEdges :: [LabeledTile] -> Set [Int]

@@ -29,7 +29,7 @@ instance (Functor v, KnownNat n, forall a. VG.Vector v a) => Additive (VGS.Vecto
   liftU2 = VGS.zipWith
   liftI2 = VGS.zipWith
 
-instance KnownNat n => Num (STM n) where
+instance (KnownNat n) => Num (STM n) where
   STM x + STM y = STM (x ^+^ y)
   STM x - STM y = STM (x ^-^ y)
   STM x * STM y = STM (x !*! y)
@@ -38,7 +38,7 @@ instance KnownNat n => Num (STM n) where
   signum = undefined
   fromInteger = STM . scaled . fromInteger
 
-instance KnownNat n => Semigroup (STM n) where
+instance (KnownNat n) => Semigroup (STM n) where
   STM x <> STM y = STM (x !*! y)
 
 main :: IO ()
@@ -67,7 +67,9 @@ mkState = foldr ((%~ succ) . VS.ix) (pure 0)
 
 stm :: STM 9
 stm =
-  STM . fromJust . VS.fromListN
+  STM
+    . fromJust
+    . VS.fromListN
     . mapMaybe VS.fromListN
     $ [ [0, 1, 0, 0, 0, 0, 0, 0, 0],
         [0, 0, 1, 0, 0, 0, 0, 0, 0],

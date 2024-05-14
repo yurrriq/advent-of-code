@@ -56,7 +56,8 @@ partTwo xxs = solve 5 neighborhood grid
 
 solve :: Int -> Map Point (Set Point) -> Map Point Bool -> Int
 solve n neighborhood =
-  Map.size . Map.filter id
+  Map.size
+    . Map.filter id
     . fix' (musicalChairs n neighborhood)
 
 -- TODO: Control.Lens tricks with indexed

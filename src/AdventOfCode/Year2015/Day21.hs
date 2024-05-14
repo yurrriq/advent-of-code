@@ -3,7 +3,7 @@
 module AdventOfCode.Year2015.Day21 where
 
 import AdventOfCode.TH (defaultMain)
-import Control.Applicative (liftA2)
+import Combinatorics (variate)
 import Control.Arrow (second, (>>>))
 import Control.Lens (views, (&), (+~), (-~), (^.), _1, _2)
 import Control.Monad (ap)
@@ -11,7 +11,6 @@ import Data.Foldable (foldl')
 import Data.List.HT (takeUntil)
 import Data.Tuple.Extra (both)
 import Linear (V3 (..), _x, _y, _yz, _z)
-import Math.Combinat.Sets (choose)
 
 type Item = (String, V3 Int)
 
@@ -39,9 +38,9 @@ allPlayers =
     foldl'
       (liftA2 (++))
       [[]]
-      [ choose 1 weapons,
-        [] : choose 1 armors,
-        [] : choose 1 rings ++ choose 2 rings
+      [ variate 1 weapons,
+        [] : variate 1 armors,
+        [] : variate 1 rings ++ variate 2 rings
       ]
 
 weapons :: [Item]

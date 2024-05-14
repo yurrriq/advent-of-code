@@ -80,7 +80,7 @@ nonnegInt = fromIntegral <$> natural
 manhattanDistance :: Point -> Point -> Int
 manhattanDistance = curry $ (distanceOn _x &&& distanceOn _y) >>> uncurry (+)
   where
-    distanceOn :: Num a => (b -> a) -> (b, b) -> a
+    distanceOn :: (Num a) => (b -> a) -> (b, b) -> a
     distanceOn f = abs . uncurry (subtract `on` f)
 
 findCrossings :: [Point] -> [Point] -> Set Point

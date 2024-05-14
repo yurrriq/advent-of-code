@@ -11,10 +11,10 @@ import Prelude hiding (foldMap)
 -- | A directed graph with labeled edges.
 type Digraph vertex edgeLabel = Map vertex (Map vertex edgeLabel)
 
-allAnscestors :: Ord v => Digraph v e -> Map v (Set v)
+allAnscestors :: (Ord v) => Digraph v e -> Map v (Set v)
 allAnscestors = allDescendants . transpose
 
-allDescendants :: Ord v => Digraph v e -> Map v (Set v)
+allDescendants :: (Ord v) => Digraph v e -> Map v (Set v)
 allDescendants = foldMap S.singleton (const id)
 
 -- | Map each vertex into a monoid, transform with the edge label, and
@@ -28,7 +28,7 @@ foldMap f g graph = graph'
     go k v = f k <> F.foldMap (g v) (M.lookup k graph')
 
 -- | Reverse all the edges of a directed graph, preserving the labels.
-transpose :: Ord v => Digraph v e -> Digraph v e
+transpose :: (Ord v) => Digraph v e -> Digraph v e
 transpose dag =
   M.fromListWith
     M.union

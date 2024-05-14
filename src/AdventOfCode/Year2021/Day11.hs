@@ -59,10 +59,10 @@ go (flashes, octopuses) =
 flash :: (Set (V2 Int), Map (V2 Int) Int) -> V2 Int -> Int -> (Set (V2 Int), Map (V2 Int) Int)
 flash (flashes, octopuses) coords octopus
   | octopus > 9 =
-    let neighbors = neighborsInRange (pure 0, pure 9) coords
-        flashes' = S.insert coords flashes
-        octopuses' = M.delete coords octopuses
-     in go (flashes', foldl (flip (M.alter (fmap succ))) octopuses' neighbors)
+      let neighbors = neighborsInRange (pure 0, pure 9) coords
+          flashes' = S.insert coords flashes
+          octopuses' = M.delete coords octopuses
+       in go (flashes', foldl (flip (M.alter (fmap succ))) octopuses' neighbors)
   | otherwise = (flashes, octopuses)
 
 partTwo :: Map (V2 Int) Int -> Int

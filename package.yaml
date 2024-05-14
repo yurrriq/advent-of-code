@@ -37,7 +37,7 @@ library:
   dependencies:
     - aeson
     - arithmoi
-    - combinat
+    - combinatorial
     - comonad
     - composition
     - conduit
@@ -144,7 +144,7 @@ executables:
     <<: *executable
     main: AdventOfCode.Year2015.Day21
     dependencies:
-      - combinat
+      - combinatorial
       - extra
       - linear
       - utility-ht

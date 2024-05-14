@@ -7,8 +7,8 @@
       url = "github:nix-community/emacs-overlay";
     };
     flake-parts.url = "github:hercules-ci/flake-parts";
-    nixpkgs.url = "github:nixos/nixpkgs/release-22.11"; # FIXME
-    nixpkgs-stable.follows = "nixpkgs"; # FIXME
+    nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
+    nixpkgs-stable.url = "github:nixos/nixpkgs/release-23.11";
     pre-commit-hooks-nix = {
       inputs = {
         nixpkgs.follows = "nixpkgs";

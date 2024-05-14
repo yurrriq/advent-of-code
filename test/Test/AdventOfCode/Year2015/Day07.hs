@@ -16,16 +16,19 @@ test_day07_examples =
     [ testCase "the example evaluates correctly" $
         do
           let input =
-                fromJust . \case { Success c -> Just c; Failure _ -> Nothing } . parseString circuit mempty . unlines $
-                  [ "123 -> x",
-                    "456 -> y",
-                    "x AND y -> d",
-                    "x OR y -> e",
-                    "x LSHIFT 2 -> f",
-                    "y RSHIFT 2 -> g",
-                    "NOT x -> h",
-                    "NOT y -> i"
-                  ]
+                fromJust
+                  . \case Success c -> Just c; Failure _ -> Nothing
+                  . parseString circuit mempty
+                  . unlines
+                  $ [ "123 -> x",
+                      "456 -> y",
+                      "x AND y -> d",
+                      "x OR y -> e",
+                      "x LSHIFT 2 -> f",
+                      "y RSHIFT 2 -> g",
+                      "NOT x -> h",
+                      "NOT y -> i"
+                    ]
           let expected =
                 Map.fromList
                   [ ("d", 72),

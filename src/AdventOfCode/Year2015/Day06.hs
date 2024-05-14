@@ -63,12 +63,12 @@ partOne = howBright (Map.empty :: Map Location SimpleLight)
 partTwo :: [Instruction] -> Int
 partTwo = howBright (Map.empty :: Map Location Dimmer)
 
-howBright :: Light a => Map Location a -> [Instruction] -> Int
+howBright :: (Light a) => Map Location a -> [Instruction] -> Int
 howBright emptyGrid instructions =
   foldr ((+) . brightness) 0 $
     execState (mapM_ runInstruction instructions) emptyGrid
 
-runInstruction :: Light a => Instruction -> State (Map Location a) ()
+runInstruction :: (Light a) => Instruction -> State (Map Location a) ()
 runInstruction (Instruction op locations) = forM_ (range locations) $ \loc ->
   modify (Map.alter (Just . alter op . fromMaybe off) loc)
 

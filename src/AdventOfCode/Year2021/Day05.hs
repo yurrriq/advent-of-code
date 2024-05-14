@@ -3,7 +3,7 @@ module AdventOfCode.Year2021.Day05 where
 import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (defaultMain, inputFilePath)
 import AdventOfCode.Util (frequencies)
-import Control.Applicative (Alternative (..), liftA2)
+import Control.Applicative (Alternative (..))
 import Control.Lens ((^.))
 import qualified Data.Map as M
 import Linear (V2 (..), (*^), _x, _y)
@@ -89,7 +89,10 @@ showField vents =
 
 showVent :: Vent -> String
 showVent (V2 (V2 x1 y1) (V2 x2 y2)) =
-  show x1 <> "," <> show y1 <> " -> "
+  show x1
+    <> ","
+    <> show y1
+    <> " -> "
     <> show x2
     <> ","
     <> show y2

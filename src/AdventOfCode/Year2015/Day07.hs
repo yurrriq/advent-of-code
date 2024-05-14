@@ -5,7 +5,7 @@ module AdventOfCode.Year2015.Day07 where
 
 import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (inputFilePath)
-import Control.Applicative (liftA2, (<|>))
+import Control.Applicative ((<|>))
 import Control.Monad.Reader
 import Data.Bits (Bits (..), complement, shiftL, shiftR, (.&.), (.|.))
 import Data.Function (on)

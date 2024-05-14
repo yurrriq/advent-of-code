@@ -46,11 +46,11 @@ data Grid
 instance Show Grid where
   show (Grid (width, height) asteroids) =
     concat $
-      [ '\n' :
-        concat
-          [ maybe "." (show . HM.size) (HM.lookup (x, y) asteroids)
-            | x <- [0 .. width - 1]
-          ]
+      [ '\n'
+          : concat
+            [ maybe "." (show . HM.size) (HM.lookup (x, y) asteroids)
+              | x <- [0 .. width - 1]
+            ]
         | y <- [0 .. height - 1]
       ]
 

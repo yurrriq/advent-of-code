@@ -21,7 +21,7 @@ partOne = countPairwiseIncreases 1
 partTwo :: [Integer] -> Int
 partTwo = countPairwiseIncreases 3
 
-countPairwiseIncreases :: Ord a => Int -> [a] -> Int
+countPairwiseIncreases :: (Ord a) => Int -> [a] -> Int
 countPairwiseIncreases n =
   count (== LT)
     . uncurry (zipWith compare)

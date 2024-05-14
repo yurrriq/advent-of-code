@@ -1,3 +1,5 @@
+{-# LANGUAGE TupleSections #-}
+
 module AdventOfCode.Year2015.Day13 where
 
 import AdventOfCode.Input
@@ -27,7 +29,7 @@ partTwo :: PotentialHappiness -> Integer
 partTwo input =
   maxHappiness . HM.union (HM.map (HM.insert "Me" 0) input) $
     HM.singleton "Me" . HM.fromList $
-      zip (invitees input) (repeat 0)
+      map (,0) (invitees input)
 
 maxHappiness :: PotentialHappiness -> Integer
 maxHappiness input =

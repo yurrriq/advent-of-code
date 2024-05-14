@@ -2,7 +2,6 @@ module AdventOfCode.Year2022.Day04 where
 
 import AdventOfCode.Input (parseInput, parseString)
 import AdventOfCode.TH (defaultMain, inputFilePath)
-import Control.Applicative (liftA2)
 import Data.Ix (inRange)
 import Data.Tuple (swap)
 import Text.Trifecta (Parser, char, comma, decimal, newline, sepEndBy)

@@ -3,7 +3,8 @@
 module AdventOfCode.Year2015.Day12 (main) where
 
 import AdventOfCode.TH (defaultMain, inputFilePath)
-import Control.Monad.Reader (Reader, asks, foldM, runReader)
+import Control.Monad (foldM)
+import Control.Monad.Reader (Reader, asks, runReader)
 import Data.Aeson (Array, Object, Value (..), decodeFileStrict')
 import qualified Data.Aeson.KeyMap as KM
 import Data.Bool (bool)

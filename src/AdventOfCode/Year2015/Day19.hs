@@ -37,7 +37,7 @@ expand :: Problem Atom -> [Molecule]
 expand (formulae :-> goal) = expansions formulae goal
 
 -- https://github.com/amalloy/advent-of-code/blob/master/day19/src.hs
-expansions :: Ord a => Grammar a -> [a] -> [[a]]
+expansions :: (Ord a) => Grammar a -> [a] -> [[a]]
 expansions _ [] = []
 expansions m (x : xs) = leaveAlone ++ expandHere
   where
@@ -57,5 +57,5 @@ replacements =
 replacement :: Parser (Atom, Molecule)
 replacement = (,) <$> token atom <* symbol "=>" <*> token molecule
 
-count :: Eq a => a -> [a] -> Int
+count :: (Eq a) => a -> [a] -> Int
 count x = length . filter (== x)

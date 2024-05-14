@@ -32,7 +32,7 @@ partOne :: [Pair] -> Int
 partOne = sum . fmap totalEnergy . (!! 1000) . iterate step
 
 partTwo :: [Pair] -> Int
-partTwo = foldr lcm 1 . fmap period . traverse transpose
+partTwo = foldr (lcm . period) 1 . traverse transpose
 
 type Pair = (Dimensions, Dimensions)
 
@@ -56,19 +56,19 @@ period :: (Eq a, Num a) => [(a, a)] -> Int
 period initial =
   1 + length (takeWhile (/= initial) (iterate step (step initial)))
 
-step :: Num a => [(a, a)] -> [(a, a)]
+step :: (Num a) => [(a, a)] -> [(a, a)]
 step = fmap applyVelocity . applyGravities
 
-applyGravities :: Num a => [(a, a)] -> [(a, a)]
+applyGravities :: (Num a) => [(a, a)] -> [(a, a)]
 applyGravities moons = fmap (`applyGravity` moons) moons
 
-applyGravity :: Num a => (a, a) -> [(a, a)] -> (a, a)
+applyGravity :: (Num a) => (a, a) -> [(a, a)] -> (a, a)
 applyGravity = foldr stepVelocity
   where
     stepVelocity there = second =<< (pull `on` fst) there
     pull there here = (+ signum (there - here))
 
-applyVelocity :: Num a => (a, a) -> (a, a)
+applyVelocity :: (Num a) => (a, a) -> (a, a)
 applyVelocity (pos, vel) = (pos + vel, vel)
 
 totalEnergy :: Pair -> Int

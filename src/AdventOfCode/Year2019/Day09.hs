@@ -252,5 +252,5 @@ mkValue 1 = ImmediateMode
 mkValue 2 = RelativeMode
 mkValue _ = error "Invalid parameter mode"
 
-await' :: Monad m => ConduitT i o m i
+await' :: (Monad m) => ConduitT i o m i
 await' = maybe (error "Missing input") pure =<< await

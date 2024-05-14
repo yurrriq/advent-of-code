@@ -33,7 +33,8 @@ partTwo = doPartTwo 100 100
 
 doPartTwo :: Int -> Int -> Set (V2 Int) -> Int
 doPartTwo size i =
-  Set.size . (!! i)
+  Set.size
+    . (!! i)
     . iterate (lightCorners . stepAnimation bounds)
     . lightCorners
   where

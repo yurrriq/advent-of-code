@@ -36,7 +36,7 @@ partOne = solve stepOne (pure 0, E)
 partTwo :: [Instruction] -> Int
 partTwo = solve stepTwo (pure 0, E, V2 10 (-1))
 
-solve :: Field1 a a (V2 Int) (V2 Int) => (Instruction -> a -> a) -> a -> [Instruction] -> Int
+solve :: (Field1 a a (V2 Int) (V2 Int)) => (Instruction -> a -> a) -> a -> [Instruction] -> Int
 solve f initialState = sum . abs . view _1 . foldl (flip f) initialState
 
 stepOne :: Instruction -> (V2 Int, Heading) -> (V2 Int, Heading)

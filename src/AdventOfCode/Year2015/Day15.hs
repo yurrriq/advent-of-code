@@ -4,7 +4,6 @@ module AdventOfCode.Year2015.Day15 where
 
 import AdventOfCode.Input
 import AdventOfCode.TH
-import Control.Applicative (liftA2)
 import Control.Lens hiding (transform)
 import Data.Monoid
 import Text.Trifecta
@@ -26,10 +25,10 @@ instance Applicative Ingredient where
   Ingredient a b c d e <*> Ingredient f g h i j = Ingredient (a f) (b g) (c h) (d i) (e j)
   {-# INLINE (<*>) #-}
 
-instance Semigroup a => Semigroup (Ingredient a) where
+instance (Semigroup a) => Semigroup (Ingredient a) where
   (<>) = liftA2 (<>)
 
-instance Monoid a => Monoid (Ingredient a) where
+instance (Monoid a) => Monoid (Ingredient a) where
   mempty = pure mempty
 
 main :: IO ()
@@ -54,7 +53,8 @@ bestCookie tsp transform ingredients =
 
 score :: (Ingredient Integer -> Ingredient Integer) -> [Ingredient (Product Integer)] -> Integer
 score transform =
-  getProduct . product
+  getProduct
+    . product
     . (calories .~ mempty)
     . fmap Product
     . transform
@@ -72,7 +72,7 @@ ingredient =
     [a, b, c, d, e] <- commaSep (token (some letter) *> integer)
     pure $ Ingredient a b c d e
 
-splits :: Integral a => a -> a -> [[a]]
+splits :: (Integral a) => a -> a -> [[a]]
 splits _ 0 = []
 splits n 1 = [[n]]
 splits n k =

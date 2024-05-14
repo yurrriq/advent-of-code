@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -Wno-incomplete-uni-patterns #-}
+
 module AdventOfCode.Year2023.Day03 where
 
 import AdventOfCode.Input (parseInput, parseString)
@@ -56,7 +58,7 @@ isNumberAdjacentToSymbol hm (V2 x y) (Number n) =
       _ -> False
 isNumberAdjacentToSymbol _ _ _ = False
 
-allNeighborsOf :: Show a => V2 Int -> a -> Set (V2 Int)
+allNeighborsOf :: (Show a) => V2 Int -> a -> Set (V2 Int)
 allNeighborsOf (V2 x y) n =
   flip Set.difference (Set.fromList points) $
     foldr ((<>) . neighborsOf) Set.empty points

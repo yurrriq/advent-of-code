@@ -1,3 +1,5 @@
+{-# OPTIONS_GHC -Wno-incomplete-uni-patterns #-}
+
 module AdventOfCode.Year2019.Day07 where
 
 import AdventOfCode.Input (parseInput)
@@ -5,7 +7,7 @@ import AdventOfCode.TH (inputFilePath)
 import Control.Monad (forM, liftM2, when)
 import Control.Monad.State (get, gets, lift, put)
 import Control.Monad.Trans.State.Strict (StateT, execStateT)
-import Data.Conduit
+import Data.Conduit (ConduitM, ConduitT, await, runConduit, yield, (.|))
 import Data.Conduit.Lift (evalStateC)
 import Data.FastDigits (digits)
 import Data.List (permutations)
@@ -69,8 +71,8 @@ data Instruction
   deriving (Eq, Show)
 
 data Value
-  = PositionMode Int
-  | ImmediateMode Int
+  = PositionMode !Int
+  | ImmediateMode !Int
   deriving (Eq, Show)
 
 -- ------------------------------------------------------------------ [ Parser ]
@@ -236,5 +238,5 @@ fuseAmp phase =
     yield phase
     yield input
 
-await' :: Monad m => ConduitT i o m i
+await' :: (Monad m) => ConduitT i o m i
 await' = maybe (error "Missing input") pure =<< await

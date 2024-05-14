@@ -33,7 +33,7 @@ fromChar c
     unit = packFinite . fromIntegral $ ((-) `on` ord) (toLower c) 'a'
 
 -- As per [the documentation][returnFree], `returnFree` is an [injective][] map
---  that embeds generators into a [free algebra][] ([`FreeAlgebra`][]).
+-- that embeds generators into a [free algebra][] ([`FreeAlgebra`][]).
 
 inject :: Char -> FG.FreeGroupL Unit
 inject = foldMap (either returnFree (invert . returnFree)) . fromChar

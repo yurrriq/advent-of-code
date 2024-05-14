@@ -6,7 +6,7 @@ import AdventOfCode.Util (wigglesum)
 import Control.Applicative ((<|>))
 import Control.Lens
 import Control.Monad.State (State, evalState, get, gets)
-import Data.Either (rights)
+import Data.Either (fromLeft, rights)
 import Text.Parser.Token.Highlight (Highlight (..))
 import Text.Trifecta (Parser, highlight, integer, some, symbol, (<?>))
 
@@ -19,9 +19,9 @@ data Operation
   deriving (Eq, Show)
 
 data ProgState = ProgState
-  { _cursor :: Int,
-    _history :: [Int],
-    _accumulator :: Int
+  { _cursor :: !Int,
+    _history :: ![Int],
+    _accumulator :: !Int
   }
   deriving (Eq, Show)
 
@@ -40,11 +40,12 @@ getInput :: IO [Instruction]
 getInput = parseInput (some instruction) $(inputFilePath)
 
 partOne :: [Instruction] -> Int
-partOne prog = answer where Left answer = evalState (program prog) initialState
+partOne prog = fromLeft 0 $ evalState (program prog) initialState
 
 partTwo :: [Instruction] -> Int
 partTwo =
-  head . rights
+  head
+    . rights
     . map (flip evalState initialState . program)
     . wigglesum (_1 wiggle)
   where

@@ -1,8 +1,11 @@
+{-# LANGUAGE TupleSections #-}
+
 module AdventOfCode.Year2015.Day14 where
 
 import AdventOfCode.Input
 import AdventOfCode.TH
 import Control.Lens
+import Control.Monad (unless)
 import Control.Monad.State
 import Text.Trifecta hiding (position)
 
@@ -52,7 +55,7 @@ partTwo flyers = maximum . map (_score . snd) $ foldl go xs [1 :: Integer .. 250
     go ys = const $ zip flyers $ awardPoint $ map snd zs
       where
         zs = map (\(flyer, st) -> (flyer, execState (step flyer) st)) ys
-    xs = zip flyers (repeat (ReindeerState 0 0 0 0))
+    xs = map (,ReindeerState 0 0 0 0) flyers
 
 run :: Integer -> Reindeer -> ReindeerState
 run seconds flyer =

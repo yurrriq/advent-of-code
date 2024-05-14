@@ -2,7 +2,7 @@ module AdventOfCode.Year2023.Day02 where
 
 import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (defaultMain, inputFilePath)
-import Control.Applicative (liftA2, (<|>))
+import Control.Applicative ((<|>))
 import Data.List.Extra (sumOn')
 import Data.Traversable (for)
 import Linear (V3 (..))
@@ -32,8 +32,9 @@ game =
   fmap Game $
     symbol "Game"
       *> ( (,)
-             <$> natural <* symbol ":"
-               <*> (sum <$> revelation `sepBy` comma) `sepBy` symbol ";"
+             <$> natural
+             <* symbol ":"
+             <*> (sum <$> revelation `sepBy` comma) `sepBy` symbol ";"
          )
 
 revelation :: Parser (V3 Integer)

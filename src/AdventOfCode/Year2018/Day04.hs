@@ -53,7 +53,9 @@ data Event
 shift :: Parser Event
 shift =
   Shift . Guard
-    <$> ( symbol "Guard" *> char '#' *> natural
+    <$> ( symbol "Guard"
+            *> char '#'
+            *> natural
             <* symbol "begins shift"
         )
 

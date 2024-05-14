@@ -87,5 +87,5 @@ scoreBracket = either autocomplete illegal
       Angle -> 25137
 
 -- length must be odd
-medianOdd :: Ord a => [a] -> a
+medianOdd :: (Ord a) => [a] -> a
 medianOdd xs = sort xs !! (length xs `div` 2)

@@ -14,7 +14,7 @@
     devShells.emacs = pkgs.mkShell {
       nativeBuildInputs = with pkgs; [
         myEmacs
-        rnix-lsp
+        nixd
       ];
     };
   };

@@ -19,7 +19,8 @@ partOne = length . solutions
 
 partTwo :: [Int] -> Int
 partTwo =
-  minimum . map length
+  minimum
+    . map length
     . group
     . sort
     . map length

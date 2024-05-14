@@ -34,7 +34,7 @@ partOne :: Image -> Int
 partOne layers = numberOf White layer * numberOf Transparent layer
   where
     layer = minimumBy (compare `on` numberOf Black) layers
-    numberOf :: Eq a => a -> [[a]] -> Int
+    numberOf :: (Eq a) => a -> [[a]] -> Int
     numberOf x = sum . fmap (length . filter (== x))
 
 partTwo :: Image -> String
