@@ -37,6 +37,7 @@ library:
   dependencies:
     - aeson
     - arithmoi
+    - astar
     - combinatorial
     - comonad
     - composition
@@ -51,6 +52,7 @@ library:
     - finite-typelits
     - free-algebras
     - groups
+    - hashable
     - lens
     - linear
     - monoid-extras
@@ -60,6 +62,7 @@ library:
     - safe
     - scientific
     - transformers
+    - unordered-containers
     - utility-ht
     - vector
     - vector-sized
@@ -148,6 +151,20 @@ executables:
       - extra
       - linear
       - utility-ht
+  aoc-2015-day22:
+    <<: *executable
+    main: AdventOfCode.Year2015.Day22
+    dependencies:
+      - astar
+      - extra
+      - hashable
+      - unordered-containers
+    other-modules:
+      - AdventOfCode.Input
+      - AdventOfCode.TH
+      - AdventOfCode.Util
+      - AdventOfCode.Year2015.Day22.Types
+      - Paths_advent_of_code
   aoc-2016-day05:
     <<: *executable
     main: AdventOfCode.Year2016.Day05
