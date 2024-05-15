@@ -25,6 +25,7 @@ import AdventOfCode.Util ((<&&>), (<||>))
 import AdventOfCode.Year2015.Day22.Types
 import Control.Arrow (first)
 import Control.Lens (Getter, over, view, views, (%~), (+~), (-~), (.~), (^.))
+import Data.Bool (bool)
 import Data.Function ((&))
 import Data.Graph.AStar (aStar)
 import qualified Data.HashMap.Strict as HashMap
@@ -39,8 +40,10 @@ main = $(defaultMainMaybe)
 partOne :: GameState -> Maybe Int
 partOne =
   fmap (view (player . manaSpent) . last)
-    . aStar neighbors distance spamMagicMissile isBossDead
+    . aStar neighbors distance heuristic isBossDead
   where
+    -- FIXME: wtf
+    heuristic state = bool (spamMagicMissile state) 1 (state ^. hardMode)
     spamMagicMissile = views (boss . hitPoints) ((* 53) . (+ 1) . (`div` 4))
     neighbors state =
       if isGameOver state
@@ -50,7 +53,7 @@ partOne =
     nexts = HashMap.fromList . runTurn
 
 partTwo :: GameState -> Maybe Int
-partTwo = undefined
+partTwo = partOne . (hardMode .~ True)
 
 -- ---------------------------------------------------------------- [ Examples ]
 
@@ -84,7 +87,8 @@ getInput =
                 _playerMana = 500,
                 _playerManaSpent = 0
               },
-          _gameStateActiveEffects = []
+          _gameStateActiveEffects = [],
+          _gameStateHardMode = False
         }
 
 parseBoss :: Parser Boss
@@ -107,9 +111,12 @@ grimoire =
 -- -------------------------------------------------------------- [ Turn Logic ]
 
 runTurn :: GameState -> [(GameState, Int)]
-runTurn st = case st ^. turn of
-  TurnPlayer -> first (turn .~ TurnBoss) <$> playerAttacks (runEffects st)
-  TurnBoss -> [(turn .~ TurnPlayer $ bossAttack (runEffects st), 0)]
+runTurn state =
+  case state ^. turn of
+    TurnPlayer -> first (turn .~ TurnBoss) <$> playerAttacks nextState
+    TurnBoss -> [(turn .~ TurnPlayer $ bossAttack nextState, 0)]
+  where
+    nextState = runEffects state
 
 runEffects :: GameState -> GameState
 runEffects state =
@@ -118,8 +125,9 @@ runEffects state =
     else newState & (player . armor) .~ 0
   where
     newState =
-      over activeEffects decrementTimers $
-        foldr runEffect state (views activeEffects (map fst) state)
+      runHardModeEffect $
+        over activeEffects decrementTimers $
+          foldr runEffect state (views activeEffects (map fst) state)
     decrementTimers = filter ((> 0) . snd) . map (fmap (subtract 1))
 
 runEffect :: SpellEffect -> GameState -> GameState
@@ -127,12 +135,20 @@ runEffect Shield = (player . armor) .~ 7
 runEffect Poison = (boss . hitPoints) -~ 3
 runEffect Recharge = (player . mana) +~ 101
 
+runHardModeEffect :: GameState -> GameState
+runHardModeEffect =
+  bool id ((player . hitPoints) -~ 1)
+    =<< (view hardMode <&&> views turn (== TurnPlayer))
+
 playerAttacks :: GameState -> [(GameState, Int)]
 playerAttacks state =
-  [ ((player . manaSpent) +~ cost $ (player . mana) -~ cost $ cast rule state, cost)
-    | spell@(cost, rule) <- grimoire,
-      canCast spell state
-  ]
+  if isPlayerDead state
+    then []
+    else
+      [ ((player . manaSpent) +~ cost $ (player . mana) -~ cost $ cast rule state, cost)
+        | spell@(cost, rule) <- grimoire,
+          canCast spell state
+      ]
 
 cast :: SpellRule -> GameState -> GameState
 cast (Instant MagicMissile) = (boss . hitPoints) -~ 4
@@ -140,7 +156,10 @@ cast (Instant Drain) = (boss . hitPoints -~ 2) . (player . hitPoints +~ 2)
 cast (Effect effect turns) = activeEffects %~ ((effect, turns) :)
 
 bossAttack :: GameState -> GameState
-bossAttack state = (player . hitPoints) -~ actualDamage $ state
+bossAttack state =
+  if isBossDead state
+    then state
+    else (player . hitPoints) -~ actualDamage $ state
   where
     playerArmor = view (player . armor) state
     actualDamage = views (boss . damage) (max 1 . subtract playerArmor) state

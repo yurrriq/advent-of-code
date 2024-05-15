@@ -65,7 +65,8 @@ data GameState = GameState
   { _gameStateTurn :: !GameTurn,
     _gameStateBoss :: !Boss,
     _gameStatePlayer :: !Player,
-    _gameStateActiveEffects :: ![(SpellEffect, Int)]
+    _gameStateActiveEffects :: ![(SpellEffect, Int)],
+    _gameStateHardMode :: !Bool
   }
   deriving (Eq, Generic, Ord, Show)
 
