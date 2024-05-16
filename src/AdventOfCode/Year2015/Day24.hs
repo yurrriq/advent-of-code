@@ -19,16 +19,20 @@ main :: IO ()
 main = $(defaultMain)
 
 partOne :: [Int] -> Int
-partOne xs = minimalArrangement (sum xs `div` 3) xs
+partOne = balanceTheSleigh 3
 
 partTwo :: [Int] -> Int
-partTwo = undefined
+partTwo = balanceTheSleigh 4
 
 getInput :: IO [Int]
 getInput = parseInput (some (fromInteger <$> natural)) $(inputFilePath)
 
 example :: [Int]
 example = [1 .. 5] ++ [7 .. 11]
+
+balanceTheSleigh :: Int -> [Int] -> Int
+balanceTheSleigh numGroups packages =
+  minimalArrangement (sum packages `div` numGroups) packages
 
 minimalArrangement :: Int -> [Int] -> Int
 minimalArrangement targetWeight weights =
