@@ -14,10 +14,12 @@ module AdventOfCode.Year2015.Day23
   ( main,
     partOne,
     partTwo,
+    getInput,
+    example,
   )
 where
 
-import AdventOfCode.Input (parseInput)
+import AdventOfCode.Input (parseInput, parseString)
 import AdventOfCode.TH (defaultMain, inputFilePath)
 import Control.Applicative ((<|>))
 import Control.Lens (makeLenses, modifying, uses, view, (+=), (.~))
@@ -96,6 +98,17 @@ partTwo = programExec $ def & (registerA .~ 1)
 
 getInput :: IO (Vector Instruction)
 getInput = parseInput (Vector.fromList <$> some instruction) $(inputFilePath)
+
+example :: IO Int
+example =
+  fmap (view registerA . flip execState def . program) $
+    parseString (Vector.fromList <$> some instruction) $
+      unlines
+        [ "inc a",
+          "jio a, +2",
+          "tpl a",
+          "inc a"
+        ]
 
 -- ---------------------------------------------------------------- [ Programs ]
 
