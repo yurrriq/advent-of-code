@@ -175,6 +175,11 @@ executables:
       - mtl
       - pointless-fun
       - vector
+  aoc-2015-day24:
+    <<: *executable
+    main: AdventOfCode.Year2015.Day24
+    dependencies:
+      - safe
   aoc-2016-day05:
     <<: *executable
     main: AdventOfCode.Year2016.Day05
