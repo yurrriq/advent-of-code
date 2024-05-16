@@ -1,6 +1,15 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
 
+-- |
+-- Module      : AdventOfCode.Year2015.Day23
+-- Description : Advent of Code 2015 Day 23: Opening the Turing Lock
+-- Copyright   : (c) Eric Bailey, 2024
+-- License     : MIT
+-- Maintainer  : eric@ericb.me
+-- Stability   : experimental
+-- Portability : POSIX
+-- https://adventofcode.com/2015/day/23
 module AdventOfCode.Year2015.Day23
   ( main,
     partOne,
@@ -11,11 +20,13 @@ where
 import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (defaultMain, inputFilePath)
 import Control.Applicative ((<|>))
-import Control.Lens (makeLenses, modifying, uses, view, (+=))
+import Control.Lens (makeLenses, modifying, uses, view, (+=), (.~))
 import Control.Monad (when)
 import Control.Monad.State (State, execState)
 import Data.Bool (bool)
-import Data.Default (Default (..))
+import Data.Default (Default (def))
+import Data.Function ((&))
+import Data.Function.Pointless ((.:))
 import Data.Ix (inRange)
 import Data.Vector (Vector, (!))
 import qualified Data.Vector as Vector
@@ -32,21 +43,7 @@ import Text.Trifecta
     (<?>),
   )
 
-data Register
-  = A
-  | B
-  deriving (Eq, Show)
-
-type Offset = Int
-
-data Operation
-  = HLF
-  | TPL
-  | INC
-  | JMP
-  | JIE
-  | JIO
-  deriving (Eq, Show)
+-- ------------------------------------------------------------------- [ Types ]
 
 data Instruction
   = InstructionRegister !Operation !Register
@@ -59,6 +56,22 @@ instance Show Instruction where
   show (InstructionOffset op o) = show op <> " " <> show o
   show (InstructionRegisterOffset op r o) = show op <> " " <> show r <> ", " <> show o
 
+data Operation
+  = HLF
+  | TPL
+  | INC
+  | JMP
+  | JIE
+  | JIO
+  deriving (Eq, Show)
+
+data Register
+  = A
+  | B
+  deriving (Eq, Show)
+
+type Offset = Int
+
 data ComputerState = ComputerState
   { _cursor :: !Int,
     _registerA :: !Int,
@@ -68,22 +81,25 @@ data ComputerState = ComputerState
 
 makeLenses ''ComputerState
 
+type Program = State ComputerState
+
+-- ------------------------------------------------------------------ [ Puzzle ]
+
 main :: IO ()
 main = $(defaultMain)
 
 partOne :: Vector Instruction -> Int
-partOne = view registerB . flip execState initialState . program
+partOne = programExec def
 
 partTwo :: Vector Instruction -> Int
-partTwo = undefined
+partTwo = programExec $ def & (registerA .~ 1)
 
 getInput :: IO (Vector Instruction)
 getInput = parseInput (Vector.fromList <$> some instruction) $(inputFilePath)
 
-initialState :: ComputerState
-initialState = def
+-- ---------------------------------------------------------------- [ Programs ]
 
-program :: Vector Instruction -> State ComputerState ()
+program :: Vector Instruction -> Program ()
 program prog
   | Vector.null prog = pure ()
   | otherwise =
@@ -92,10 +108,15 @@ program prog
           runInstruction =<< uses cursor (prog !)
           program prog
 
-ensuring :: (Monad m) => m Bool -> m () -> m ()
-ensuring p s = p >>= flip when s
+execProgram :: Vector Instruction -> ComputerState -> Int
+execProgram = view registerB .: execState . program
 
-runInstruction :: Instruction -> State ComputerState ()
+programExec :: ComputerState -> Vector Instruction -> Int
+programExec = flip execProgram
+
+-- ------------------------------------------------------------ [ Instructions ]
+
+runInstruction :: Instruction -> Program ()
 runInstruction (InstructionRegister HLF r) =
   modifyingRegister r (`div` 2) *> moveCursor 1
 runInstruction (InstructionRegister TPL r) =
@@ -103,22 +124,17 @@ runInstruction (InstructionRegister TPL r) =
 runInstruction (InstructionRegister INC r) =
   modifyingRegister r (+ 1) *> moveCursor 1
 runInstruction (InstructionOffset JMP o) = moveCursor o
-runInstruction (InstructionRegisterOffset JIE r o) =
-  moveCursor . bool 1 (fromIntegral o) =<< usesRegister r even
-runInstruction (InstructionRegisterOffset JIO r o) =
-  moveCursor . bool 1 (fromIntegral o) =<< usesRegister r (== 1)
+runInstruction (InstructionRegisterOffset JIE r o) = jumpIf even r o
+runInstruction (InstructionRegisterOffset JIO r o) = jumpIf (== 1) r o
 runInstruction _ = error "Invalid instruction!"
 
-usesRegister :: Register -> (Int -> Bool) -> State ComputerState Bool
-usesRegister A = uses registerA
-usesRegister B = uses registerB
-
-modifyingRegister :: Register -> (Int -> Int) -> State ComputerState ()
-modifyingRegister A = modifying registerA
-modifyingRegister B = modifying registerB
-
-moveCursor :: Int -> State ComputerState ()
+moveCursor :: Offset -> Program ()
 moveCursor o = cursor += o
+
+jumpIf :: (Int -> Bool) -> Register -> Offset -> Program ()
+jumpIf p r o = moveCursor . bool 1 o =<< usesRegister r p
+
+-- ----------------------------------------------------------------- [ Parsers ]
 
 instruction :: Parser Instruction
 instruction =
@@ -143,9 +159,6 @@ jump = mkOp JMP "jmp" "jump"
 jumpIfEven = mkOp JIE "jie" "jump if even"
 jumpIfOne = mkOp JIO "jio" "jump if one"
 
-mkOp :: a -> String -> String -> Parser a
-mkOp op repr desc = highlight Operator $ op <$ symbol repr <?> desc
-
 register :: Parser Register
 register =
   highlight Identifier $
@@ -154,3 +167,21 @@ register =
 
 offset :: Parser Offset
 offset = highlight Number $ fromInteger <$> integer <?> "offset"
+
+-- ----------------------------------------------------------------- [ Helpers ]
+
+ensuring :: (Monad m) => m Bool -> m () -> m ()
+ensuring p s = p >>= flip when s
+
+mkOp :: a -> String -> String -> Parser a
+mkOp op repr desc = highlight Operator $ op <$ symbol repr <?> desc
+
+modifyingRegister :: Register -> (Int -> Int) -> Program ()
+modifyingRegister A = modifying registerA
+modifyingRegister B = modifying registerB
+
+usesRegister :: Register -> (Int -> Bool) -> Program Bool
+usesRegister A = uses registerA
+usesRegister B = uses registerB
+
+-- --------------------------------------------------------------------- [ EOF ]

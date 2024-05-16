@@ -59,6 +59,7 @@ library:
     - monoid-extras
     - mtl
     - parser-combinators
+    - pointless-fun
     - recursion-schemes
     - safe
     - scientific
@@ -172,6 +173,7 @@ executables:
     dependencies:
       - data-default
       - mtl
+      - pointless-fun
       - vector
   aoc-2016-day05:
     <<: *executable
