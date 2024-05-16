@@ -44,6 +44,7 @@ library:
     - conduit
     - containers
     - cryptonite
+    - data-default
     - data-interval
     - data-ordlist
     - dlist
@@ -165,6 +166,13 @@ executables:
       - AdventOfCode.Util
       - AdventOfCode.Year2015.Day22.Types
       - Paths_advent_of_code
+  aoc-2015-day23:
+    <<: *executable
+    main: AdventOfCode.Year2015.Day23
+    dependencies:
+      - data-default
+      - mtl
+      - vector
   aoc-2016-day05:
     <<: *executable
     main: AdventOfCode.Year2016.Day05
