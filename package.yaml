@@ -180,6 +180,9 @@ executables:
     main: AdventOfCode.Year2015.Day24
     dependencies:
       - safe
+  aoc-2015-day25:
+    <<: *executable
+    main: AdventOfCode.Year2015.Day25
   aoc-2016-day05:
     <<: *executable
     main: AdventOfCode.Year2016.Day05
