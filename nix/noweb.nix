@@ -14,6 +14,7 @@
         inherit (final) noweb;
         # Packages for Noweb
         inherit (prev.texlive)
+          booktabs
           braket
           catchfile
           datatool
