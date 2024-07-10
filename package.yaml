@@ -201,6 +201,8 @@ executables:
     <<: *executable
     main: AdventOfCode.Year2017.Day03
     dependencies:
+      - containers
+      - extra
       - linear
   aoc-2017-day04:
     <<: *executable

@@ -5,22 +5,42 @@ module AdventOfCode.Year2017.Day03
   )
 where
 
+import AdventOfCode.Util (neighborsOf)
 import Control.Arrow ((&&&), (>>>))
 import Control.Lens (view)
 import Data.Function (on)
-import Linear
+import Data.List (intersect)
+import Data.List.Extra (sumOn')
+import Data.Map ((!))
+import qualified Data.Map as Map
+import qualified Data.Set as Set
+import Linear (V2 (..), _x, _y)
 
 main :: IO ()
 main =
   do
     input <- getInput
     putStr "Part One: " *> print (partOne input)
+    putStr "Part Two: " *> print (partTwo input)
 
 getInput :: IO Int
 getInput = pure 265149
 
 partOne :: Int -> Int
 partOne = manhattanDistance (pure 0) . (coords !!) . pred
+
+-- https://oeis.org/A141481
+partTwo :: Int -> Int
+partTwo input = go (Map.singleton (pure 0) 1) (next (pure 0))
+  where
+    go seen here =
+      if nextValue > input
+        then nextValue
+        else go (Map.insert here nextValue seen) (next here)
+      where
+        nextValue =
+          sumOn' (seen !) $
+            Map.keys seen `intersect` Set.toList (neighborsOf here)
 
 coords :: [V2 Int]
 coords = iterate next (pure 0)
