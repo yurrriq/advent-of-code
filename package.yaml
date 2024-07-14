@@ -25,6 +25,7 @@ dependencies:
   - text
   - trifecta
   - unordered-containers
+  - zippers
 default-extensions:
   - TemplateHaskell
 ghc-options:
@@ -211,7 +212,7 @@ executables:
     <<: *executable
     main: AdventOfCode.Year2017.Day05
     dependencies:
-      - mtl
+      - extra
   aoc-2018-day01:
     <<: *executable
     main: AdventOfCode.Year2018.Day01

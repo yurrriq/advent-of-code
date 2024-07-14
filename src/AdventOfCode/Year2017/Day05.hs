@@ -1,42 +1,58 @@
-{-# LANGUAGE TupleSections #-}
+{-# LANGUAGE StrictData #-}
 
 module AdventOfCode.Year2017.Day05 where
 
 import AdventOfCode.Input (parseInput)
-import AdventOfCode.TH (defaultMain, inputFilePath)
-import Control.Lens (ifoldl')
-import Control.Monad.State (State, evalState, get, put)
-import Data.IntMap (IntMap)
-import qualified Data.IntMap as IM
+import AdventOfCode.TH (defaultMainMaybe, inputFilePath)
+import Data.List (unfoldr)
+import Data.Tuple.Extra (dupe)
 import Text.Trifecta (integer, some)
 
+data ListZipper a = ListZipper [a] a [a]
+  deriving (Show)
+
 main :: IO ()
-main = $(defaultMain)
+main = $(defaultMainMaybe)
 
-getInput :: IO (IntMap Int)
-getInput = parseInput jumpOffsets $(inputFilePath)
-  where
-    jumpOffsets = ifoldl' go IM.empty <$> some (fromInteger <$> integer)
-    go i m n = IM.insert i n m
+getInput :: IO [Int]
+getInput = parseInput (some (fromInteger <$> integer)) $(inputFilePath)
 
-partOne :: IntMap Int -> Int
-partOne = evalState (step (+ 1)) . (0,0,)
+partOne :: [Int] -> Maybe Int
+partOne = solve (+ 1)
 
-partTwo :: IntMap Int -> Int
-partTwo = evalState (step updateOffset) . (0,0,)
+partTwo :: [Int] -> Maybe Int
+partTwo = solve updateOffset
   where
     updateOffset offset
       | offset >= 3 = offset - 1
       | otherwise = offset + 1
 
-step :: (Int -> Int) -> State (Int, Int, IntMap Int) Int
-step updateOffset =
-  do
-    (steps, pos, offsets) <- get
-    let offset = offsets IM.! pos
-    let nextPos = pos + offset
-    if nextPos >= IM.size offsets
-      then pure (steps + 1)
-      else do
-        put (steps + 1, pos + offset, IM.update (Just . updateOffset) pos offsets)
-        step updateOffset
+solve :: (Int -> Int) -> [Int] -> Maybe Int
+solve updateOffset = fmap (length . iterateMaybe (step updateOffset)) . zipper
+
+example :: [Int]
+example = [0, 3, 0, 1, -3]
+
+step :: (Int -> Int) -> ListZipper Int -> Maybe (ListZipper Int)
+step f (ListZipper ls x rs) = move x (ListZipper ls (f x) rs)
+
+move :: Int -> ListZipper a -> Maybe (ListZipper a)
+move n = case compare n 0 of
+  LT -> (!! abs n) . iterate (moveLeft =<<) . Just
+  EQ -> Just
+  GT -> (!! n) . iterate (moveRight =<<) . Just
+
+moveRight :: ListZipper a -> Maybe (ListZipper a)
+moveRight (ListZipper _ _ []) = Nothing
+moveRight (ListZipper ls x (r : rs)) = Just (ListZipper (x : ls) r rs)
+
+moveLeft :: ListZipper a -> Maybe (ListZipper a)
+moveLeft (ListZipper [] _ _) = Nothing
+moveLeft (ListZipper (l : ls) x rs) = Just (ListZipper ls l (x : rs))
+
+zipper :: [a] -> Maybe (ListZipper a)
+zipper [] = Nothing
+zipper (x : rs) = Just (ListZipper [] x rs)
+
+iterateMaybe :: (a -> Maybe a) -> a -> [a]
+iterateMaybe f x = x : unfoldr (fmap dupe . f) x
