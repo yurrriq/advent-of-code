@@ -25,7 +25,6 @@ dependencies:
   - text
   - trifecta
   - unordered-containers
-  - zippers
 default-extensions:
   - TemplateHaskell
 ghc-options:
@@ -69,6 +68,7 @@ library:
     - utility-ht
     - vector
     - vector-sized
+    - zippers
 _executable: &executable
   ghc-options:
     - -O0
@@ -213,6 +213,7 @@ executables:
     main: AdventOfCode.Year2017.Day05
     dependencies:
       - extra
+      - zippers
   aoc-2018-day01:
     <<: *executable
     main: AdventOfCode.Year2018.Day01
