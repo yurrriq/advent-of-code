@@ -2,10 +2,12 @@ module AdventOfCode.Year2017.Day06 where
 
 import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (defaultMain, inputFilePath)
+import AdventOfCode.Year2015.Day24 (bruteForce)
 import Data.Foldable (maximumBy)
 import Data.IntMap.Strict (IntMap)
 import qualified Data.IntMap.Strict as IntMap
-import Data.List (foldl', unfoldr)
+import Data.List (elemIndex, foldl', unfoldr)
+import Data.Maybe (fromJust)
 import qualified Data.Set as Set
 import Text.Trifecta (natural, some)
 
@@ -23,7 +25,13 @@ partOne = (+ 1) . length . unfoldr go . ((,) =<< Set.singleton)
         seen' = Set.insert after seen
 
 partTwo :: IntMap Int -> Int
-partTwo = undefined
+partTwo im = go (Set.singleton im) [im] im
+  where
+    go seen history before
+      | Set.member after seen = 1 + fromJust (elemIndex after history)
+      | otherwise = go (Set.insert after seen) (after : history) after
+      where
+        after = step before
 
 getInput :: IO (IntMap Int)
 getInput = parseInput parser $(inputFilePath)
