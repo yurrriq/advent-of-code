@@ -1,37 +1,24 @@
 module AdventOfCode.Year2017.Day06 where
 
 import AdventOfCode.Input (parseInput)
-import AdventOfCode.TH (defaultMain, inputFilePath)
-import AdventOfCode.Year2015.Day24 (bruteForce)
+import AdventOfCode.TH (defaultMainMaybe, inputFilePath)
+import Control.Monad ((<=<))
 import Data.Foldable (maximumBy)
 import Data.IntMap.Strict (IntMap)
 import qualified Data.IntMap.Strict as IntMap
-import Data.List (elemIndex, foldl', unfoldr)
-import Data.Maybe (fromJust)
+import Data.List (elemIndex, foldl', uncons)
+import Data.Set (Set)
 import qualified Data.Set as Set
 import Text.Trifecta (natural, some)
 
 main :: IO ()
-main = $(defaultMain)
+main = $(defaultMainMaybe)
 
-partOne :: IntMap Int -> Int
-partOne = (+ 1) . length . unfoldr go . ((,) =<< Set.singleton)
-  where
-    go (seen, before)
-      | Set.member after seen = Nothing
-      | otherwise = Just (seen', (seen', after))
-      where
-        after = step before
-        seen' = Set.insert after seen
+partOne :: IntMap Int -> Maybe Int
+partOne = Just . Set.size . fst . reallocate
 
-partTwo :: IntMap Int -> Int
-partTwo im = go (Set.singleton im) [im] im
-  where
-    go seen history before
-      | Set.member after seen = 1 + fromJust (elemIndex after history)
-      | otherwise = go (Set.insert after seen) (after : history) after
-      where
-        after = step before
+partTwo :: IntMap Int -> Maybe Int
+partTwo = fmap (1 +) . uncurry elemIndex <=< (uncons . snd . reallocate)
 
 getInput :: IO (IntMap Int)
 getInput = parseInput parser $(inputFilePath)
@@ -40,6 +27,15 @@ getInput = parseInput parser $(inputFilePath)
 
 example :: IntMap Int
 example = IntMap.fromList (zip [0 ..] [0, 2, 7, 0])
+
+reallocate :: IntMap Int -> (Set (IntMap Int), [IntMap Int])
+reallocate im = go (Set.singleton im) [im] im
+  where
+    go seen history before
+      | Set.member after seen = (seen, after : history)
+      | otherwise = go (Set.insert after seen) (after : history) after
+      where
+        after = step before
 
 step :: IntMap Int -> IntMap Int
 step im =
