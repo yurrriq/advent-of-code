@@ -220,6 +220,8 @@ executables:
   aoc-2017-day07:
     <<: *executable
     main: AdventOfCode.Year2017.Day07
+    dependencies:
+      - extra
   aoc-2018-day01:
     <<: *executable
     main: AdventOfCode.Year2018.Day01
