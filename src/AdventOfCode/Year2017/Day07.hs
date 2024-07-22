@@ -12,7 +12,8 @@ import Data.List.Extra (maximumOn, sumOn')
 import Data.Maybe (fromMaybe)
 import Data.Text (Text)
 import qualified Data.Text as Text
-import Data.Tuple.Extra (dupe, thd3)
+import qualified Data.Text.IO as TextIO
+import Data.Tuple.Extra (dupe, snd3, thd3)
 import Text.Trifecta
   ( Parser,
     commaSep,
@@ -26,29 +27,29 @@ import Text.Trifecta
     symbol,
   )
 
-type GraphTuple = (Graph, Vertex -> ((Text, Integer), Text, [Text]), Text -> Maybe Vertex)
+type GraphTuple = (Graph, Vertex -> (Integer, Text, [Text]), Text -> Maybe Vertex)
 
 main :: IO ()
 main =
   do
     input <- getInput
     putStr "Part One: "
-    print =<< partOne input
+    TextIO.putStrLn =<< partOne input
     putStr "Part Two: "
     print =<< partTwo input
 
-partOne :: (MonadFail m) => GraphTuple -> m (Either Text Integer)
+partOne :: (MonadFail m) => GraphTuple -> m Text
 partOne (graph, nodeFromVertex, _vertexFromKey) =
   case Graph.topSort graph of
-    top : _ -> let (_, name, _) = nodeFromVertex top in pure (Left name)
+    top : _ -> pure (snd3 (nodeFromVertex top))
     [] -> fail "Empty graph!"
 
-partTwo :: (MonadFail m) => GraphTuple -> m (Either Text Integer)
+partTwo :: (MonadFail m) => GraphTuple -> m Integer
 partTwo (graph, nodeFromVertex, vertexFromKey) =
   case map nodeFromVertex . take 2 . reverse $ iterateMaybe go (head (Graph.topSort graph)) of
-    [((_, weight), _, _), (_, _, stack)] ->
+    [(weight, _, _), (_, _, stack)] ->
       let weightsAbove = map weightAbove stack
-       in pure . Right $ weight - maximum weightsAbove + minimum weightsAbove
+       in pure $ weight - maximum weightsAbove + minimum weightsAbove
     _unexpected -> fail "Shame!"
   where
     go vertex =
@@ -60,7 +61,7 @@ partTwo (graph, nodeFromVertex, vertexFromKey) =
             else vertexFromKey maxK
     weightAbove k =
       case nodeFromVertex <$> vertexFromKey k of
-        Just ((_, w), _, stack) -> w + sumOn' weightAbove stack
+        Just (w, _, stack) -> w + sumOn' weightAbove stack
         Nothing -> 0
 
 iterateMaybe :: (a -> Maybe a) -> a -> [a]
@@ -78,7 +79,7 @@ parseGraph = fmap Graph.graphFromEdges . some $
       do
         void (symbol "->")
         commaSep parseName <* newline
-    pure ((name, weight), name, above)
+    pure (weight, name, above)
 
 parseName :: Parser Text
 parseName = Text.pack <$> some letter
