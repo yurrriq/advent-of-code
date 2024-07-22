@@ -4,18 +4,17 @@
   inputs = {
     emacs-overlay = {
       inputs.nixpkgs.follows = "nixpkgs";
-      inputs.nixpkgs-stable.follows = "nixpkgs-stable";
       url = "github:nix-community/emacs-overlay";
     };
     flake-parts.url = "github:hercules-ci/flake-parts";
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-    nixpkgs-stable.url = "github:nixos/nixpkgs/release-24.05";
+    nixpkgs-stable.url = "github:nixos/nixpkgs/release-23.11";
     pre-commit-hooks-nix = {
       inputs = {
         nixpkgs.follows = "nixpkgs";
         nixpkgs-stable.follows = "nixpkgs-stable";
       };
-      url = "github:cachix/git-hooks.nix";
+      url = "github:cachix/pre-commit-hooks.nix";
     };
     treefmt-nix = {
       inputs.nixpkgs.follows = "nixpkgs";
