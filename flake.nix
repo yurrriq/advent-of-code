@@ -3,18 +3,21 @@
 
   inputs = {
     emacs-overlay = {
-      inputs.nixpkgs.follows = "nixpkgs";
+      inputs = {
+        nixpkgs.follows = "nixpkgs";
+        nixpkgs-stable.follows = "nixpkgs-stable";
+      };
       url = "github:nix-community/emacs-overlay";
     };
     flake-parts.url = "github:hercules-ci/flake-parts";
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-    nixpkgs-stable.url = "github:nixos/nixpkgs/release-23.11";
+    nixpkgs-stable.url = "github:nixos/nixpkgs/release-24.05";
     pre-commit-hooks-nix = {
       inputs = {
         nixpkgs.follows = "nixpkgs";
         nixpkgs-stable.follows = "nixpkgs-stable";
       };
-      url = "github:cachix/pre-commit-hooks.nix";
+      url = "github:cachix/git-hooks.nix";
     };
     treefmt-nix = {
       inputs.nixpkgs.follows = "nixpkgs";
@@ -44,6 +47,11 @@
         lib.composeManyExtensions
           (lib.attrValues
             (lib.filterAttrs (name: _: name != "default") self.overlays));
+
+      # FIXME: v2 works differently, I guess.
+      flake.overlays.treefmt = _final: prev: {
+        treefmt = prev.treefmt1;
+      };
 
       perSystem = { config, pkgs, self', system, ... }: {
         _module.args.pkgs = import inputs.nixpkgs {
