@@ -36,7 +36,16 @@ partOne = maximum . Map.elems . foldl' go Map.empty
         else mem
 
 partTwo :: [Instruction] -> Int
-partTwo = undefined
+partTwo = maximum . map (maximum . Map.elems) . init . foldl' go [Map.empty]
+  where
+    go (mem : history) (Ins op regAlter delta cmp regCompare comparate) =
+      mem' : mem : history
+      where
+        mem' =
+          if compareReg mem cmp regCompare comparate
+            then Map.alter (Just . flip (binOp op) delta . fromMaybe 0) regAlter mem
+            else mem
+    go [] _ = []
 
 getInput :: IO [Instruction]
 getInput = parseInput (some instruction) $(inputFilePath)
