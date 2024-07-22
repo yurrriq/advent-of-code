@@ -9,6 +9,7 @@ module AdventOfCode.Util
     findFirstDup,
     hammingDistance,
     hammingSimilar,
+    iterateMaybe,
     scan,
     count,
     snoc,
@@ -26,10 +27,11 @@ where
 import Control.Arrow (second, (>>>))
 import Control.Comonad.Store (experiment)
 import Control.Lens (holesOf)
-import Control.Monad ((>=>))
+import Control.Monad (join, (>=>))
 import Data.ByteString (ByteString)
 import Data.Function (fix)
 import qualified Data.IntMap as IM
+import Data.List (unfoldr)
 import Data.Map (Map)
 import qualified Data.Map as Map
 import Data.Set (Set)
@@ -65,6 +67,9 @@ hammingDistance _ _ = Nothing
 
 hammingSimilar :: (Eq a) => Integer -> [a] -> [a] -> Bool
 hammingSimilar n xs = maybe False (<= n) . hammingDistance xs
+
+iterateMaybe :: (a -> Maybe a) -> a -> [a]
+iterateMaybe f x = x : unfoldr (fmap (join (,)) . f) x
 
 findFirstDup :: (Ord a) => [a] -> Maybe a
 findFirstDup = go Set.empty

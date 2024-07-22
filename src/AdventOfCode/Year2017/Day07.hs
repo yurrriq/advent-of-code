@@ -4,16 +4,15 @@ module AdventOfCode.Year2017.Day07 where
 
 import AdventOfCode.Input (parseInput, parseString)
 import AdventOfCode.TH (inputFilePath)
-import Control.Monad (void)
+import AdventOfCode.Util (iterateMaybe)
+import Control.Monad (ap, void)
 import Data.Graph (Graph, Vertex)
 import qualified Data.Graph as Graph
-import Data.List (unfoldr)
 import Data.List.Extra (maximumOn, sumOn')
 import Data.Maybe (fromMaybe)
 import Data.Text (Text)
 import qualified Data.Text as Text
 import qualified Data.Text.IO as TextIO
-import Data.Tuple.Extra (dupe, snd3, thd3)
 import Text.Trifecta
   ( Parser,
     commaSep,
@@ -41,7 +40,7 @@ main =
 partOne :: (MonadFail m) => GraphTuple -> m Text
 partOne (graph, nodeFromVertex, _vertexFromKey) =
   case Graph.topSort graph of
-    top : _ -> pure (snd3 (nodeFromVertex top))
+    top : _ -> let (_, key, _) = nodeFromVertex top in pure key
     [] -> fail "Empty graph!"
 
 partTwo :: (MonadFail m) => GraphTuple -> m Integer
@@ -53,19 +52,16 @@ partTwo (graph, nodeFromVertex, vertexFromKey) =
     _unexpected -> fail "Shame!"
   where
     go vertex =
-      let stack = thd3 (nodeFromVertex vertex)
-          weights = [(k', weightAbove k') | k' <- stack]
+      let (_, _, stack) = nodeFromVertex vertex
+          weights = ap zip (map weightAbove) stack
           (maxK, maxWeight) = maximumOn snd weights
        in if all ((== maxWeight) . snd) weights
             then Nothing
             else vertexFromKey maxK
-    weightAbove k =
-      case nodeFromVertex <$> vertexFromKey k of
-        Just (w, _, stack) -> w + sumOn' weightAbove stack
+    weightAbove key =
+      case nodeFromVertex <$> vertexFromKey key of
+        Just (weight, _, stack) -> weight + sumOn' weightAbove stack
         Nothing -> 0
-
-iterateMaybe :: (a -> Maybe a) -> a -> [a]
-iterateMaybe f x = x : unfoldr (fmap dupe . f) x
 
 getInput :: IO GraphTuple
 getInput = parseInput parseGraph $(inputFilePath)

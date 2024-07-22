@@ -4,11 +4,10 @@ module AdventOfCode.Year2017.Day05 where
 
 import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (defaultMain, inputFilePath)
+import AdventOfCode.Util (iterateMaybe)
 import Control.Lens (over, view)
 import Control.Monad (ap)
 import Control.Zipper
-import Data.List (unfoldr)
-import Data.Tuple.Extra (dupe)
 import Text.Trifecta (integer, some)
 
 type CPU = Top :>> [Int] :>> Int
@@ -43,6 +42,3 @@ move n = case compare n 0 of
   LT -> jerks leftward (abs n)
   EQ -> Just
   GT -> jerks rightward n
-
-iterateMaybe :: (a -> Maybe a) -> a -> [a]
-iterateMaybe f x = x : unfoldr (fmap dupe . f) x
