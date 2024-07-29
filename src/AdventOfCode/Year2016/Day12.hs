@@ -36,9 +36,9 @@ data Instruction
   deriving (Eq, Show)
 
 data ProgState = ProgState
-  { _cursor :: Int,
-    _instructions :: Vector Instruction,
-    _registers :: V4 Integer
+  { _registers :: V4 Integer,
+    _cursor :: Int,
+    _instructions :: Vector Instruction
   }
   deriving (Eq, Show)
 
@@ -48,10 +48,10 @@ main :: IO ()
 main = $(defaultMain)
 
 partOne :: Vector Instruction -> Integer
-partOne = evalState assembunny . flip (ProgState 0) (pure 0)
+partOne = evalState assembunny . ProgState (pure 0) 0
 
 partTwo :: Vector Instruction -> Integer
-partTwo = undefined
+partTwo = evalState assembunny . ProgState (V4 0 0 1 0) 0
 
 getInput :: IO (Vector Instruction)
 getInput = parseInput (V.fromList <$> some instruction) $(inputFilePath)
