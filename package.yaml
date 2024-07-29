@@ -190,6 +190,13 @@ executables:
     dependencies:
       - containers
       - cryptonite
+  aoc-2016-day12:
+    <<: *executable
+    main: AdventOfCode.Year2016.Day12
+    dependencies:
+      - linear
+      - mtl
+      - vector
   aoc-2017-day01:
     <<: *executable
     main: AdventOfCode.Year2017.Day01
