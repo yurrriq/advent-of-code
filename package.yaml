@@ -502,6 +502,8 @@ executables:
   aoc-2024-day01:
     <<: *executable
     main: AdventOfCode.Year2024.Day01
+    dependencies:
+      - extra
 _benchmark: &benchmark
   ghc-options:
     - -threaded
