@@ -13,14 +13,6 @@
               hash = "sha256-/n2gf33zShj6LexHRplp975teCZyLAsg0rmXK9AHoK0=";
             })
             { };
-          free-algebras = hprev.callCabal2nix "free-algebras"
-            (prev.fetchFromGitHub {
-              owner = "yurrriq";
-              repo = "free-algebras";
-              rev = "f3d130b9ce3d4f53ab8a11b1149c8590233cbdb1";
-              hash = "sha256-C3Fi2dEyrQvqfk5XMzl1vpoeH7lxkQPxveqhOtwcoYc=";
-            })
-            { };
         };
       };
     };
