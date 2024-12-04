@@ -11,7 +11,7 @@
     };
     flake-parts.url = "github:hercules-ci/flake-parts";
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-    nixpkgs-stable.url = "github:nixos/nixpkgs/release-24.05";
+    nixpkgs-stable.url = "github:nixos/nixpkgs/release-24.11";
     pre-commit-hooks-nix = {
       inputs = {
         nixpkgs.follows = "nixpkgs";
@@ -65,7 +65,7 @@
         devShells.default = pkgs.mkShell {
           FONTCONFIG_FILE = pkgs.makeFontsConf {
             fontDirectories = [
-              (pkgs.nerdfonts.override { fonts = [ "Iosevka" ]; })
+              pkgs.nerd-fonts.iosevka
             ];
           };
 
@@ -100,7 +100,6 @@
         };
 
         treefmt = {
-          projectRootFile = ./flake.nix;
           programs = {
             deadnix.enable = true;
             nixpkgs-fmt.enable = true;
