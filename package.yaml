@@ -24,6 +24,7 @@ dependencies:
   - template-haskell
   - text
   - trifecta
+  - universe-base
   - unordered-containers
 default-extensions:
   - TemplateHaskell
@@ -519,6 +520,12 @@ executables:
     main: AdventOfCode.Year2024.Day03
     dependencies:
       - extra
+  aoc-2024-day04:
+    <<: *executable
+    main: AdventOfCode.Year2024.Day04
+    dependencies:
+      - extra
+      - universe-base
 _benchmark: &benchmark
   ghc-options:
     - -threaded
