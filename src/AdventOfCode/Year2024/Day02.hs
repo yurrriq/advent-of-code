@@ -29,7 +29,6 @@ example =
   ]
 
 isSafe :: [Integer] -> Bool
-isSafe xs = all (== head signs) (tail signs) && all (inRange (1, 3) . abs) diffs
+isSafe xs = any (all (inRange (1, 3))) [diffs, negate <$> diffs]
   where
-    diffs = zipWith (-) (tail xs) xs
-    signs = map signum diffs
+    diffs = zipWith subtract xs (tail xs)
