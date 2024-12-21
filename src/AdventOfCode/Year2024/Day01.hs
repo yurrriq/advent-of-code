@@ -12,13 +12,12 @@ main :: IO ()
 main = $(defaultMain)
 
 partOne :: (Num a, Ord a) => ([a], [a]) -> a
-partOne (xs, ys) = sum $ zipWith ((abs .) . (-)) (sort xs) (sort ys)
+partOne (xs, ys) = sumOn' abs $ zipWith subtract (sort xs) (sort ys)
 
 partTwo :: (Num a, Ord a) => ([a], [a]) -> a
 partTwo (xs, ys) = sumOn' go xs
   where
-    go x = x * fromIntegral (Map.findWithDefault 0 x freqs)
-    freqs = frequencies ys
+    go x = x * fromIntegral (Map.findWithDefault 0 x (frequencies ys))
 
 getInput :: IO ([Integer], [Integer])
 getInput =
