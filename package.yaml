@@ -526,6 +526,11 @@ executables:
     dependencies:
       - extra
       - universe-base
+  aoc-2024-day05:
+    <<: *executable
+    main: AdventOfCode.Year2024.Day05
+    dependencies:
+      - extra
 _benchmark: &benchmark
   ghc-options:
     - -threaded
