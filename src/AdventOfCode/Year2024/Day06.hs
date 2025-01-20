@@ -1,9 +1,11 @@
+{-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE GADTs #-}
 
 module AdventOfCode.Year2024.Day06 where
 
 import AdventOfCode.Input (parseInput, parseString)
 import AdventOfCode.TH (defaultMain, inputFilePath)
+import AdventOfCode.Util (CyclicEnum (..))
 import Control.Applicative ((<|>))
 import Control.Lens (ifoldl')
 import Data.Ix (inRange)
@@ -18,7 +20,7 @@ data Heading
   | Right
   | Down
   | Left
-  deriving (Eq, Show, Enum, Bounded)
+  deriving (Eq, Show, Enum, Bounded, CyclicEnum)
 
 data Position where
   Guard :: Heading -> Position
@@ -43,14 +45,10 @@ partTwo = undefined
 move :: (Ord a, Num a) => (V2 a, Heading) -> Set (V2 a) -> (V2 a, Heading)
 move (position, heading) obstacles =
   if facingObstacle
-    then (position, turnRight heading)
+    then (position, csucc heading)
     else (move' (position, heading), heading)
   where
     facingObstacle = Set.member (move' (position, heading)) obstacles
-
-turnRight :: Heading -> Heading
-turnRight Left = Up
-turnRight heading = succ heading
 
 move' :: (Num a) => (V2 a, Heading) -> V2 a
 move' (position, heading) =

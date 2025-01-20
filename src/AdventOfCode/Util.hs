@@ -2,7 +2,8 @@
 {-# LANGUAGE LambdaCase #-}
 
 module AdventOfCode.Util
-  ( Frequencies,
+  ( CyclicEnum (..),
+    Frequencies,
     frequencies,
     frequenciesInt,
     maybeParseByteString,
@@ -37,6 +38,18 @@ import qualified Data.Map as Map
 import Data.Set (Set)
 import qualified Data.Set as Set
 import Text.Trifecta (Parser, Result (..), parseByteString)
+
+-- https://github.com/bravit/hid-examples/blob/master/ch02/radar/Radar.hs
+class (Eq a, Enum a, Bounded a) => CyclicEnum a where
+  cpred :: a -> a
+  cpred d
+    | d == minBound = maxBound
+    | otherwise = pred d
+
+  csucc :: a -> a
+  csucc d
+    | d == maxBound = minBound
+    | otherwise = succ d
 
 type Frequencies a = Map a Int
 
