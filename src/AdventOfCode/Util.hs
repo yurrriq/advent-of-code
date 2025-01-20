@@ -1,5 +1,6 @@
 {-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE TypeApplications #-}
 
 module AdventOfCode.Util
   ( CyclicEnum (..),
@@ -19,6 +20,7 @@ module AdventOfCode.Util
     adjacencies,
     neighborsOf,
     holes,
+    numDigits,
     (<&&>),
     (<||>),
     (<.>),
@@ -119,6 +121,9 @@ neighborsOf = Set.fromList . flip map adjacencies . (+)
 holes :: [a] -> [(a, [a])]
 holes [] = []
 holes (x : xs) = (x, xs) : map (second (x :)) (holes xs)
+
+numDigits :: (Integral a) => a -> Int
+numDigits n = truncate @Double (logBase 10 (fromIntegral n) + 1)
 
 (<&&>) :: (Applicative f) => f Bool -> f Bool -> f Bool
 (<&&>) = liftA2 (&&)

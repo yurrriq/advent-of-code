@@ -1,62 +1,87 @@
 {-# LANGUAGE MonadComprehensions #-}
-{-# LANGUAGE TypeApplications #-}
 
 module AdventOfCode.Year2024.Day07 where
 
 import AdventOfCode.Input (parseInput, parseString)
 import AdventOfCode.TH (defaultMain, inputFilePath)
-import Combinatorics (variateRep)
-import Data.Function (on)
-import Data.Function.Pointless ((.:))
-import Data.List (uncons)
-import Text.Trifecta (Parser, char, decimal, newline, sepEndBy, string)
-import Prelude hiding ((||))
+import AdventOfCode.Util (numDigits)
+import Data.Foldable (foldrM)
+import Data.List (foldl')
+import Data.List.NonEmpty (NonEmpty (..))
+import Data.Maybe (mapMaybe)
+import Text.Trifecta (Parser, char, decimal, newline, sepEndBy, sepEndByNonEmpty, string)
 
 main :: IO ()
 main = $(defaultMain)
 
-partOne :: [(Integer, [Integer])] -> Integer
-partOne = calibrate [(+), (*)]
+partOne :: [(Integer, NonEmpty Integer)] -> Integer
+partOne = calibrate [unAdd, unMultiply]
 
-numDigits :: Integer -> Int
-numDigits n = fromIntegral @Integer (floor (logBase 10 (fromInteger @Double n)) + 1)
+partTwo :: [(Integer, NonEmpty Integer)] -> Integer
+partTwo = calibrate [unAdd, unMultiply, unConcatenate]
 
-partTwo :: [(Integer, [Integer])] -> Integer
-partTwo = calibrate [(+), (*), (||)]
-  where
-    (||) = read .: (++) `on` show
-
-calibrate :: (Foldable t, Ord a, Num a) => [a -> a -> a] -> t (a, [a]) -> a
-calibrate operators = foldl go 0
+-- | Given a list of operators and a list of calibration equations, compute the
+-- calibration result, i.e., the sum of the test values from just the equations
+-- that could possibly be true.
+calibrate :: [Integer -> Integer -> Maybe Integer] -> [(Integer, NonEmpty Integer)] -> Integer
+calibrate operators = foldl' go 0
   where
     go acc eq =
       if isPossible operators eq
         then fst eq + acc
         else acc
 
-isPossible :: (Ord a) => [a -> a -> a] -> (a, [a]) -> Bool
-isPossible operators (testValue, operands) =
-  any (go operands) operatorLists
+-- | Given a list of operators, determine if a given calibration equation is
+-- possible, i.e., placing some combination of operators into the equation
+-- produces the test value.
+--
+-- Process the operands from right to left, using the inverses of the given
+-- operators, to short circuit on operations that make the equation impossible.
+--
+-- >>> isPossible [unAdd, unMultiply] (190, 10 :| [19])
+-- True
+isPossible :: [Integer -> Integer -> Maybe Integer] -> (Integer, NonEmpty Integer) -> Bool
+isPossible operators (testValue, operand :| operands) =
+  operand `elem` foldrM go testValue operands
   where
-    operatorLists = variateRep (length operands - 1) operators
-    go [x] []
-      | testValue == x = True
-      | otherwise = False
-    go (x : operands') (op : ops) =
-      (x <= testValue)
-        && maybe False (\(y, ys) -> go (x `op` y : ys) ops) (uncons operands')
-    go _ _ = False
+    go x y = mapMaybe (\f -> f x y) operators
 
-getInput :: IO [(Integer, [Integer])]
+-- | The inverse of addition.
+--
+-- >>> unAdd 40 121
+-- Just 81
+unAdd :: Integer -> Integer -> Maybe Integer
+unAdd x y = [y - x | y >= x]
+
+-- | The inverse of multiplication.
+--
+-- >>> unMultiply 19 190
+-- Just 10
+unMultiply :: Integer -> Integer -> Maybe Integer
+unMultiply x y = [y `div` x | y `mod` x == 0]
+
+-- | The inverse of concatenation.
+--
+-- >>> unConcatenate 345 12345
+-- Just 12
+unConcatenate :: Integer -> Integer -> Maybe Integer
+unConcatenate x y = [d | m == x]
+  where
+    pow = numDigits x
+    (d, m) = y `divMod` (10 ^ pow)
+
+getInput :: IO [(Integer, NonEmpty Integer)]
 getInput = parseInput (calibrationEquation `sepEndBy` newline) $(inputFilePath)
 
-calibrationEquation :: Parser (Integer, [Integer])
+-- | Parse a calibration equation, i.e., a test value and a nonempty list of
+-- operands.
+calibrationEquation :: Parser (Integer, NonEmpty Integer)
 calibrationEquation =
   (,)
     <$> (decimal <* string ": ")
-    <*> (decimal `sepEndBy` char ' ')
+    <*> decimal `sepEndByNonEmpty` char ' '
 
-getExample :: IO [(Integer, [Integer])]
+getExample :: IO [(Integer, NonEmpty Integer)]
 getExample = parseString (calibrationEquation `sepEndBy` newline) example
 
 example :: String
