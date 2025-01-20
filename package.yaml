@@ -541,7 +541,7 @@ executables:
     main: AdventOfCode.Year2024.Day07
     dependencies:
       - combinatorial
-      - extra
+      - pointless-fun
 _benchmark: &benchmark
   ghc-options:
     - -threaded

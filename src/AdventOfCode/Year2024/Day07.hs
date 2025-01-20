@@ -1,10 +1,14 @@
+{-# LANGUAGE MonadComprehensions #-}
+{-# LANGUAGE TypeApplications #-}
+
 module AdventOfCode.Year2024.Day07 where
 
 import AdventOfCode.Input (parseInput, parseString)
 import AdventOfCode.TH (defaultMain, inputFilePath)
 import Combinatorics (variateRep)
-import Data.List.Extra (sumOn')
-import Data.Maybe (mapMaybe)
+import Data.Function (on)
+import Data.Function.Pointless ((.:))
+import Data.List (uncons)
 import Text.Trifecta (Parser, char, decimal, newline, sepEndBy, string)
 import Prelude hiding ((||))
 
@@ -12,12 +16,36 @@ main :: IO ()
 main = $(defaultMain)
 
 partOne :: [(Integer, [Integer])] -> Integer
-partOne = sumOn' (fst . head) . filter (not . null) . map (insertOperators [(+), (*)])
+partOne = calibrate [(+), (*)]
+
+numDigits :: Integer -> Int
+numDigits n = fromIntegral @Integer (floor (logBase 10 (fromInteger @Double n)) + 1)
 
 partTwo :: [(Integer, [Integer])] -> Integer
-partTwo = sumOn' (fst . head) . filter (not . null) . map (insertOperators [(+), (*), (||)])
+partTwo = calibrate [(+), (*), (||)]
   where
-    x || y = read (show x ++ show y)
+    (||) = read .: (++) `on` show
+
+calibrate :: (Foldable t, Ord a, Num a) => [a -> a -> a] -> t (a, [a]) -> a
+calibrate operators = foldl go 0
+  where
+    go acc eq =
+      if isPossible operators eq
+        then fst eq + acc
+        else acc
+
+isPossible :: (Ord a) => [a -> a -> a] -> (a, [a]) -> Bool
+isPossible operators (testValue, operands) =
+  any (go operands) operatorLists
+  where
+    operatorLists = variateRep (length operands - 1) operators
+    go [x] []
+      | testValue == x = True
+      | otherwise = False
+    go (x : operands') (op : ops) =
+      (x <= testValue)
+        && maybe False (\(y, ys) -> go (x `op` y : ys) ops) (uncons operands')
+    go _ _ = False
 
 getInput :: IO [(Integer, [Integer])]
 getInput = parseInput (calibrationEquation `sepEndBy` newline) $(inputFilePath)
@@ -27,21 +55,6 @@ calibrationEquation =
   (,)
     <$> (decimal <* string ": ")
     <*> (decimal `sepEndBy` char ' ')
-
-insertOperators ::
-  [Integer -> Integer -> Integer] ->
-  (Integer, [Integer]) ->
-  [(Integer, [Integer])]
-insertOperators operators (testValue, operands) =
-  mapMaybe (go operands operands) operatorLists
-  where
-    operatorLists = variateRep (length operands - 1) operators
-    go xs [x] []
-      | testValue == x = Just (x, xs)
-      | otherwise = Nothing
-    go xs (x : y : ys) (op : ops) =
-      go xs (x `op` y : ys) ops
-    go _ _ _ = undefined
 
 getExample :: IO [(Integer, [Integer])]
 getExample = parseString (calibrationEquation `sepEndBy` newline) example
