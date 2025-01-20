@@ -6,15 +6,18 @@ import Combinatorics (variateRep)
 import Data.List.Extra (sumOn')
 import Data.Maybe (mapMaybe)
 import Text.Trifecta (Parser, char, decimal, newline, sepEndBy, string)
+import Prelude hiding ((||))
 
 main :: IO ()
 main = $(defaultMain)
 
 partOne :: [(Integer, [Integer])] -> Integer
-partOne = sumOn' (fst . head) . filter (not . null) . map insertOperators
+partOne = sumOn' (fst . head) . filter (not . null) . map (insertOperators [(+), (*)])
 
 partTwo :: [(Integer, [Integer])] -> Integer
-partTwo = undefined
+partTwo = sumOn' (fst . head) . filter (not . null) . map (insertOperators [(+), (*), (||)])
+  where
+    x || y = read (show x ++ show y)
 
 getInput :: IO [(Integer, [Integer])]
 getInput = parseInput (calibrationEquation `sepEndBy` newline) $(inputFilePath)
@@ -25,11 +28,14 @@ calibrationEquation =
     <$> (decimal <* string ": ")
     <*> (decimal `sepEndBy` char ' ')
 
-insertOperators :: (Integer, [Integer]) -> [(Integer, [Integer])]
-insertOperators (testValue, operands) =
+insertOperators ::
+  [Integer -> Integer -> Integer] ->
+  (Integer, [Integer]) ->
+  [(Integer, [Integer])]
+insertOperators operators (testValue, operands) =
   mapMaybe (go operands operands) operatorLists
   where
-    operatorLists = variateRep (length operands - 1) [(+), (*)]
+    operatorLists = variateRep (length operands - 1) operators
     go xs [x] []
       | testValue == x = Just (x, xs)
       | otherwise = Nothing
