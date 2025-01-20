@@ -14,16 +14,16 @@ import Text.Trifecta (Parser, char, decimal, newline, sepEndBy, sepEndByNonEmpty
 main :: IO ()
 main = $(defaultMain)
 
-partOne :: [(Integer, NonEmpty Integer)] -> Integer
+partOne :: [(Int, NonEmpty Int)] -> Int
 partOne = calibrate [unAdd, unMultiply]
 
-partTwo :: [(Integer, NonEmpty Integer)] -> Integer
+partTwo :: [(Int, NonEmpty Int)] -> Int
 partTwo = calibrate [unAdd, unMultiply, unConcatenate]
 
 -- | Given a list of operators and a list of calibration equations, compute the
 -- calibration result, i.e., the sum of the test values from just the equations
 -- that could possibly be true.
-calibrate :: [Integer -> Integer -> Maybe Integer] -> [(Integer, NonEmpty Integer)] -> Integer
+calibrate :: [Int -> Int -> Maybe Int] -> [(Int, NonEmpty Int)] -> Int
 calibrate operators = foldl' go 0
   where
     go acc eq =
@@ -40,7 +40,7 @@ calibrate operators = foldl' go 0
 --
 -- >>> isPossible [unAdd, unMultiply] (190, 10 :| [19])
 -- True
-isPossible :: [Integer -> Integer -> Maybe Integer] -> (Integer, NonEmpty Integer) -> Bool
+isPossible :: [Int -> Int -> Maybe Int] -> (Int, NonEmpty Int) -> Bool
 isPossible operators (testValue, operand :| operands) =
   operand `elem` foldrM go testValue operands
   where
@@ -50,38 +50,40 @@ isPossible operators (testValue, operand :| operands) =
 --
 -- >>> unAdd 40 121
 -- Just 81
-unAdd :: Integer -> Integer -> Maybe Integer
+unAdd :: Int -> Int -> Maybe Int
 unAdd x y = [y - x | y >= x]
 
 -- | The inverse of multiplication.
 --
 -- >>> unMultiply 19 190
 -- Just 10
-unMultiply :: Integer -> Integer -> Maybe Integer
+unMultiply :: Int -> Int -> Maybe Int
 unMultiply x y = [y `div` x | y `mod` x == 0]
 
 -- | The inverse of concatenation.
 --
 -- >>> unConcatenate 345 12345
 -- Just 12
-unConcatenate :: Integer -> Integer -> Maybe Integer
+unConcatenate :: Int -> Int -> Maybe Int
 unConcatenate x y = [d | m == x]
   where
     pow = numDigits x
     (d, m) = y `divMod` (10 ^ pow)
 
-getInput :: IO [(Integer, NonEmpty Integer)]
+getInput :: IO [(Int, NonEmpty Int)]
 getInput = parseInput (calibrationEquation `sepEndBy` newline) $(inputFilePath)
 
 -- | Parse a calibration equation, i.e., a test value and a nonempty list of
 -- operands.
-calibrationEquation :: Parser (Integer, NonEmpty Integer)
+calibrationEquation :: Parser (Int, NonEmpty Int)
 calibrationEquation =
   (,)
-    <$> (decimal <* string ": ")
-    <*> decimal `sepEndByNonEmpty` char ' '
+    <$> (decimalInt <* string ": ")
+    <*> decimalInt `sepEndByNonEmpty` char ' '
+  where
+    decimalInt = fromInteger <$> decimal
 
-getExample :: IO [(Integer, NonEmpty Integer)]
+getExample :: IO [(Int, NonEmpty Int)]
 getExample = parseString (calibrationEquation `sepEndBy` newline) example
 
 example :: String
