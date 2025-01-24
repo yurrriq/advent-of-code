@@ -2,27 +2,40 @@ module AdventOfCode.Year2024.Day05 where
 
 import AdventOfCode.Input (parseInput, parseString)
 import AdventOfCode.TH (defaultMain, inputFilePath)
+import Control.Arrow ((&&&))
 import Control.Monad (void)
-import Data.List.Extra (sumOn')
-import Data.Maybe (fromMaybe)
+import qualified Data.Graph as Graph
 import Text.Trifecta hiding (parseString)
 
 main :: IO ()
 main = $(defaultMain)
 
 partOne :: ([(Int, Int)], [[Int]]) -> Int
-partOne (rules, updates) = sumOn' middle (filter isOrdered updates)
-  where
-    isOrdered update =
-      let positions = zip update [0 :: Int ..]
-       in and
-            [ fromMaybe True $
-                liftA2 (<) (lookup before positions) (lookup after positions)
-              | (before, after) <- rules
-            ]
+partOne (rules, updates) =
+  sum
+    [ middle update
+      | update <- updates,
+        update == applyRules rules update
+    ]
 
 partTwo :: ([(Int, Int)], [[Int]]) -> Int
-partTwo = undefined
+partTwo (rules, updates) =
+  sum
+    [ middle sorted
+      | update <- updates,
+        let sorted = applyRules rules update,
+        update /= sorted
+    ]
+
+-- TODO: look into fgl instead
+applyRules :: [(Int, Int)] -> [Int] -> [Int]
+applyRules rules update = filter (`elem` update) (Graph.topSort graph)
+  where
+    graph = Graph.buildG bounds relevantRules
+    relevantRules = filter (all (`elem` update)) rules
+    bounds =
+      minimum &&& maximum $
+        foldMap (\(before, after) -> [before, after]) relevantRules
 
 getInput :: IO ([(Int, Int)], [[Int]])
 getInput = parseInput safetyManual $(inputFilePath)

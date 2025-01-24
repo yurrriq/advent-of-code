@@ -529,8 +529,6 @@ executables:
   aoc-2024-day05:
     <<: *executable
     main: AdventOfCode.Year2024.Day05
-    dependencies:
-      - extra
   aoc-2024-day06:
     <<: *executable
     main: AdventOfCode.Year2024.Day06
