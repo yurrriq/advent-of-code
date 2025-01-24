@@ -10,7 +10,7 @@ import Text.Trifecta hiding (parseString)
 main :: IO ()
 main = $(defaultMain)
 
-partOne :: ([(Integer, Integer)], [[Integer]]) -> Integer
+partOne :: ([(Int, Int)], [[Int]]) -> Int
 partOne (rules, updates) = sumOn' middle (filter isOrdered updates)
   where
     isOrdered update =
@@ -21,13 +21,13 @@ partOne (rules, updates) = sumOn' middle (filter isOrdered updates)
               | (before, after) <- rules
             ]
 
-partTwo :: ([(Integer, Integer)], [[Integer]]) -> Integer
+partTwo :: ([(Int, Int)], [[Int]]) -> Int
 partTwo = undefined
 
-getInput :: IO ([(Integer, Integer)], [[Integer]])
+getInput :: IO ([(Int, Int)], [[Int]])
 getInput = parseInput safetyManual $(inputFilePath)
 
-safetyManual :: Parser ([(Integer, Integer)], [[Integer]])
+safetyManual :: Parser ([(Int, Int)], [[Int]])
 safetyManual =
   do
     orderingRules <- orderingRule `sepEndBy` newline
@@ -35,13 +35,14 @@ safetyManual =
     updates <- update `sepEndBy` newline
     pure (orderingRules, updates)
   where
-    update = decimal `sepBy1` comma
+    update = posInt `sepBy1` comma
+    posInt = fromInteger <$> decimal
     orderingRule =
       (,)
-        <$> (decimal <* char '|')
-        <*> decimal
+        <$> (posInt <* char '|')
+        <*> posInt
 
-getExample :: IO ([(Integer, Integer)], [[Integer]])
+getExample :: IO ([(Int, Int)], [[Int]])
 getExample = parseString safetyManual example
 
 example :: String
