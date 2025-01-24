@@ -27,7 +27,37 @@ partOne grid =
     gridRotatedRight90 = transpose (reverse grid)
 
 partTwo :: [[Char]] -> Int
-partTwo = undefined
+partTwo grid =
+  sum
+    [ 1
+      | x <- [0 .. width - 3],
+        y <- [0 .. height - 3],
+        (grid !! (y + 1) !! (x + 1) == 'A')
+          && ( ( grid !! y !! x == 'M'
+                   && grid !! y !! (x + 2) == 'M'
+                   && grid !! (y + 2) !! x == 'S'
+                   && grid !! (y + 2) !! (x + 2) == 'S'
+               )
+                 || ( grid !! y !! x == 'M'
+                        && grid !! y !! (x + 2) == 'S'
+                        && grid !! (y + 2) !! x == 'M'
+                        && grid !! (y + 2) !! (x + 2) == 'S'
+                    )
+                 || ( grid !! y !! x == 'S'
+                        && grid !! y !! (x + 2) == 'S'
+                        && grid !! (y + 2) !! x == 'M'
+                        && grid !! (y + 2) !! (x + 2) == 'M'
+                    )
+                 || ( grid !! y !! x == 'S'
+                        && grid !! y !! (x + 2) == 'M'
+                        && grid !! (y + 2) !! x == 'S'
+                        && grid !! (y + 2) !! (x + 2) == 'M'
+                    )
+             )
+    ]
+  where
+    width = length (head grid)
+    height = length grid
 
 getInput :: IO [[Char]]
 getInput =

@@ -525,6 +525,7 @@ executables:
     main: AdventOfCode.Year2024.Day04
     dependencies:
       - extra
+      - linear
       - universe-base
   aoc-2024-day05:
     <<: *executable
