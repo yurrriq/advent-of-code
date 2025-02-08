@@ -1,12 +1,8 @@
-{-# LANGUAGE TypeApplications #-}
-
 module AdventOfCode.Year2020.Day13 where
 
 import AdventOfCode.Input (parseInput, parseString)
 import AdventOfCode.TH (defaultMain, inputFilePath)
 import Control.Applicative ((<|>))
-import Control.Arrow (second, (&&&))
-import Data.Function (on)
 import Data.List.Extra (minimumOn)
 import Data.Maybe (catMaybes)
 import Text.Trifecta (Parser, char, commaSep, decimal, newline)
@@ -16,13 +12,12 @@ main = $(defaultMain)
 
 partOne :: (Integer, [Maybe Integer]) -> Integer
 partOne (timestamp, busIDs) =
-  let (soonestBus, (q, _)) =
-        minimumOn (snd . snd) $
-          (id &&& second (abs . (1 -)) . properFraction @Double . ((/) `on` fromInteger) timestamp)
-            <$> catMaybes busIDs
-
-      wait = (soonestBus * (q + 1)) - timestamp
-   in soonestBus * wait
+  uncurry (*) $
+    minimumOn snd $
+      [ (busID, wait)
+        | busID <- catMaybes busIDs,
+          let wait = busID - (timestamp `mod` busID)
+      ]
 
 partTwo :: (Integer, [Maybe Integer]) -> Integer
 partTwo = undefined
@@ -32,10 +27,9 @@ getInput = parseInput notes $(inputFilePath)
 
 notes :: Parser (Integer, [Maybe Integer])
 notes =
-  do
-    (,)
-      <$> (decimal <* newline)
-      <*> commaSep (Just <$> decimal <|> Nothing <$ char 'x')
+  (,)
+    <$> (decimal <* newline)
+    <*> commaSep (Just <$> decimal <|> Nothing <$ char 'x')
 
 getExample :: IO (Integer, [Maybe Integer])
 getExample = parseString notes example
