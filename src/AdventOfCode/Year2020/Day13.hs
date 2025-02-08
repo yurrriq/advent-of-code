@@ -3,8 +3,8 @@ module AdventOfCode.Year2020.Day13 where
 import AdventOfCode.Input (parseInput, parseString)
 import AdventOfCode.TH (defaultMain, inputFilePath)
 import Control.Applicative ((<|>))
-import Data.List.Extra (minimumOn)
-import Data.Maybe (catMaybes)
+import Data.List.Extra (foldl', minimumOn)
+import Data.Maybe (catMaybes, mapMaybe)
 import Text.Trifecta (Parser, char, commaSep, decimal, newline)
 
 main :: IO ()
@@ -21,17 +21,18 @@ partOne (timestamp, busIDs) =
 
 partTwo :: (Integer, [Maybe Integer]) -> Integer
 partTwo (_, busIDs) =
-  head $
-    filter
-      ( \timestamp ->
-          and
-            [ (timestamp + offset) `mod` bus == 0
-              | (offset, Just bus) <- zip [0 ..] busIDs
-            ]
-      )
-      [busID, busID + busID ..]
+  fst $
+    foldl' go (0, 1) $
+      mapMaybe (uncurry ((<$>) . (,))) $
+        zip [0 ..] busIDs
   where
-    busID = head (catMaybes busIDs)
+    go (base, step) (offset, busID) = (base', step * busID)
+      where
+        base' =
+          until
+            (\timestamp -> (timestamp + offset) `mod` busID == 0)
+            (+ step)
+            base
 
 getInput :: IO (Integer, [Maybe Integer])
 getInput = parseInput notes $(inputFilePath)
