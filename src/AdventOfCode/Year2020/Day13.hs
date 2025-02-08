@@ -20,7 +20,18 @@ partOne (timestamp, busIDs) =
       ]
 
 partTwo :: (Integer, [Maybe Integer]) -> Integer
-partTwo = undefined
+partTwo (_, busIDs) =
+  head $
+    filter
+      ( \timestamp ->
+          and
+            [ (timestamp + offset) `mod` bus == 0
+              | (offset, Just bus) <- zip [0 ..] busIDs
+            ]
+      )
+      [busID, busID + busID ..]
+  where
+    busID = head (catMaybes busIDs)
 
 getInput :: IO (Integer, [Maybe Integer])
 getInput = parseInput notes $(inputFilePath)
