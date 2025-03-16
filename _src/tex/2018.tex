@@ -33,22 +33,22 @@ getInput = parseInput (some (\nwlinkedidentc{FrequencyChange}{NW1oqLIA-3C8vxP-1}
 
 \newthought{Computing the answer for Part One} is also a cinch: just sum the changes in frequency.
 
-\nwenddocs{}\nwbegincode{5}\sublabel{NW1oqLIA-3j9t0t-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW1oqLIA-3j9t0t-1}}}\moddef{Solve parts one and two.~{\nwtagstyle{}\subpageref{NW1oqLIA-3j9t0t-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1oqLIA-12NRmi-1}}\nwprevnextdefs{\relax}{NW1oqLIA-3j9t0t-2}\nwenddeflinemarkup
+\nwenddocs{}\nwbegincode{5}\sublabel{NW1oqLIA-3j9t0t-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW1oqLIA-3j9t0t-1}}}\moddef{Solve parts one and two.~{\nwtagstyle{}\subpageref{NW1oqLIA-3j9t0t-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1oqLIA-12NRmi-1}\\{NW1loFqJ-15Rje1-1}}\nwprevnextdefs{\relax}{NW1oqLIA-3j9t0t-2}\nwenddeflinemarkup
 \nwlinkedidentc{partOne}{NW1nsOf7-2iOjQS-1} :: [\nwlinkedidentc{FrequencyChange}{NW1oqLIA-3C8vxP-1}] -> Maybe Integer
 \nwlinkedidentc{partOne}{NW1nsOf7-2iOjQS-1} = Just . unFrequencyChange . mconcat
 
-\nwalsodefined{\\{NW1oqLIA-3j9t0t-2}}\nwused{\\{NW1oqLIA-12NRmi-1}}\nwidentuses{\\{{\nwixident{FrequencyChange}}{FrequencyChange}}\\{{\nwixident{partOne}}{partOne}}}\nwindexuse{\nwixident{FrequencyChange}}{FrequencyChange}{NW1oqLIA-3j9t0t-1}\nwindexuse{\nwixident{partOne}}{partOne}{NW1oqLIA-3j9t0t-1}\nwendcode{}\nwbegindocs{6}\nwdocspar
+\nwalsodefined{\\{NW1oqLIA-3j9t0t-2}\\{NW1loFqJ-3j9t0t-1}\\{NW1loFqJ-3j9t0t-2}}\nwused{\\{NW1oqLIA-12NRmi-1}\\{NW1loFqJ-15Rje1-1}}\nwidentuses{\\{{\nwixident{FrequencyChange}}{FrequencyChange}}\\{{\nwixident{partOne}}{partOne}}}\nwindexuse{\nwixident{FrequencyChange}}{FrequencyChange}{NW1oqLIA-3j9t0t-1}\nwindexuse{\nwixident{partOne}}{partOne}{NW1oqLIA-3j9t0t-1}\nwendcode{}\nwbegindocs{6}\nwdocspar
 
 \newthought{To solve Part Two,} compute the list of frequencies reached and find the first duplicate.
 
-\nwenddocs{}\nwbegincode{7}\sublabel{NW1oqLIA-3j9t0t-2}\nwmargintag{{\nwtagstyle{}\subpageref{NW1oqLIA-3j9t0t-2}}}\moddef{Solve parts one and two.~{\nwtagstyle{}\subpageref{NW1oqLIA-3j9t0t-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1oqLIA-12NRmi-1}}\nwprevnextdefs{NW1oqLIA-3j9t0t-1}{\relax}\nwenddeflinemarkup
+\nwenddocs{}\nwbegincode{7}\sublabel{NW1oqLIA-3j9t0t-2}\nwmargintag{{\nwtagstyle{}\subpageref{NW1oqLIA-3j9t0t-2}}}\moddef{Solve parts one and two.~{\nwtagstyle{}\subpageref{NW1oqLIA-3j9t0t-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1oqLIA-12NRmi-1}\\{NW1loFqJ-15Rje1-1}}\nwprevnextdefs{NW1oqLIA-3j9t0t-1}{NW1loFqJ-3j9t0t-1}\nwenddeflinemarkup
 \nwlinkedidentc{partTwo}{NW1nsOf7-4P9qKy-1} :: [\nwlinkedidentc{FrequencyChange}{NW1oqLIA-3C8vxP-1}] -> Maybe Integer
 \nwlinkedidentc{partTwo}{NW1nsOf7-4P9qKy-1} =
   fmap unFrequencyChange
     . findFirstDup
     . scan
     . cycle
-\nwused{\\{NW1oqLIA-12NRmi-1}}\nwidentuses{\\{{\nwixident{FrequencyChange}}{FrequencyChange}}\\{{\nwixident{partTwo}}{partTwo}}}\nwindexuse{\nwixident{FrequencyChange}}{FrequencyChange}{NW1oqLIA-3j9t0t-2}\nwindexuse{\nwixident{partTwo}}{partTwo}{NW1oqLIA-3j9t0t-2}\nwendcode{}\nwbegindocs{8}\nwdocspar
+\nwused{\\{NW1oqLIA-12NRmi-1}\\{NW1loFqJ-15Rje1-1}}\nwidentuses{\\{{\nwixident{FrequencyChange}}{FrequencyChange}}\\{{\nwixident{partTwo}}{partTwo}}}\nwindexuse{\nwixident{FrequencyChange}}{FrequencyChange}{NW1oqLIA-3j9t0t-2}\nwindexuse{\nwixident{partTwo}}{partTwo}{NW1oqLIA-3j9t0t-2}\nwendcode{}\nwbegindocs{8}\nwdocspar
 
 
 \newthought{Bring it} all together.
@@ -154,17 +154,124 @@ getInput = parseInput (some letter `sepEndBy` newline) $(inputFilePath)
 
 \LA{}Correct the box IDs.~{\nwtagstyle{}\subpageref{NW1nsOf7-1vzJfP-1}}\RA{}
 \nwnotused{Day02.hs}\nwidentuses{\\{{\nwixident{BoxID}}{BoxID}}}\nwindexuse{\nwixident{BoxID}}{BoxID}{NW1nsOf7-1375sF-1}\nwendcode{}\nwbegindocs{12}\nwdocspar
+\nwenddocs{}\nwfilename{_src/2018/day/05.nw}\nwbegindocs{0}\newpage
+\section{Day 5: Alchemical Reduction}
+\todoo{Copy description}
+\marginnote{\url{https://adventofcode.com/2018/day/5}}
+\nwenddocs{}\nwfilename{_src/2018/haskell/05.nw}\nwbegindocs{0}\subsection{Haskell Solution}
+
+Thanks to \hrefootnote{https://github.com/mstksg}{Justin Le} for teaching me
+some \hrefootnote{https://blog.jle.im/entry/alchemical-groups.html}{neat group
+  theory tricks}!
+
+\nwenddocs{}\nwbegincode{1}\sublabel{NW1loFqJ-S3xqU-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW1loFqJ-S3xqU-1}}}\moddef{Define the Unit type.~{\nwtagstyle{}\subpageref{NW1loFqJ-S3xqU-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1loFqJ-15Rje1-1}}\nwprevnextdefs{\relax}{NW1loFqJ-S3xqU-2}\nwenddeflinemarkup
+-- | Units' types are represented by letters, modelled by a finite number type
+-- inhabited by exactly 26 values.
+type Unit = Finite 26
+
+\nwalsodefined{\\{NW1loFqJ-S3xqU-2}}\nwused{\\{NW1loFqJ-15Rje1-1}}\nwendcode{}\nwbegindocs{2}\nwdocspar
+
+\todoo{Describe this.}
+
+\nwenddocs{}\nwbegincode{3}\sublabel{NW1loFqJ-S3xqU-2}\nwmargintag{{\nwtagstyle{}\subpageref{NW1loFqJ-S3xqU-2}}}\moddef{Define the Unit type.~{\nwtagstyle{}\subpageref{NW1loFqJ-S3xqU-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1loFqJ-15Rje1-1}}\nwprevnextdefs{NW1loFqJ-S3xqU-1}{\relax}\nwenddeflinemarkup
+fromChar :: Char -> Maybe (Either Unit Unit)
+fromChar c
+  | isLower c = Left <$> unit
+  | isUpper c = Right <$> unit
+  | otherwise = Nothing
+  where
+    unit = packFinite . fromIntegral $ ((-) `on` ord) (toLower c) 'a'
+\nwused{\\{NW1loFqJ-15Rje1-1}}\nwendcode{}\nwbegindocs{4}\nwdocspar
+
+As per
+\hrefootnote{https://hackage.haskell.org/package/free-algebras-0.1.2.0/docs/Data-Algebra-Free.html\#v:returnFree}{the
+  documentation}, \hs{returnFree} is an
+\hrefootnote{https://en.wikipedia.org/wiki/Injective_function}{injective} map
+that embeds generators into a
+\hrefootnote{https://en.wikipedia.org/wiki/Free_algebra}{free algebra}
+(\hrefootnote{https://hackage.haskell.org/package/free-algebras-0.1.2.0/docs/Data-Algebra-Free.html\#t:FreeAlgebra}{\hs{FreeAlgebra}}).
+
+\nwenddocs{}\nwbegincode{5}\sublabel{NW1loFqJ-2IyRTY-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW1loFqJ-2IyRTY-1}}}\moddef{Define helper functions.~{\nwtagstyle{}\subpageref{NW1loFqJ-2IyRTY-1}}}\endmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1loFqJ-15Rje1-1}}\nwenddeflinemarkup
+inject :: Char -> FreeGroupL Unit
+inject = foldMap (either returnFree (invert . returnFree)) . fromChar
+
+clean :: Unit -> FreeGroupL Unit -> FreeGroupL Unit
+clean c = foldMapFree go
+  where
+    go :: Unit -> FreeGroupL Unit
+    go d
+      | d == c = mempty
+      | otherwise = returnFree d
+
+-- | Compute the order of a 'FreeGroupL'.
+order :: FreeGroupL a -> Int
+order = length . FG.toList
+\nwused{\\{NW1loFqJ-15Rje1-1}}\nwendcode{}\nwbegindocs{6}\nwdocspar
+
+\nwenddocs{}\nwbegincode{7}\sublabel{NW1loFqJ-3j9t0t-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW1loFqJ-3j9t0t-1}}}\moddef{Solve parts one and two.~{\nwtagstyle{}\subpageref{NW1oqLIA-3j9t0t-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1oqLIA-12NRmi-1}\\{NW1loFqJ-15Rje1-1}}\nwprevnextdefs{NW1oqLIA-3j9t0t-2}{NW1loFqJ-3j9t0t-2}\nwenddeflinemarkup
+\nwlinkedidentc{partOne}{NW1nsOf7-2iOjQS-1} :: String -> Int
+\nwlinkedidentc{partOne}{NW1nsOf7-2iOjQS-1} = order . foldMap inject
+
+\nwused{\\{NW1oqLIA-12NRmi-1}\\{NW1loFqJ-15Rje1-1}}\nwidentuses{\\{{\nwixident{partOne}}{partOne}}}\nwindexuse{\nwixident{partOne}}{partOne}{NW1loFqJ-3j9t0t-1}\nwendcode{}\nwbegindocs{8}\nwdocspar
+
+\nwenddocs{}\nwbegincode{9}\sublabel{NW1loFqJ-3j9t0t-2}\nwmargintag{{\nwtagstyle{}\subpageref{NW1loFqJ-3j9t0t-2}}}\moddef{Solve parts one and two.~{\nwtagstyle{}\subpageref{NW1oqLIA-3j9t0t-1}}}\plusendmoddef\nwstartdeflinemarkup\nwusesondefline{\\{NW1oqLIA-12NRmi-1}\\{NW1loFqJ-15Rje1-1}}\nwprevnextdefs{NW1loFqJ-3j9t0t-1}{\relax}\nwenddeflinemarkup
+\nwlinkedidentc{partTwo}{NW1nsOf7-4P9qKy-1} :: String -> Int
+\nwlinkedidentc{partTwo}{NW1nsOf7-4P9qKy-1} = minimum . cleanedPolymers . foldMap inject
+  where
+    cleanedPolymers :: FreeGroupL Unit -> [Int]
+    cleanedPolymers polymer = order . flip clean polymer <$> finites
+\nwused{\\{NW1oqLIA-12NRmi-1}\\{NW1loFqJ-15Rje1-1}}\nwidentuses{\\{{\nwixident{partTwo}}{partTwo}}}\nwindexuse{\nwixident{partTwo}}{partTwo}{NW1loFqJ-3j9t0t-2}\nwendcode{}\nwbegindocs{10}\nwdocspar
+
+\newthought{Bring it} all together.
+
+\nwenddocs{}\nwbegincode{11}\sublabel{NW1loFqJ-15Rje1-1}\nwmargintag{{\nwtagstyle{}\subpageref{NW1loFqJ-15Rje1-1}}}\moddef{Day05.hs~{\nwtagstyle{}\subpageref{NW1loFqJ-15Rje1-1}}}\endmoddef\nwstartdeflinemarkup\nwenddeflinemarkup
+\{-# LANGUAGE DataKinds #-\}
+
+module AdventOfCode.Year2018.Day05
+  ( main,
+    \nwlinkedidentc{partOne}{NW1nsOf7-2iOjQS-1},
+    \nwlinkedidentc{partTwo}{NW1nsOf7-4P9qKy-1},
+  )
+where
+
+import AdventOfCode.TH (inputFilePath)
+import Data.Algebra.Free (foldMapFree, returnFree)
+import Data.Char (isLower, isUpper, ord, toLower)
+import Data.Finite (Finite, finites, packFinite)
+import Data.Function (on)
+import Data.Group (invert)
+import Data.Group.Free (FreeGroupL)
+import qualified Data.Group.Free as FG
+
+\LA{}Define the Unit type.~{\nwtagstyle{}\subpageref{NW1loFqJ-S3xqU-1}}\RA{}
+
+\LA{}Define helper functions.~{\nwtagstyle{}\subpageref{NW1loFqJ-2IyRTY-1}}\RA{}
+
+\LA{}Solve parts one and two.~{\nwtagstyle{}\subpageref{NW1oqLIA-3j9t0t-1}}\RA{}
+
+main :: IO ()
+main =
+  do
+    input <- readFile $(inputFilePath)
+    putStr "Part One: "
+    print (\nwlinkedidentc{partOne}{NW1nsOf7-2iOjQS-1} input)
+    putStr "Part Two: "
+    print (\nwlinkedidentc{partTwo}{NW1nsOf7-4P9qKy-1} input)
+\nwnotused{Day05.hs}\nwidentuses{\\{{\nwixident{partOne}}{partOne}}\\{{\nwixident{partTwo}}{partTwo}}}\nwindexuse{\nwixident{partOne}}{partOne}{NW1loFqJ-15Rje1-1}\nwindexuse{\nwixident{partTwo}}{partTwo}{NW1loFqJ-15Rje1-1}\nwendcode{}\nwbegindocs{12}\nwdocspar
 \nwenddocs{}
 
 \nwixlogsorted{c}{{Compute the checksum.}{NW1nsOf7-1hMs9W-1}{\nwixd{NW1nsOf7-1hMs9W-1}\nwixu{NW1nsOf7-1375sF-1}}}%
 \nwixlogsorted{c}{{Correct the box IDs.}{NW1nsOf7-1vzJfP-1}{\nwixd{NW1nsOf7-1vzJfP-1}\nwixu{NW1nsOf7-1375sF-1}}}%
 \nwixlogsorted{c}{{Day01.hs}{NW1oqLIA-12NRmi-1}{\nwixd{NW1oqLIA-12NRmi-1}}}%
 \nwixlogsorted{c}{{Day02.hs}{NW1nsOf7-1375sF-1}{\nwixd{NW1nsOf7-1375sF-1}}}%
+\nwixlogsorted{c}{{Day05.hs}{NW1loFqJ-15Rje1-1}{\nwixd{NW1loFqJ-15Rje1-1}}}%
 \nwixlogsorted{c}{{Define data types to model the puzzle input.}{NW1oqLIA-3C8vxP-1}{\nwixd{NW1oqLIA-3C8vxP-1}\nwixu{NW1oqLIA-12NRmi-1}}}%
+\nwixlogsorted{c}{{Define helper functions.}{NW1loFqJ-2IyRTY-1}{\nwixd{NW1loFqJ-2IyRTY-1}\nwixu{NW1loFqJ-15Rje1-1}}}%
+\nwixlogsorted{c}{{Define the Unit type.}{NW1loFqJ-S3xqU-1}{\nwixd{NW1loFqJ-S3xqU-1}\nwixd{NW1loFqJ-S3xqU-2}\nwixu{NW1loFqJ-15Rje1-1}}}%
 \nwixlogsorted{c}{{Parse the input.}{NW1oqLIA-2S9BvQ-1}{\nwixd{NW1oqLIA-2S9BvQ-1}\nwixu{NW1oqLIA-12NRmi-1}}}%
 \nwixlogsorted{c}{{Part One}{NW1nsOf7-2iOjQS-1}{\nwixd{NW1nsOf7-2iOjQS-1}\nwixu{NW1nsOf7-1375sF-1}}}%
 \nwixlogsorted{c}{{Part Two}{NW1nsOf7-4P9qKy-1}{\nwixd{NW1nsOf7-4P9qKy-1}\nwixu{NW1nsOf7-1375sF-1}}}%
-\nwixlogsorted{c}{{Solve parts one and two.}{NW1oqLIA-3j9t0t-1}{\nwixd{NW1oqLIA-3j9t0t-1}\nwixd{NW1oqLIA-3j9t0t-2}\nwixu{NW1oqLIA-12NRmi-1}}}%
+\nwixlogsorted{c}{{Solve parts one and two.}{NW1oqLIA-3j9t0t-1}{\nwixd{NW1oqLIA-3j9t0t-1}\nwixd{NW1oqLIA-3j9t0t-2}\nwixu{NW1oqLIA-12NRmi-1}\nwixd{NW1loFqJ-3j9t0t-1}\nwixd{NW1loFqJ-3j9t0t-2}\nwixu{NW1loFqJ-15Rje1-1}}}%
 \nwixlogsorted{c}{{Type aliases}{NW1nsOf7-4UP1v0-1}{\nwixd{NW1nsOf7-4UP1v0-1}\nwixu{NW1nsOf7-1375sF-1}}}%
 \nwixlogsorted{i}{{\nwixident{BoxID}}{BoxID}}%
 \nwixlogsorted{i}{{\nwixident{Checksum}}{Checksum}}%

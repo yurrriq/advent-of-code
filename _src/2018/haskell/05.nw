@@ -1,0 +1,100 @@
+\subsection{Haskell Solution}
+
+Thanks to \hrefootnote{https://github.com/mstksg}{Justin Le} for teaching me
+some \hrefootnote{https://blog.jle.im/entry/alchemical-groups.html}{neat group
+  theory tricks}!
+
+<<Define the Unit type.>>=
+-- | Units' types are represented by letters, modelled by a finite number type
+-- inhabited by exactly 26 values.
+type Unit = Finite 26
+
+@
+
+\todoo{Describe this.}
+
+<<Define the Unit type.>>=
+fromChar :: Char -> Maybe (Either Unit Unit)
+fromChar c
+  | isLower c = Left <$> unit
+  | isUpper c = Right <$> unit
+  | otherwise = Nothing
+  where
+    unit = packFinite . fromIntegral $ ((-) `on` ord) (toLower c) 'a'
+@
+
+As per
+\hrefootnote{https://hackage.haskell.org/package/free-algebras-0.1.2.0/docs/Data-Algebra-Free.html\#v:returnFree}{the
+  documentation}, \hs{returnFree} is an
+\hrefootnote{https://en.wikipedia.org/wiki/Injective_function}{injective} map
+that embeds generators into a
+\hrefootnote{https://en.wikipedia.org/wiki/Free_algebra}{free algebra}
+(\hrefootnote{https://hackage.haskell.org/package/free-algebras-0.1.2.0/docs/Data-Algebra-Free.html\#t:FreeAlgebra}{\hs{FreeAlgebra}}).
+
+<<Define helper functions.>>=
+inject :: Char -> FreeGroupL Unit
+inject = foldMap (either returnFree (invert . returnFree)) . fromChar
+
+clean :: Unit -> FreeGroupL Unit -> FreeGroupL Unit
+clean c = foldMapFree go
+  where
+    go :: Unit -> FreeGroupL Unit
+    go d
+      | d == c = mempty
+      | otherwise = returnFree d
+
+-- | Compute the order of a 'FreeGroupL'.
+order :: FreeGroupL a -> Int
+order = length . FG.toList
+@
+
+<<Solve parts one and two.>>=
+partOne :: String -> Int
+partOne = order . foldMap inject
+
+@
+
+<<Solve parts one and two.>>=
+partTwo :: String -> Int
+partTwo = minimum . cleanedPolymers . foldMap inject
+  where
+    cleanedPolymers :: FreeGroupL Unit -> [Int]
+    cleanedPolymers polymer = order . flip clean polymer <$> finites
+@
+
+\newthought{Bring it} all together.
+
+<<Day05.hs>>=
+{-# LANGUAGE DataKinds #-}
+
+module AdventOfCode.Year2018.Day05
+  ( main,
+    partOne,
+    partTwo,
+  )
+where
+
+import AdventOfCode.TH (inputFilePath)
+import Data.Algebra.Free (foldMapFree, returnFree)
+import Data.Char (isLower, isUpper, ord, toLower)
+import Data.Finite (Finite, finites, packFinite)
+import Data.Function (on)
+import Data.Group (invert)
+import Data.Group.Free (FreeGroupL)
+import qualified Data.Group.Free as FG
+
+<<Define the Unit type.>>
+
+<<Define helper functions.>>
+
+<<Solve parts one and two.>>
+
+main :: IO ()
+main =
+  do
+    input <- readFile $(inputFilePath)
+    putStr "Part One: "
+    print (partOne input)
+    putStr "Part Two: "
+    print (partTwo input)
+@
