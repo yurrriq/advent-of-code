@@ -96,6 +96,7 @@
         };
 
         pre-commit.settings.hooks = {
+          convco.enable = true;
           treefmt.enable = true;
         };
 
