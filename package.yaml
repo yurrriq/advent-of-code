@@ -81,6 +81,13 @@ _executable: &executable
     - Paths_advent_of_code
   source-dirs: src
 executables:
+  aoc-2015-day01:
+    <<: *executable
+    main: AdventOfCode.Year2015.Day01
+    other-modules:
+      - AdventOfCode.Input
+      - AdventOfCode.TH
+      - Paths_advent_of_code
   aoc-2015-day06:
     <<: *executable
     main: AdventOfCode.Year2015.Day06
