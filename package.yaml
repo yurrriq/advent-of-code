@@ -88,6 +88,16 @@ executables:
       - AdventOfCode.Input
       - AdventOfCode.TH
       - Paths_advent_of_code
+  aoc-2015-day02:
+    <<: *executable
+    main: AdventOfCode.Year2015.Day02
+    other-modules:
+      - AdventOfCode.Input
+      - AdventOfCode.TH
+      - Paths_advent_of_code
+    dependencies:
+      - extra
+      - linear
   aoc-2015-day06:
     <<: *executable
     main: AdventOfCode.Year2015.Day06
