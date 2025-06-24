@@ -9,7 +9,7 @@ import Data.Foldable (minimumBy)
 import Data.Function (on)
 import Data.Ix (Ix (..))
 import Data.Set (Set)
-import qualified Data.Set as Set
+import Data.Set qualified as Set
 import GHC.Arr (unsafeIndex, unsafeRangeSize)
 import Text.Trifecta
 

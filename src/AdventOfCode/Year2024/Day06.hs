@@ -10,7 +10,7 @@ import Control.Applicative ((<|>))
 import Control.Lens (ifoldl')
 import Data.Ix (inRange)
 import Data.Set (Set)
-import qualified Data.Set as Set
+import Data.Set qualified as Set
 import Linear (V2 (..))
 import Text.Trifecta (Parser, char, newline, sepEndBy, some)
 import Prelude hiding (Either (..))

@@ -12,8 +12,8 @@ import Data.Function (on)
 import Data.List (intersect)
 import Data.List.Extra (sumOn')
 import Data.Map ((!))
-import qualified Data.Map as Map
-import qualified Data.Set as Set
+import Data.Map qualified as Map
+import Data.Set qualified as Set
 import Linear (V2 (..), _x, _y)
 
 main :: IO ()

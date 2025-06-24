@@ -8,7 +8,7 @@ where
 
 import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (inputFilePath)
-import qualified Data.Set as Set
+import Data.Set qualified as Set
 import Text.Trifecta (Parser, lower, newline, sepEndBy, some)
 
 main :: IO ()

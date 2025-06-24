@@ -7,12 +7,12 @@ import AdventOfCode.TH (inputFilePath)
 import AdventOfCode.Util (iterateMaybe)
 import Control.Monad (ap, void)
 import Data.Graph (Graph, Vertex)
-import qualified Data.Graph as Graph
+import Data.Graph qualified as Graph
 import Data.List.Extra (maximumOn, sumOn')
 import Data.Maybe (fromMaybe)
 import Data.Text (Text)
-import qualified Data.Text as Text
-import qualified Data.Text.IO as TextIO
+import Data.Text qualified as Text
+import Data.Text.IO qualified as TextIO
 import Text.Trifecta
   ( Parser,
     commaSep,

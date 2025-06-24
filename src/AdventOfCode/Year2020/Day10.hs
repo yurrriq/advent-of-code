@@ -4,8 +4,8 @@ import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (inputFilePath)
 import AdventOfCode.Util (frequenciesInt, snoc)
 import Data.IntMap ((!))
-import qualified Data.IntMap as IM
-import qualified Data.IntSet as IS
+import Data.IntMap qualified as IM
+import Data.IntSet qualified as IS
 import Data.List (sort)
 import Text.Trifecta (natural, some)
 

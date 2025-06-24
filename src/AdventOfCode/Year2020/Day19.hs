@@ -16,7 +16,7 @@ import Control.Arrow (first)
 import Control.Monad (guard, (>=>))
 import Data.Functor.Foldable (hylo)
 import Data.IntMap (IntMap, (!))
-import qualified Data.IntMap as IntMap
+import Data.IntMap qualified as IntMap
 import Text.Trifecta
   ( Parser,
     lower,

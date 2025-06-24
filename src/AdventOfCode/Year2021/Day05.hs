@@ -5,7 +5,7 @@ import AdventOfCode.TH (defaultMain, inputFilePath)
 import AdventOfCode.Util (frequencies)
 import Control.Applicative (Alternative (..))
 import Control.Lens ((^.))
-import qualified Data.Map as M
+import Data.Map qualified as M
 import Linear (V2 (..), (*^), _x, _y)
 import Text.Trifecta (comma, natural, symbol)
 

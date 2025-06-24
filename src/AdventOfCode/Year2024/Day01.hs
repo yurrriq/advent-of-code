@@ -5,7 +5,7 @@ import AdventOfCode.TH (defaultMain, inputFilePath)
 import AdventOfCode.Util (frequencies)
 import Data.List (sort, transpose)
 import Data.List.Extra (sumOn')
-import qualified Data.Map as Map
+import Data.Map qualified as Map
 import Text.Trifecta (count, natural, some)
 
 main :: IO ()

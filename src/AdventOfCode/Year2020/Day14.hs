@@ -10,7 +10,7 @@ import Control.Applicative (some)
 import Control.Lens
 import Control.Monad.State (State, execState, gets)
 import Data.Bits (clearBit, setBit)
-import qualified Data.IntMap as IM
+import Data.IntMap qualified as IM
 
 main :: IO ()
 main =

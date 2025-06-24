@@ -6,11 +6,11 @@ import AdventOfCode.Input (parseInput, parseString)
 import AdventOfCode.TH (defaultMain, inputFilePath)
 import Control.Arrow ((>>>))
 import Data.IntMap.Strict ((!))
-import qualified Data.IntMap.Strict as IntMap
+import Data.IntMap.Strict qualified as IntMap
 import Data.List (sortOn)
 import Data.List.Extra (sumOn')
 import Data.Set (Set)
-import qualified Data.Set as Set
+import Data.Set qualified as Set
 import Text.Trifecta hiding (parseString)
 
 newtype Scratchcard = Scratchcard {unScratchcard :: (Int, (Set Int, Set Int))}

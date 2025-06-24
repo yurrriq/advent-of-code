@@ -4,7 +4,7 @@ import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (inputFilePath)
 import Control.Monad (void)
 import Data.Map (Map, (!))
-import qualified Data.Map as Map
+import Data.Map qualified as Map
 import Text.Trifecta
   ( Parser,
     alphaNum,

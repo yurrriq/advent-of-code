@@ -5,10 +5,10 @@ import AdventOfCode.TH (defaultMainMaybe, inputFilePath)
 import Control.Monad ((<=<))
 import Data.Foldable (maximumBy)
 import Data.IntMap.Strict (IntMap)
-import qualified Data.IntMap.Strict as IntMap
+import Data.IntMap.Strict qualified as IntMap
 import Data.List (elemIndex, foldl', uncons)
 import Data.Set (Set)
-import qualified Data.Set as Set
+import Data.Set qualified as Set
 import Text.Trifecta (natural, some)
 
 main :: IO ()

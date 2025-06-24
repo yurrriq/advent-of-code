@@ -4,7 +4,7 @@ import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (defaultMain, inputFilePath)
 import AdventOfCode.Util (frequenciesInt)
 import Control.Arrow ((&&&))
-import qualified Data.IntMap as IM
+import Data.IntMap qualified as IM
 import Data.List (maximumBy, sort)
 import Data.Ord (comparing)
 import Text.Trifecta (commaSep, natural)

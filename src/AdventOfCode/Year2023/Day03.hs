@@ -10,10 +10,10 @@ import Control.Lens (ifoldl')
 import Data.Char (digitToInt)
 import Data.FastDigits (undigits)
 import Data.HashMap.Strict (HashMap)
-import qualified Data.HashMap.Strict as HM
+import Data.HashMap.Strict qualified as HM
 import Data.List (intercalate)
 import Data.Set (Set)
-import qualified Data.Set as Set
+import Data.Set qualified as Set
 import Linear (V2 (..))
 import Text.Trifecta hiding (parseString)
 

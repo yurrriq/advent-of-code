@@ -5,7 +5,7 @@ import AdventOfCode.TH (defaultMain, inputFilePath)
 import Control.Applicative ((<|>))
 import Control.Monad (void)
 import Data.IntMap (IntMap, (!))
-import qualified Data.IntMap as IM
+import Data.IntMap qualified as IM
 import Data.List (transpose)
 import Data.Maybe (catMaybes)
 import Text.Trifecta

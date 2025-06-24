@@ -12,7 +12,7 @@ import AdventOfCode.Util (count)
 import Control.Applicative ((<|>))
 import Data.Functor (($>))
 import Data.Vector (Vector, (!))
-import qualified Data.Vector as V
+import Data.Vector qualified as V
 import Text.Trifecta (Parser, char, newline, sepEndBy, some)
 
 main :: IO ()

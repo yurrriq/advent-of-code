@@ -13,9 +13,9 @@ import Data.Char (digitToInt)
 import Data.Foldable (forM_)
 import Data.Ix (Ix, inRange)
 import Data.Map (Map)
-import qualified Data.Map as M
+import Data.Map qualified as M
 import Data.Set (Set)
-import qualified Data.Set as S
+import Data.Set qualified as S
 import Linear (V2 (..))
 import Text.Trifecta (Parser, digit, newline, sepEndBy, some)
 

@@ -15,9 +15,9 @@ import Control.Monad (ap, guard)
 import Data.Bool (bool)
 import Data.Foldable (toList)
 import Data.Map (Map, (!), (!?))
-import qualified Data.Map as Map
+import Data.Map qualified as Map
 import Data.Set (Set)
-import qualified Data.Set as Set
+import Data.Set qualified as Set
 import Linear.V2 (R1 (..), R2 (..), V2 (..), perp, _yx)
 import Text.Trifecta (Parser, char, natural, newline, sepEndBy, some, symbol)
 

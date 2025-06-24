@@ -10,7 +10,7 @@ import Control.Monad.Reader
 import Data.Bits (Bits (..), complement, shiftL, shiftR, (.&.), (.|.))
 import Data.Function (on)
 import Data.Map (Map, (!))
-import qualified Data.Map as Map
+import Data.Map qualified as Map
 import Data.Word (Word16)
 import Text.Parser.Token.Highlight
 import Text.Trifecta

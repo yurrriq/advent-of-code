@@ -5,9 +5,9 @@ import AdventOfCode.TH (inputFilePath)
 import Control.Arrow (first, (>>>))
 import Data.List (find)
 import Data.Vector (Vector, fromList, modify, toList, (!))
-import qualified Data.Vector as V
+import Data.Vector qualified as V
 import Data.Vector.Mutable (write)
-import qualified Data.Vector.Mutable as MV
+import Data.Vector.Mutable qualified as MV
 import Text.Trifecta (Parser, Result (..), comma, natural, parseString, sepBy)
 
 program :: Parser (Vector Int)

@@ -9,7 +9,7 @@ import Data.Finite (Finite, finite, finites)
 import Data.Function (on)
 import Data.Group (invert)
 import Data.Group.Free (FreeGroupL)
-import qualified Data.Group.Free as FG
+import Data.Group.Free qualified as FG
 
 -- | Units' types are represented by letters, modelled by a finite number type
 -- inhabited by exactly 26 values.

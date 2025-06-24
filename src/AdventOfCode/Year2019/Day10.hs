@@ -9,10 +9,10 @@ import Control.Monad (foldM)
 import Data.Foldable (minimumBy)
 import Data.Functor (($>))
 import Data.HashMap.Strict (HashMap, (!))
-import qualified Data.HashMap.Strict as HM
+import Data.HashMap.Strict qualified as HM
 import Data.List (delete, maximumBy, sortOn)
 import Data.Ord (comparing)
-import qualified Data.Set as Set
+import Data.Set qualified as Set
 import GHC.Real (Ratio (..))
 import Text.Trifecta (Parser, char, newline, sepEndBy, some)
 

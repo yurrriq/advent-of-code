@@ -4,7 +4,7 @@ import AdventOfCode.Input (parseInput, parseString)
 import AdventOfCode.TH (defaultMain, inputFilePath)
 import Control.Arrow ((&&&))
 import Control.Monad (void)
-import qualified Data.Graph as Graph
+import Data.Graph qualified as Graph
 import Text.Trifecta hiding (parseString)
 
 main :: IO ()

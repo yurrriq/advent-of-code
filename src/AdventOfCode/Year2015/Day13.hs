@@ -6,7 +6,7 @@ import AdventOfCode.Input
 import AdventOfCode.TH
 import Control.Applicative ((<|>))
 import Data.HashMap.Strict (HashMap)
-import qualified Data.HashMap.Strict as HM
+import Data.HashMap.Strict qualified as HM
 import Data.List (permutations)
 import Data.Tuple (swap)
 import Text.Parser.Token.Highlight

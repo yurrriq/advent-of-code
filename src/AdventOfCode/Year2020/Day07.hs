@@ -5,12 +5,12 @@ import AdventOfCode.TH (inputFilePath)
 import Control.Applicative ((<|>))
 import Data.Bool (bool)
 import Data.Digraph (Digraph)
-import qualified Data.Digraph as DG
+import Data.Digraph qualified as DG
 import Data.Map (Map)
-import qualified Data.Map as M
+import Data.Map qualified as M
 import Data.Maybe (catMaybes)
 import Data.Monoid (Sum (..))
-import qualified Data.Set as S
+import Data.Set qualified as S
 import Text.Trifecta
 
 main :: IO ()

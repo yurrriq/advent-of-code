@@ -10,9 +10,9 @@ import Control.Lens ((%~))
 import Data.Finite (Finite)
 import Data.Maybe (fromJust, mapMaybe)
 import Data.Semigroup (stimes)
-import qualified Data.Vector.Generic as VG
-import qualified Data.Vector.Generic.Sized as VGS
-import qualified Data.Vector.Sized as VS
+import Data.Vector.Generic qualified as VG
+import Data.Vector.Generic.Sized qualified as VGS
+import Data.Vector.Sized qualified as VS
 import GHC.TypeNats (KnownNat)
 import Linear (Additive (..), negated, scaled, (!*), (!*!))
 import Text.Trifecta (commaSep, natural)

@@ -33,12 +33,12 @@ import Control.Lens (holesOf)
 import Control.Monad (join, (>=>))
 import Data.ByteString (ByteString)
 import Data.Function (fix)
-import qualified Data.IntMap as IM
+import Data.IntMap qualified as IM
 import Data.List (unfoldr)
 import Data.Map (Map)
-import qualified Data.Map as Map
+import Data.Map qualified as Map
 import Data.Set (Set)
-import qualified Data.Set as Set
+import Data.Set qualified as Set
 import Text.Trifecta (Parser, Result (..), parseByteString)
 
 -- https://github.com/bravit/hid-examples/blob/master/ch02/radar/Radar.hs

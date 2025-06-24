@@ -1,7 +1,7 @@
 module AdventOfCode.Year2015.Day20 where
 
 import AdventOfCode.TH (defaultMain)
-import qualified Data.Set as S
+import Data.Set qualified as S
 import Math.NumberTheory.ArithmeticFunctions
 
 main :: IO ()

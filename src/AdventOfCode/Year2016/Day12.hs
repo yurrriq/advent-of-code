@@ -21,7 +21,7 @@ import Control.Lens
 import Control.Monad.State (State, evalState)
 import Data.Bool (bool)
 import Data.Vector (Vector)
-import qualified Data.Vector as V
+import Data.Vector qualified as V
 import Linear.V4 (V4 (..))
 import Text.Trifecta (Parser, char, choice, integer', some, symbol, token)
 
@@ -86,7 +86,8 @@ runInstruction = \case
       cursor += bool 1 (fromInteger delta) (0 /= x)
 
 handleRegisterOrInteger :: V4 Integer -> Either Register Integer -> Integer
-handleRegisterOrInteger regs = either ((regs ^?!) . element . fromEnum) id
+handleRegisterOrInteger _ (Right i) = i
+handleRegisterOrInteger regs (Left reg) = regs ^?! element (fromEnum reg)
 
 readRegister :: Register -> V4 a -> a
 readRegister reg regs = regs ^?! element (fromEnum reg)

@@ -8,7 +8,7 @@ where
 
 import Control.Monad.State (State, evalState, execState, get, put)
 import Data.IntMap (IntMap)
-import qualified Data.IntMap as IM
+import Data.IntMap qualified as IM
 
 main :: IO ()
 main =

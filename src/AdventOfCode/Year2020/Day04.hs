@@ -14,7 +14,7 @@ import Data.Bool (bool)
 import Data.Char (isDigit, isHexDigit)
 import Data.Ix (inRange)
 import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
+import Data.Map.Strict qualified as Map
 import Data.Maybe (mapMaybe)
 import Text.Trifecta
   ( Parser,

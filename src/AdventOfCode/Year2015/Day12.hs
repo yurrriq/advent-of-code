@@ -6,7 +6,7 @@ import AdventOfCode.TH (defaultMain, inputFilePath)
 import Control.Monad (foldM)
 import Control.Monad.Reader (Reader, asks, runReader)
 import Data.Aeson (Array, Object, Value (..), decodeFileStrict')
-import qualified Data.Aeson.KeyMap as KM
+import Data.Aeson.KeyMap qualified as KM
 import Data.Bool (bool)
 import Data.Maybe (fromJust)
 import Data.Scientific (Scientific (coefficient))

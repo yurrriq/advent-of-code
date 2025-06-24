@@ -11,9 +11,9 @@ import Control.Lens (ifoldl')
 import Data.Functor.Foldable (ana, hylo)
 import Data.Functor.Foldable.TH (makeBaseFunctor)
 import Data.IntMap (IntMap)
-import qualified Data.IntMap as IM
+import Data.IntMap qualified as IM
 import Data.IntSet (IntSet)
-import qualified Data.IntSet as IS
+import Data.IntSet qualified as IS
 import Data.Maybe (mapMaybe)
 import Data.Ord (comparing)
 import Safe.Foldable (maximumByMay)

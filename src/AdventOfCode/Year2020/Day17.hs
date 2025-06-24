@@ -12,9 +12,9 @@ import AdventOfCode.Util (neighborsOf)
 import Control.Applicative ((<|>))
 import Control.Lens (ifoldl', set)
 import Data.Functor (($>))
-import qualified Data.Map as Map
+import Data.Map qualified as Map
 import Data.Set (Set)
-import qualified Data.Set as Set
+import Data.Set qualified as Set
 import Linear (R2 (..), V2 (..), V3 (..), V4 (..))
 import Text.Trifecta
 

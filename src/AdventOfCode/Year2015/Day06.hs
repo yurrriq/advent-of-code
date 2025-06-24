@@ -10,7 +10,7 @@ import Control.Monad (forM_)
 import Control.Monad.Trans.State (State, execState, modify)
 import Data.Ix (range)
 import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as Map
+import Data.Map.Strict qualified as Map
 import Data.Maybe (fromMaybe)
 import Foreign.Marshal.Utils (fromBool)
 import Linear (V2 (..))

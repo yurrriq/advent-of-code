@@ -3,9 +3,9 @@ module AdventOfCode.Year2015.Day16 where
 import AdventOfCode.Input
 import AdventOfCode.TH
 import Data.HashMap.Strict (HashMap)
-import qualified Data.HashMap.Strict as HM
+import Data.HashMap.Strict qualified as HM
 import Data.IntMap (IntMap)
-import qualified Data.IntMap as IM
+import Data.IntMap qualified as IM
 import Data.Maybe (fromJust, listToMaybe)
 import Text.Trifecta (Parser, commaSep, integer, letter, some, symbol)
 

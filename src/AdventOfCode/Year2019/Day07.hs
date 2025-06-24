@@ -1,6 +1,7 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE StrictData #-}
 {-# OPTIONS_GHC -Wno-incomplete-uni-patterns #-}
 
 module AdventOfCode.Year2019.Day07 where
@@ -13,12 +14,11 @@ import Control.Monad.State (get, lift)
 import Control.Monad.Trans.State.Strict (StateT, execStateT)
 import Data.Conduit (ConduitM, ConduitT, await, runConduit, yield, (.|))
 import Data.Conduit.Lift (evalStateC)
-import Data.Default (Default (def))
 import Data.FastDigits (digits)
 import Data.List (permutations)
 import Data.Vector (Vector, fromList, modify, (!))
-import qualified Data.Vector as V
-import qualified Data.Vector.Mutable as MV
+import Data.Vector qualified as V
+import Data.Vector.Mutable qualified as MV
 import Foreign.Marshal.Utils (fromBool)
 import GHC.Generics (Generic)
 import Text.Trifecta (Parser, comma, integer, sepBy)
@@ -29,17 +29,17 @@ type Program = StateT ProgramState IO
 
 type Stack = Vector Int
 
-instance Default Stack where
-  def = mempty
-
 data ProgramState = ProgramState
   { _stack :: Stack,
     _pointer :: Int,
     _debug :: Bool
   }
-  deriving (Eq, Generic, Default, Show)
+  deriving (Eq, Generic, Show)
 
 makeLenses ''ProgramState
+
+defaultProgramState :: ProgramState
+defaultProgramState = ProgramState V.empty 0 False
 
 data Instruction
   = Add Value Value Int
@@ -181,14 +181,12 @@ jump :: Value -> Program ()
 jump vy = (pointer .=) =<< handleValue vy
 
 evalStack :: Stack -> ConduitT Int Int IO ()
-evalStack st = evalStateC (def & stack .~ st) runProgram
+evalStack st = evalStateC (defaultProgramState & stack .~ st) runProgram
 
 evalStack' :: Stack -> ConduitT Int Int IO ()
 evalStack' st =
-  lift (execStateT debugMode (def & stack .~ st))
+  lift (execStateT debugMode (defaultProgramState & stack .~ st))
     >>= flip evalStateC runProgram
-
--- evalStateC state runProgram
 
 -- -------------------------------------------------- [ Manipulating the Stack ]
 

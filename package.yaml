@@ -6,6 +6,7 @@ maintainer: eric@ericb.me
 license-file: LICENSE
 license: MIT
 github: yurrriq/advent-of-code
+language: GHC2021
 extra-source-files:
   - LICENSE
   - VERSION
@@ -31,9 +32,9 @@ default-extensions:
 ghc-options:
   - -Wall
   - -Werror
+  - -Wincomplete-patterns
+  - -Wincomplete-uni-patterns
 library:
-  ghc-options:
-    - -fwarn-incomplete-patterns
   source-dirs: src
   dependencies:
     - aeson
@@ -45,7 +46,6 @@ library:
     - conduit
     - containers
     - cryptonite
-    - data-default
     - data-interval
     - data-ordlist
     - dlist
@@ -173,7 +173,6 @@ executables:
     <<: *executable
     main: AdventOfCode.Year2015.Day23
     dependencies:
-      - data-default
       - mtl
       - pointless-fun
       - vector

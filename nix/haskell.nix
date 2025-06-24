@@ -49,7 +49,7 @@
         ormolu = {
           enable = true;
           ghcOpts = [
-            "LambdaCase"
+            "GHC2021"
             "TemplateHaskell"
           ];
         };

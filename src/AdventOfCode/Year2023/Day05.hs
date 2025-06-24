@@ -3,10 +3,10 @@ module AdventOfCode.Year2023.Day05 where
 import AdventOfCode.Input (parseInput, parseString)
 import AdventOfCode.TH (defaultMain, inputFilePath)
 import Data.Interval (Extended (..), Interval, (<=..<))
-import qualified Data.Interval as Interval
+import Data.Interval qualified as Interval
 import Data.IntervalMap.Strict (IntervalMap)
-import qualified Data.IntervalMap.Strict as IMap
-import qualified Data.IntervalSet as ISet
+import Data.IntervalMap.Strict qualified as IMap
+import Data.IntervalSet qualified as ISet
 import Data.List (foldl')
 import Data.List.Split (chunksOf)
 import Text.Trifecta hiding (parseString)

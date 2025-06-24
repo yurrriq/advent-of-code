@@ -1,10 +1,11 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
+{-# LANGUAGE StrictData #-}
 
 -- |
 -- Module      : AdventOfCode.Year2015.Day23
 -- Description : Advent of Code 2015 Day 23: Opening the Turing Lock
--- Copyright   : (c) Eric Bailey, 2024
+-- Copyright   : (c) Eric Bailey, 2024-2025
 -- License     : MIT
 -- Maintainer  : eric@ericb.me
 -- Stability   : experimental
@@ -26,12 +27,11 @@ import Control.Lens (makeLenses, modifying, uses, view, (+=), (.~))
 import Control.Monad (when)
 import Control.Monad.State (State, execState)
 import Data.Bool (bool)
-import Data.Default (Default (def))
 import Data.Function ((&))
 import Data.Function.Pointless ((.:))
 import Data.Ix (inRange)
 import Data.Vector (Vector, (!))
-import qualified Data.Vector as Vector
+import Data.Vector qualified as Vector
 import GHC.Generics (Generic)
 import Text.Parser.Token.Highlight (Highlight (..))
 import Text.Trifecta
@@ -48,9 +48,9 @@ import Text.Trifecta
 -- ------------------------------------------------------------------- [ Types ]
 
 data Instruction
-  = InstructionRegister !Operation !Register
-  | InstructionOffset !Operation !Offset
-  | InstructionRegisterOffset !Operation !Register !Offset
+  = InstructionRegister Operation Register
+  | InstructionOffset Operation Offset
+  | InstructionRegisterOffset Operation Register Offset
   deriving (Eq)
 
 instance Show Instruction where
@@ -75,13 +75,16 @@ data Register
 type Offset = Int
 
 data ComputerState = ComputerState
-  { _cursor :: !Int,
-    _registerA :: !Int,
-    _registerB :: !Int
+  { _cursor :: Int,
+    _registerA :: Int,
+    _registerB :: Int
   }
-  deriving (Eq, Generic, Default, Show)
+  deriving (Eq, Generic, Show)
 
 makeLenses ''ComputerState
+
+defaultComputerState :: ComputerState
+defaultComputerState = ComputerState 0 0 0
 
 type Program = State ComputerState
 
@@ -91,17 +94,17 @@ main :: IO ()
 main = $(defaultMain)
 
 partOne :: Vector Instruction -> Int
-partOne = programExec def
+partOne = programExec defaultComputerState
 
 partTwo :: Vector Instruction -> Int
-partTwo = programExec $ def & (registerA .~ 1)
+partTwo = programExec $ defaultComputerState & (registerA .~ 1)
 
 getInput :: IO (Vector Instruction)
 getInput = parseInput (Vector.fromList <$> some instruction) $(inputFilePath)
 
 example :: IO Int
 example =
-  fmap (view registerA . flip execState def . program) $
+  fmap (view registerA . flip execState defaultComputerState . program) $
     parseString (Vector.fromList <$> some instruction) $
       unlines
         [ "inc a",

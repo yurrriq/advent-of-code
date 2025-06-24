@@ -3,7 +3,7 @@
 module Test.AdventOfCode.Year2015.Day07 where
 
 import AdventOfCode.Year2015.Day07 (circuit, evalCircuit)
-import qualified Data.Map as Map
+import Data.Map qualified as Map
 import Data.Maybe (fromJust)
 import Test.Tasty
 import Test.Tasty.HUnit

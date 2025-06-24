@@ -12,7 +12,7 @@ import AdventOfCode.TH (inputFilePath)
 import Data.Char (digitToInt)
 import Data.Monoid (Sum (..))
 import Data.Vector (Vector)
-import qualified Data.Vector as V
+import Data.Vector qualified as V
 import Text.Trifecta (Parser, digit, some)
 
 main :: IO ()

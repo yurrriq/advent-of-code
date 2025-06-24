@@ -8,12 +8,12 @@ import Data.Bool (bool)
 import Data.Ix (inRange)
 import Data.List (find)
 import Data.Map (Map)
-import qualified Data.Map as Map
+import Data.Map qualified as Map
 import Data.Maybe (mapMaybe)
 import Data.Set (Set)
-import qualified Data.Set as Set
+import Data.Set qualified as Set
 import Data.Vector (Vector)
-import qualified Data.Vector as V
+import Data.Vector qualified as V
 import Linear (V2 (..))
 import Text.Parser.Token.Highlight (Highlight (..))
 import Text.Trifecta (Parser, char, highlight, newline, sepEndBy, some, (<?>))

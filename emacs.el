@@ -149,7 +149,9 @@
   (:map haskell-mode-map
         ("C-c r" . ormolu-format-buffer))
   :config
-  (setq ormolu-extra-args '("--ghc-opt" "-XTemplateHaskell")))
+  (setq ormolu-extra-args
+    '("--ghc-opt" "-XGHC2021"
+      "--ghc-opt" "-XTemplateHaskell")))
 
 (use-package paredit
   :hook (emacs-lisp-mode . paredit-mode))

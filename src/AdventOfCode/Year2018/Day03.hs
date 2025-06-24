@@ -9,7 +9,7 @@ import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (inputFilePath)
 import AdventOfCode.Util (Frequencies, frequencies)
 import Data.List (find)
-import qualified Data.Map as Map
+import Data.Map qualified as Map
 import Data.Maybe (fromMaybe)
 import Text.Trifecta (Parser, comma, digit, many, natural, some, space, symbol)
 

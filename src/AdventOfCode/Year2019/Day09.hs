@@ -20,8 +20,8 @@ import Data.Vector
     modify,
     (!),
   )
-import qualified Data.Vector as V
-import qualified Data.Vector.Mutable as MV
+import Data.Vector qualified as V
+import Data.Vector.Mutable qualified as MV
 import Text.Trifecta (Parser, comma, integer, sepBy)
 
 -- -------------------------------------------------------------------- [ Main ]

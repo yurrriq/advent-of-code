@@ -8,7 +8,7 @@ import Control.Monad (void)
 import Data.Char (digitToInt)
 import Text.Parser.LookAhead (lookAhead)
 import Text.Trifecta hiding (digit, parseString)
-import qualified Text.Trifecta as Trifecta
+import Text.Trifecta qualified as Trifecta
 
 main :: IO ()
 main =

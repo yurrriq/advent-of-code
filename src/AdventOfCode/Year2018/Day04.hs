@@ -14,7 +14,7 @@ import Control.Applicative ((<|>))
 import Control.Arrow (first)
 import Data.List (maximumBy, sort)
 import Data.Map (Map)
-import qualified Data.Map as Map
+import Data.Map qualified as Map
 import Data.Ord (comparing)
 import Text.Trifecta (Parser, brackets, char, colon, many, natural, symbol, (<?>))
 

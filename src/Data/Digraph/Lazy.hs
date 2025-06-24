@@ -1,11 +1,11 @@
 -- https://github.com/mstksg/advent-of-code-2020/blob/master/reflections-out/day07.md
 module Data.Digraph.Lazy where
 
-import qualified Data.Foldable as F
+import Data.Foldable qualified as F
 import Data.Map (Map)
-import qualified Data.Map as M
+import Data.Map qualified as M
 import Data.Set (Set)
-import qualified Data.Set as S
+import Data.Set qualified as S
 import Prelude hiding (foldMap)
 
 -- | A directed graph with labeled edges.

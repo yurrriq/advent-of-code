@@ -7,7 +7,7 @@ import Control.Arrow (second)
 import Data.Functor ((<&>))
 import Data.List (nub)
 import Data.Map.Strict (Map)
-import qualified Data.Map.Strict as M
+import Data.Map.Strict qualified as M
 import Text.Trifecta (Parser, lower, string, symbol, token, try, upper)
 
 data Problem a = (Grammar a) :-> [a]

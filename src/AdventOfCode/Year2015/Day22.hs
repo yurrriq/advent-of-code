@@ -28,8 +28,8 @@ import Control.Lens (Getter, over, view, views, (%~), (+~), (-~), (.~), (^.))
 import Data.Bool (bool)
 import Data.Function ((&))
 import Data.Graph.AStar (aStar)
-import qualified Data.HashMap.Strict as HashMap
-import qualified Data.HashSet as HashSet
+import Data.HashMap.Strict qualified as HashMap
+import Data.HashSet qualified as HashSet
 import Text.Trifecta (Parser, natural, symbol)
 
 -- -------------------------------------------------------------------- [ Main ]
