@@ -214,6 +214,13 @@ executables:
       - linear
       - mtl
       - vector
+  aoc-2016-day14:
+    <<: *executable
+    main: AdventOfCode.Year2016.Day14
+    dependencies:
+      - containers
+      - cryptonite
+      - mtl
   aoc-2017-day01:
     <<: *executable
     main: AdventOfCode.Year2017.Day01
