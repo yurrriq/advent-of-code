@@ -18,7 +18,7 @@
     };
   };
 
-  perSystem = { pkgs, self', ... }: {
+  perSystem = { lib, pkgs, self', ... }: {
     devShells.haskell = pkgs.mkShell {
       inputsFrom = [
         self'.packages.advent-of-code.env
@@ -32,13 +32,35 @@
         haskellPackages.ormolu
         haskellPackages.pointfree
       ];
+
+      shellHook = ''
+        export LD_LIBRARY_PATH="${lib.makeLibraryPath [ pkgs.zlib ] }"
+      '';
     };
 
     packages = {
-      advent-of-code = pkgs.haskellPackages.callCabal2nix
-        "advent-of-code"
-        (pkgs.nix-gitignore.gitignoreSource [ ] ../.)
-        { };
+      advent-of-code =
+        let
+          src = lib.fileset.toSource {
+            fileset = lib.fileset.unions [
+              ../VERSION
+              ../package.yaml
+              ../src
+            ];
+            root = ../.;
+          };
+          pkg = pkgs.haskellPackages.callCabal2nix "advent-of-code" src.outPath { };
+        in
+        pkgs.haskell.lib.overrideCabal pkg {
+          haddockFlags = [
+            "--html-location='https://hackage.haskell.org/package/$pkgid/docs/'"
+            "--hyperlink-source"
+            "--quickjump"
+          ];
+          librarySystemDepends = [
+            pkgs.zlib
+          ];
+        };
 
       default = self'.packages.advent-of-code;
     };

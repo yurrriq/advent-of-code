@@ -17,7 +17,9 @@ dependencies:
   - bytestring
   - comonad
   - containers
+  - extra
   - lens
+  - monad-logger
   - parsers
   - split
   - tasty
