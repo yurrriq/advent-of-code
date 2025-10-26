@@ -44,6 +44,9 @@ main = do
   putStr "Part Two: "
   print =<< partTwo salt
 
+getInput :: IO ByteString
+getInput = pure "yjdafjpo"
+
 partOne :: ByteString -> IO Int
 partOne = flip partOne' 64
 
@@ -58,12 +61,6 @@ partOne' salt =
     go 0 = fail "Must specify a strictly positive number"
     go 1 = nextKey
     go k = nextKey *> go (k - 1)
-
-partTwo :: ByteString -> IO Int
-partTwo = undefined
-
-getInput :: IO ByteString
-getInput = pure "yjdafjpo"
 
 nextKey :: Puzzle Int
 nextKey = do
@@ -102,3 +99,43 @@ hasTriple =
 
 hasRun :: Int -> Word8 -> Int -> Puzzle Bool
 hasRun k digit = fmap (BS.replicate k digit `BS.isInfixOf`) . md5With
+
+partTwo :: ByteString -> IO Int
+partTwo = flip partTwo' 64
+
+partTwo' :: ByteString -> Int -> IO Int
+partTwo' salt =
+  runStderrLoggingT
+    . flip evalStateT (0, IntMap.empty)
+    . flip runReaderT (Builder.byteString salt)
+    . runPuzzle
+    . go
+  where
+    go 0 = fail "Must specify a strictly positive number"
+    go 1 = nextStretchedKey
+    go k = nextStretchedKey *> go (k - 1)
+
+nextStretchedKey :: Puzzle Int
+nextStretchedKey = do
+  digest <- stretchedHash
+  i <- gets fst
+  _1 %= (+ 1)
+  case hasTriple digest of
+    Nothing -> nextStretchedKey
+    Just digit ->
+      ifM (notM (anyM (hasStretchedRun 5 digit) [i + 1 .. i + 1000])) nextStretchedKey do
+        $(logDebug) (fromString (printf "Found key with %d" i))
+        pure i
+
+hasStretchedRun :: Int -> Word8 -> Int -> Puzzle Bool
+hasStretchedRun k digit = fmap (BS.replicate k digit `BS.isInfixOf`) . stretchedHashFor
+
+stretchedHash :: Puzzle ByteString
+stretchedHash = stretchedHashFor =<< gets fst
+
+stretchedHashFor :: Int -> Puzzle ByteString
+stretchedHashFor i = do
+  string <- asks (appendInt i)
+  let go = (<|> Just (iterate (Base16.encode . hash) string !! 2017))
+  _2 %= IntMap.alter go i
+  uses _2 (! i)
