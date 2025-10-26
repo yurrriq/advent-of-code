@@ -10,26 +10,28 @@ import Control.Monad.IO.Class (MonadIO)
 import Control.Monad.Logger (LoggingT, MonadLogger, logDebug, runStderrLoggingT)
 import Control.Monad.Reader (MonadReader, ReaderT, asks, runReaderT)
 import Control.Monad.State (MonadState, StateT, evalStateT, gets)
-import Crypto.Hash (MD5 (MD5), hashWith)
+import Crypto.Hash.MD5 (hash)
 import Data.ByteString (ByteString)
+import Data.ByteString qualified as BS
+import Data.ByteString.Base16 qualified as Base16
 import Data.ByteString.Builder (Builder)
 import Data.ByteString.Builder qualified as Builder
 import Data.ByteString.Lazy qualified as BSL
 import Data.IntMap (IntMap, (!))
 import Data.IntMap qualified as IntMap
-import Data.List (isInfixOf, isPrefixOf, uncons)
 import Data.String (fromString)
+import Data.Word (Word8)
 import Text.Printf (printf)
 
 newtype Puzzle a = Puzzle
-  {runPuzzle :: ReaderT Builder (StateT (Int, IntMap String) (LoggingT IO)) a}
+  {runPuzzle :: ReaderT Builder (StateT (Int, IntMap ByteString) (LoggingT IO)) a}
   deriving
     ( Functor,
       Applicative,
       Monad,
       MonadIO,
       MonadLogger,
-      MonadState (Int, IntMap String),
+      MonadState (Int, IntMap ByteString),
       MonadReader Builder,
       MonadFail
     )
@@ -75,13 +77,13 @@ nextKey = do
         $(logDebug) (fromString (printf "Found key with %d" i))
         pure i
 
-md5 :: Puzzle String
+md5 :: Puzzle ByteString
 md5 = md5With =<< gets fst
 
-md5With :: Int -> Puzzle String
+md5With :: Int -> Puzzle ByteString
 md5With i = do
   string <- asks (appendInt i)
-  let go = (<|> Just (show (hashWith MD5 string)))
+  let go = (<|> Just (Base16.encode (hash string)))
   _2 %= IntMap.alter go i
   uses _2 (! i)
 
@@ -91,12 +93,12 @@ appendInt n salt =
     Builder.toLazyByteString $
       salt <> Builder.intDec n
 
-hasTriple :: String -> Maybe Char
+hasTriple :: ByteString -> Maybe Word8
 hasTriple =
-  uncons >=> \(c, cs) ->
-    if replicate 2 c `isPrefixOf` cs
+  BS.uncons >=> \(c, cs) ->
+    if BS.replicate 2 c `BS.isPrefixOf` cs
       then Just c
       else hasTriple cs
 
-hasRun :: Int -> Char -> Int -> Puzzle Bool
-hasRun k digit = fmap (replicate k digit `isInfixOf`) . md5With
+hasRun :: Int -> Word8 -> Int -> Puzzle Bool
+hasRun k digit = fmap (BS.replicate k digit `BS.isInfixOf`) . md5With

@@ -42,12 +42,13 @@ library:
     - aeson
     - arithmoi
     - astar
+    - base16-bytestring
     - combinatorial
     - comonad
     - composition
     - conduit
     - containers
-    - cryptonite
+    - cryptohash-md5
     - data-interval
     - data-ordlist
     - dlist
@@ -207,8 +208,9 @@ executables:
     <<: *executable
     main: AdventOfCode.Year2016.Day05
     dependencies:
+      - base16-bytestring
       - containers
-      - cryptonite
+      - cryptohash-md5
   aoc-2016-day12:
     <<: *executable
     main: AdventOfCode.Year2016.Day12
@@ -220,8 +222,9 @@ executables:
     <<: *executable
     main: AdventOfCode.Year2016.Day14
     dependencies:
+      - base16-bytestring
       - containers
-      - cryptonite
+      - cryptohash-md5
       - mtl
   aoc-2017-day01:
     <<: *executable
