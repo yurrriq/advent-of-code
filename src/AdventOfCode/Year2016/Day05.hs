@@ -7,52 +7,49 @@ module AdventOfCode.Year2016.Day05
   )
 where
 
-import AdventOfCode.TH (inputFilePath)
-import Crypto.Hash.MD5 (hash)
+import AdventOfCode.TH (defaultMain, inputFilePath)
+import Crypto.Hash.MD5 qualified as MD5
+import Data.ByteString (ByteString)
+import Data.ByteString qualified as BS
 import Data.ByteString.Base16 qualified as Base16
-import Data.ByteString.Char8 (ByteString)
-import Data.ByteString.Char8 qualified as BS
-import Data.Map.Lazy qualified as Map
-
-type Password = Map.Map Char Char
+import Data.ByteString.Builder (Builder)
+import Data.ByteString.Builder qualified as Builder
+import Data.ByteString.Lazy qualified as BSL
+import Data.List.Extra (nubOrdOn, sort)
 
 main :: IO ()
-main = do
-  doorID <- head . words <$> readFile $(inputFilePath)
-  putStr "Part One: "
-  putStrLn (partOne doorID)
-  putStr "Part Two: "
-  putStrLn (partTwo doorID)
+main = $(defaultMain)
 
-partOne :: String -> String
+getInput :: IO Builder
+getInput = Builder.byteString . BS.take 8 <$> BS.readFile $(inputFilePath)
+
+partOne :: Builder -> ByteString
 partOne doorID =
-  take 8 $
+  BS.pack . take 8 $
     [ digest `BS.index` 5
       | digest <- digests doorID,
         "00000" `BS.isPrefixOf` digest
     ]
 
-partTwo :: String -> String
+partTwo :: Builder -> ByteString
 partTwo doorID =
-  Map.elems . partTwo' Map.empty $
+  BS.pack . map snd . sort . take 8 . nubOrdOn fst $
     [ (digest `BS.index` 5, digest `BS.index` 6)
       | digest <- digests doorID,
         "00000" `BS.isPrefixOf` digest,
         digest `BS.index` 5 `BS.elem` "01234567"
     ]
 
-partTwo' :: Password -> [(Char, Char)] -> Password
-partTwo' m ((k, v) : kvs)
-  | 8 == Map.size m = m
-  | Map.member k m = partTwo' m kvs
-  | otherwise = flip partTwo' kvs $ Map.insertWith (const id) k v m
-partTwo' _ [] = error "333"
-
-digests :: String -> [ByteString]
-digests doorID = digests' (BS.pack doorID) 0
-
-digests' :: ByteString -> Integer -> [ByteString]
-digests' doorID n = md5 (doorID <> BS.pack (show n)) : digests' doorID (n + 1)
+digests :: Builder -> [ByteString]
+digests doorID = md5 . flip appendInt doorID <$> [0 ..]
 
 md5 :: ByteString -> ByteString
-md5 = Base16.encode . hash
+md5 = Base16.encode . MD5.hash
+
+-- | Append the decimal encoding of an 'Int' to a 'Builder' to generate a
+-- 'ByteString'.
+appendInt :: Int -> Builder -> ByteString
+appendInt n salt =
+  BSL.toStrict $
+    Builder.toLazyByteString $
+      salt <> Builder.intDec n

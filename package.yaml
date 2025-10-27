@@ -209,8 +209,8 @@ executables:
     main: AdventOfCode.Year2016.Day05
     dependencies:
       - base16-bytestring
-      - containers
       - cryptohash-md5
+      - extra
   aoc-2016-day12:
     <<: *executable
     main: AdventOfCode.Year2016.Day12
