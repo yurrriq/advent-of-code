@@ -11,12 +11,9 @@
     };
     flake-parts.url = "github:hercules-ci/flake-parts";
     nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
-    nixpkgs-stable.url = "github:nixos/nixpkgs/release-24.11";
-    pre-commit-hooks-nix = {
-      inputs = {
-        nixpkgs.follows = "nixpkgs";
-        nixpkgs-stable.follows = "nixpkgs-stable";
-      };
+    nixpkgs-stable.url = "github:nixos/nixpkgs/release-25.05";
+    git-hooks-nix = {
+      inputs.nixpkgs.follows = "nixpkgs";
       url = "github:cachix/git-hooks.nix";
     };
     treefmt-nix = {
@@ -28,7 +25,7 @@
   outputs = inputs@{ flake-parts, self, ... }:
     flake-parts.lib.mkFlake { inherit inputs; } {
       imports = [
-        inputs.pre-commit-hooks-nix.flakeModule
+        inputs.git-hooks-nix.flakeModule
         inputs.treefmt-nix.flakeModule
         ./nix/emacs.nix
         ./nix/haskell.nix
@@ -47,11 +44,6 @@
         lib.composeManyExtensions
           (lib.attrValues
             (lib.filterAttrs (name: _: name != "default") self.overlays));
-
-      # FIXME: v2 works differently, I guess.
-      flake.overlays.treefmt = _final: prev: {
-        treefmt = prev.treefmt1;
-      };
 
       perSystem = { config, pkgs, self', system, ... }: {
         _module.args.pkgs = import inputs.nixpkgs {
@@ -106,6 +98,7 @@
             nixpkgs-fmt.enable = true;
             prettier.enable = true;
             shellcheck.enable = true;
+            statix.enable = true;
           };
           settings.formatter = {
             prettier = {
