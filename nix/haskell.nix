@@ -44,8 +44,10 @@
           src = lib.fileset.toSource {
             fileset = lib.fileset.unions [
               ../VERSION
+              ../input
               ../package.yaml
               ../src
+              ../test
             ];
             root = ../.;
           };
