@@ -4,8 +4,9 @@ module AdventOfCode.Year2015.Day11 where
 
 import AdventOfCode.TH
 import Control.Arrow ((***), (>>>))
-import Control.Monad ((>=>))
-import Data.List (find, group, isPrefixOf, nub)
+import Data.List.Extra (isPrefixOf, nubOrd)
+import Data.List.Infinite qualified as Infinite
+import Data.List.NonEmpty qualified as NE
 
 main :: IO ()
 main = $(defaultMain)
@@ -13,18 +14,18 @@ main = $(defaultMain)
 getInput :: IO String
 getInput = pure "cqjxjnds"
 
-partOne :: String -> Maybe String
+partOne :: String -> String
 partOne = findNextPassword
 
-partTwo :: String -> Maybe String
-partTwo = partOne >=> findNextPassword
+partTwo :: String -> String
+partTwo = partOne >>> findNextPassword
 
-findNextPassword :: String -> Maybe String
+findNextPassword :: String -> String
 findNextPassword =
-  fmap reverse
-    . find isValidPasswordR
-    . tail
-    . iterate stepPasswordR
+  reverse
+    . Infinite.find isValidPasswordR
+    . Infinite.tail
+    . Infinite.iterate stepPasswordR
     . reverse
 
 stepPasswordR :: String -> String
@@ -55,7 +56,7 @@ isConfusing :: String -> Bool
 isConfusing = any (`elem` "iol")
 
 countUniquePairs :: String -> Int
-countUniquePairs = length . nub . map head . filter ((>= 2) . length) . group
+countUniquePairs = length . nubOrd . map NE.head . filter ((>= 2) . NE.length) . NE.group
 
 hasStraightR :: Int -> String -> Bool
 hasStraightR n = go

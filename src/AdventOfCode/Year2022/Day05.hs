@@ -7,7 +7,7 @@ import Control.Monad (void)
 import Data.IntMap (IntMap, (!))
 import Data.IntMap qualified as IM
 import Data.List (transpose)
-import Data.Maybe (catMaybes)
+import Data.Maybe (catMaybes, listToMaybe, mapMaybe)
 import Text.Trifecta
   ( Parser,
     char,
@@ -33,7 +33,7 @@ partTwo :: (IntMap [Char], [(Int, (Int, Int))]) -> String
 partTwo = day05 id
 
 day05 :: ([Char] -> [Char]) -> (IntMap [Char], [(Int, (Int, Int))]) -> String
-day05 f = map head . IM.elems . uncurry (rearrange f)
+day05 f = mapMaybe listToMaybe . IM.elems . uncurry (rearrange f)
 
 getInput :: IO (IntMap [Char], [(Int, (Int, Int))])
 getInput = parseInput drawing $(inputFilePath)

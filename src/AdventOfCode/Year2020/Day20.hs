@@ -10,12 +10,14 @@ import AdventOfCode.TH (inputFilePath)
 import AdventOfCode.Util (frequencies)
 import Control.Applicative ((<|>))
 import Control.Arrow ((&&&))
+import Control.Foldl qualified as Foldl
 import Control.Lens (ifoldl', view, (+~), (-~))
 import Control.Monad (ap, guard)
 import Data.Bool (bool)
 import Data.Foldable (toList)
 import Data.Map (Map, (!), (!?))
 import Data.Map qualified as Map
+import Data.Maybe (listToMaybe)
 import Data.Set (Set)
 import Data.Set qualified as Set
 import Linear.V2 (R1 (..), R2 (..), V2 (..), perp, _yx)
@@ -39,9 +41,9 @@ main =
 getInput :: IO [LabeledTile]
 getInput = parseInput (tile `sepEndBy` newline) $(inputFilePath)
 
-partOne :: [LabeledTile] -> Int
+partOne :: [LabeledTile] -> Maybe Int
 partOne pieces =
-  product . map fst . corners . head $
+  fmap (Foldl.fold (Foldl.premap fst Foldl.product) . corners) . listToMaybe $
     arrange edges Map.empty (Set.fromList pieces) allHoles
   where
     edges = findEdges pieces

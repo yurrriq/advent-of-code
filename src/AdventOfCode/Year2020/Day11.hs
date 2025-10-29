@@ -1,12 +1,13 @@
 module AdventOfCode.Year2020.Day11 where
 
 import AdventOfCode.Input (parseInput)
-import AdventOfCode.TH (inputFilePath)
+import AdventOfCode.TH (defaultMain, inputFilePath)
 import AdventOfCode.Util (adjacencies, fix', neighborsOf)
 import Control.Applicative ((<|>))
 import Data.Bool (bool)
 import Data.Ix (inRange)
 import Data.List (find)
+import Data.List.NonEmpty qualified as NE
 import Data.Map (Map)
 import Data.Map qualified as Map
 import Data.Maybe (mapMaybe)
@@ -20,13 +21,7 @@ import Text.Trifecta (Parser, char, highlight, newline, sepEndBy, some, (<?>))
 import Prelude hiding (floor)
 
 main :: IO ()
-main =
-  do
-    input <- getInput
-    putStr "Part One: "
-    print $ partOne input
-    putStr "Part Two: "
-    print $ partTwo input
+main = $(defaultMain)
 
 getInput :: IO (Vector (Vector Position))
 getInput = parseInput seatLayout $(inputFilePath)
@@ -49,7 +44,7 @@ partTwo xxs = solve 5 neighborhood grid
         firstNeighborInLine p dxy =
           find (`Set.member` ps) $
             takeWhile (all inRange') $
-              tail (iterate (+ dxy) p)
+              NE.tail (NE.iterate (+ dxy) p)
     -- TODO: be smarter, or (something like) the Grid type from 2019.10
     inRange' = inRange (0, max (length xxs) (length (V.head xxs)))
     grid = toGrid xxs

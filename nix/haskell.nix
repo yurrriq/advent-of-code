@@ -1,5 +1,3 @@
-{ ... }:
-
 {
   flake = {
     overlays.haskell = _final: prev: {
@@ -43,6 +41,7 @@
         let
           src = lib.fileset.toSource {
             fileset = lib.fileset.unions [
+              ../LICENSE
               ../VERSION
               ../input
               ../package.yaml
@@ -73,7 +72,7 @@
         ormolu = {
           enable = true;
           ghcOpts = [
-            "GHC2021"
+            "GHC2024"
             "TemplateHaskell"
           ];
         };

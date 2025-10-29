@@ -150,7 +150,7 @@
         ("C-c r" . ormolu-format-buffer))
   :config
   (setq ormolu-extra-args
-    '("--ghc-opt" "-XGHC2021"
+    '("--ghc-opt" "-XGHC2024"
       "--ghc-opt" "-XTemplateHaskell")))
 
 (use-package paredit

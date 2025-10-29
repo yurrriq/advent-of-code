@@ -1,5 +1,9 @@
+{-# LANGUAGE BlockArguments #-}
 {-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE DerivingVia #-}
 {-# LANGUAGE GADTs #-}
+{-# LANGUAGE MultiWayIf #-}
+{-# LANGUAGE ParallelListComp #-}
 
 module AdventOfCode.Year2024.Day06 where
 
@@ -7,11 +11,11 @@ import AdventOfCode.Input (parseInput, parseString)
 import AdventOfCode.TH (defaultMain, inputFilePath)
 import AdventOfCode.Util (CyclicEnum (..))
 import Control.Applicative ((<|>))
-import Control.Lens (ifoldl')
+import Control.Lens (ifoldl', makeLenses, to, (%=), (%~), (&), (&~), (+~), (.=), (.~), (^.))
 import Data.Ix (inRange)
 import Data.Set (Set)
 import Data.Set qualified as Set
-import Linear (V2 (..))
+import Linear (V2 (..), _x, _y)
 import Text.Trifecta (Parser, char, newline, sepEndBy, some)
 import Prelude hiding (Either (..))
 
@@ -23,67 +27,135 @@ data Heading
   deriving (Eq, Show, Enum, Bounded, CyclicEnum)
 
 data Position where
-  Guard :: Heading -> Position
-  Obstacle :: Position
+  TheGuard :: Heading -> Position
+  AnObstacle :: Position
   Empty :: Position
   deriving (Eq, Show)
+
+type Coordinates = V2 Int
+
+data Guard = Guard
+  { _position :: Coordinates,
+    _heading :: Heading
+  }
+  deriving (Eq, Show)
+
+makeLenses ''Guard
+
+data SituationMap
+  = SituationMap
+  { _bounds :: Coordinates,
+    _guard :: Guard,
+    _obstacles :: Set Coordinates
+  }
+  deriving (Eq)
+
+makeLenses ''SituationMap
+
+instance Show SituationMap where
+  show situation =
+    unlines
+      [ [ if
+            | V2 x y == situation ^. guard . position ->
+                case situation ^. guard . heading of
+                  Up -> '^'
+                  Right -> '>'
+                  Down -> 'v'
+                  Left -> '<'
+            | Set.member (V2 x y) (situation ^. obstacles) -> '#'
+            | otherwise -> '.'
+        | x <- [0 .. situation ^. bounds . _x]
+        ]
+      | y <- [0 .. situation ^. bounds . _y]
+      ]
 
 main :: IO ()
 main = $(defaultMain)
 
-partOne :: (V2 Int, (V2 Int, Heading), Set (V2 Int)) -> Int
-partOne = Set.size . go Set.empty
+partOne :: SituationMap -> Int
+partOne = Set.size . go . (Set.empty,)
   where
-    go seen (bounds, theGuard@(position, _), obstacles)
-      | inRange (pure 0, bounds - pure 1) position =
-          go (Set.insert position seen) (bounds, move theGuard obstacles, obstacles)
-      | otherwise = seen
+    go (visited, situation) =
+      moveGuard situation & \moved ->
+        if guardInBounds moved
+          then go (Set.insert (moved ^. guard . position) visited, moved)
+          else visited
 
-partTwo :: (V2 Int, (V2 Int, Heading), Set (V2 Int)) -> Int
+partTwo :: SituationMap -> Int
+-- partTwo situation = count (not . causesParadox situation) candidates
+--   where
+--     candidates =
+--       [ coords
+--       | x <- [0 .. situation ^. bounds . _x],
+--         y <- [0 .. situation ^. bounds . _y],
+--         let coords = V2 x y,
+--         coords /= situation ^. guard . position,
+--         situation ^. obstacles . to (Set.notMember coords)
+--       ]
 partTwo = undefined
 
-move :: (Ord a, Num a) => (V2 a, Heading) -> Set (V2 a) -> (V2 a, Heading)
-move (position, heading) obstacles =
-  if facingObstacle
-    then (position, csucc heading)
-    else (move' (position, heading), heading)
+causesParadox :: SituationMap -> Coordinates -> Bool
+causesParadox situation candidate = go (Set.empty, situation & obstacles %~ Set.insert candidate)
   where
-    facingObstacle = Set.member (move' (position, heading)) obstacles
+    go (visited, situation') =
+      moveGuard situation' & \moved ->
+        guardInBounds moved
+          && ( Set.member (moved ^. guard . position) visited
+                 || go (Set.insert (moved ^. guard . position) visited, moved)
+             )
 
-move' :: (Num a) => (V2 a, Heading) -> V2 a
-move' (position, heading) =
-  case heading of
-    Up -> position + V2 0 (-1)
-    Right -> position + V2 1 0
-    Down -> position + V2 0 1
-    Left -> position + V2 (-1) 0
+guardInBounds :: SituationMap -> Bool
+guardInBounds situation =
+  situation ^. guard . position . to (inRange (0, situation ^. bounds))
 
-getInput :: IO (V2 Int, (V2 Int, Heading), Set (V2 Int))
+moveGuard :: SituationMap -> SituationMap
+moveGuard situation =
+  if Set.member (moved ^. position) (situation ^. obstacles)
+    then situation & guard . heading %~ csucc & moveGuard
+    else situation & guard .~ moved
+  where
+    moved =
+      (situation ^. guard) & \theGuard ->
+        theGuard & position +~ (theGuard ^. heading . to headingToCoordinates)
+
+headingToCoordinates :: Heading -> Coordinates
+headingToCoordinates = \case
+  Up -> V2 0 (-1)
+  Right -> V2 1 0
+  Down -> V2 0 1
+  Left -> V2 (-1) 0
+
+getInput :: IO SituationMap
 getInput = parseInput situationMap $(inputFilePath)
 
-situationMap :: Parser (V2 Int, (V2 Int, Heading), Set (V2 Int))
+situationMap :: Parser SituationMap
 situationMap =
-  mkSituationMap <$> (some position `sepEndBy` newline)
-  where
-    position =
-      (Empty <$ char '.')
-        <|> (Obstacle <$ char '#')
-        <|> (Guard Up <$ char '^')
-        <|> (Guard Down <$ char 'v')
-        <|> (Guard Left <$ char '<')
-        <|> (Guard Right <$ char '>')
+  fmap mkSituationMap $
+    flip sepEndBy newline $
+      some $
+        (Empty <$ char '.')
+          <|> (AnObstacle <$ char '#')
+          <|> (TheGuard Up <$ char '^')
+          <|> (TheGuard Down <$ char 'v')
+          <|> (TheGuard Left <$ char '<')
+          <|> (TheGuard Right <$ char '>')
 
-mkSituationMap :: [[Position]] -> (V2 Int, (V2 Int, Heading), Set (V2 Int))
-mkSituationMap positions = (V2 width height, theGuard', obstacles')
+mkSituationMap :: [[Position]] -> SituationMap
+mkSituationMap = ifoldl' (ifoldl' . go) (SituationMap (pure 0) (Guard (pure 0) Up) Set.empty)
   where
-    (theGuard', obstacles') = ifoldl' (ifoldl' . go) ((pure 0, Up), Set.empty) positions
-    go y x (_, obstacles) (Guard heading) = ((V2 x y, heading), obstacles)
-    go y x (theGuard, obstacles) Obstacle = (theGuard, Set.insert (V2 x y) obstacles)
-    go _ _ acc Empty = acc
-    height = length positions
-    width = length (head positions)
+    go y x situation = \case
+      TheGuard theHeading ->
+        situation
+          & bounds .~ V2 x y
+          & guard .~ Guard (V2 x y) theHeading
+      AnObstacle ->
+        situation &~ do
+          bounds .= V2 x y
+          obstacles %= Set.insert (V2 x y)
+      Empty ->
+        situation & bounds .~ V2 x y
 
-getExample :: IO (V2 Int, (V2 Int, Heading), Set (V2 Int))
+getExample :: IO SituationMap
 getExample = parseString situationMap example
 
 example :: String
@@ -97,4 +169,4 @@ example =
   \.#..^.....\n\
   \........#.\n\
   \#.........\n\
-  \......#..."
+  \......#...\n"

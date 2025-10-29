@@ -7,7 +7,6 @@ import Data.Interval qualified as Interval
 import Data.IntervalMap.Strict (IntervalMap)
 import Data.IntervalMap.Strict qualified as IMap
 import Data.IntervalSet qualified as ISet
-import Data.List (foldl')
 import Data.List.Split (chunksOf)
 import Text.Trifecta hiding (parseString)
 
@@ -32,8 +31,8 @@ partTwo (Almanac (seeds, mappings)) =
         mapped =
           ISet.fromList
             [ Interval.mapMonotonic (+ delta) interval
-              | (interval, delta) <-
-                  IMap.toList (IMap.intersectionWith const imap seen)
+            | (interval, delta) <-
+                IMap.toList (IMap.intersectionWith const imap seen)
             ]
         seen = IMap.fromList [(interval, ()) | interval <- ISet.toList iset]
 

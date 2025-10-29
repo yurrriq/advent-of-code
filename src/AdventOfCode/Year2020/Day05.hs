@@ -1,39 +1,45 @@
 module AdventOfCode.Year2020.Day05 where
 
 import AdventOfCode.Input (parseInput)
-import AdventOfCode.TH (inputFilePath)
+import AdventOfCode.TH (defaultMain, inputFilePath)
 import Control.Applicative ((<|>))
+import Control.Arrow ((>>>))
+import Control.Foldl qualified as Foldl
+import Control.Monad (guard)
 import Data.FastDigits (undigits)
-import Data.List (delete)
 import Text.Parser.Token.Highlight (Highlight (..))
+-- TODO: use NonEmpty via sepEndBy1
+-- import Control.Applicative.Combinators.NonEmpty  (sepEndBy1)
 import Text.Trifecta (Parser, char, count, highlight, newline, sepEndBy, (<?>))
 
 main :: IO ()
-main =
-  do
-    boardingPasses <- getInput
-    putStr "Part One: "
-    print $ partOne boardingPasses
-    putStr "Part Two: "
-    print $ partTwo boardingPasses
+main = $(defaultMain)
 
 getInput :: IO [[Int]]
 getInput = parseInput (boardingPass `sepEndBy` newline) $(inputFilePath)
 
-partOne :: [[Int]] -> Integer
-partOne = maximum . map findSeatId
+partOne :: [[Int]] -> Maybe Integer
+partOne = Foldl.fold $ Foldl.premap findSeatId Foldl.maximum
 
--- TODO: in a single pass, subtract sum from sum [min..max]
-partTwo :: [[Int]] -> Integer
-partTwo bps = head $ foldr delete [firstSeatId .. lastSeatId] seatIds
+partTwo :: [[Int]] -> Maybe Integer
+partTwo =
+  Foldl.fold foldSeats >>> \(numSeats, sumIds, maybeMinId, maybeMaxId) -> do
+    minId <- maybeMinId
+    maxId <- maybeMaxId
+    let expectedCount = maxId - minId + 1
+    guard (numSeats /= expectedCount)
+    pure $ (maxId + minId) * expectedCount `div` 2 - sumIds
   where
-    -- sumThrough n = n * (n + 1) `div` 2
-    firstSeatId = minimum seatIds
-    lastSeatId = maximum seatIds
-    seatIds = map findSeatId bps
+    foldSeats =
+      Foldl.premap findSeatId $
+        (,,,)
+          <$> Foldl.genericLength
+          <*> Foldl.sum
+          <*> Foldl.minimum
+          <*> Foldl.maximum
 
 findSeatId :: [Int] -> Integer
-findSeatId = undigits (2 :: Int) . reverse
+findSeatId = undigits @Int 2 . reverse
 
 boardingPass :: Parser [Int]
 boardingPass = count 10 bsp

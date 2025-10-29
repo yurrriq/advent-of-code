@@ -10,10 +10,10 @@ test_day11_answers =
     "Answers"
     [ testCase "Part One" $ do
         input <- getInput
-        partOne input @?= Just "cqjxxyzz",
+        partOne input @?= "cqjxxyzz",
       testCase "Part Two" $ do
         input <- getInput
-        partTwo input @?= Just "cqkaabcc"
+        partTwo input @?= "cqkaabcc"
     ]
 
 test_day11_examples :: TestTree
@@ -33,10 +33,10 @@ test_day11_examples =
             failsTheThirdRequirement password,
       let password = "abcdefgh"
        in testCase password $ do
-            findNextPassword password @?= Just "abcdffaa",
+            findNextPassword password @?= "abcdffaa",
       let password = "ghijklmn"
        in testCase password $ do
-            findNextPassword password @?= Just "ghjaabcc"
+            findNextPassword password @?= "ghjaabcc"
     ]
 
 meetsTheFirstRequirement :: String -> Assertion

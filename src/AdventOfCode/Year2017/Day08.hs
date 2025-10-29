@@ -3,7 +3,6 @@ module AdventOfCode.Year2017.Day08 where
 import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (defaultMain, inputFilePath)
 import Control.Applicative ((<|>))
-import Data.List (foldl')
 import Data.Map.Strict (Map)
 import Data.Map.Strict qualified as Map
 import Data.Maybe (fromMaybe)

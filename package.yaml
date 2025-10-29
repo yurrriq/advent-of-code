@@ -6,7 +6,7 @@ maintainer: eric@ericb.me
 license-file: LICENSE
 license: MIT
 github: yurrriq/advent-of-code
-language: GHC2021
+language: GHC2024
 extra-source-files:
   - LICENSE
   - VERSION
@@ -18,6 +18,7 @@ dependencies:
   - comonad
   - containers
   - extra
+  - foldl
   - lens
   - monad-logger
   - parsers
@@ -58,6 +59,7 @@ library:
     - free-algebras
     - groups
     - hashable
+    - infinite-list
     - lens
     - linear
     - monoid-extras
@@ -67,6 +69,7 @@ library:
     - recursion-schemes
     - safe
     - scientific
+    - semirings
     - transformers
     - unordered-containers
     - utility-ht
@@ -127,9 +130,13 @@ executables:
   aoc-2015-day10:
     <<: *executable
     main: AdventOfCode.Year2015.Day10
+    dependencies:
+      - infinite-list
   aoc-2015-day11:
     <<: *executable
     main: AdventOfCode.Year2015.Day11
+    dependencies:
+      - infinite-list
   aoc-2015-day12:
     <<: *executable
     main: AdventOfCode.Year2015.Day12
@@ -167,6 +174,8 @@ executables:
     main: AdventOfCode.Year2015.Day20
     dependencies:
       - arithmoi
+      - infinite-list
+      - semirings
   aoc-2015-day21:
     <<: *executable
     main: AdventOfCode.Year2015.Day21
@@ -258,6 +267,8 @@ executables:
     main: AdventOfCode.Year2017.Day07
     dependencies:
       - extra
+      - foldl
+      - pointless-fun
   aoc-2017-day08:
     <<: *executable
     main: AdventOfCode.Year2017.Day08
@@ -328,6 +339,10 @@ executables:
   aoc-2019-day10:
     <<: *executable
     main: AdventOfCode.Year2019.Day10
+    dependencies:
+      - extra
+      - lens
+      - linear
   aoc-2019-day12:
     <<: *executable
     main: AdventOfCode.Year2019.Day12
@@ -354,6 +369,7 @@ executables:
     main: AdventOfCode.Year2020.Day05
     dependencies:
       - fast-digits
+      - foldl
   aoc-2020-day06:
     <<: *executable
     main: AdventOfCode.Year2020.Day06
@@ -376,6 +392,8 @@ executables:
   aoc-2020-day09:
     <<: *executable
     main: AdventOfCode.Year2020.Day09
+    dependencies:
+      - mtl
   aoc-2020-day10:
     <<: *executable
     main: AdventOfCode.Year2020.Day10

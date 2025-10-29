@@ -29,6 +29,7 @@ example =
   ]
 
 isSafe :: [Integer] -> Bool
-isSafe xs = any (all (inRange (1, 3))) [diffs, negate <$> diffs]
+isSafe [] = False
+isSafe xxs@(_ : xs) = any (all (inRange (1, 3))) [diffs, negate <$> diffs]
   where
-    diffs = zipWith subtract xs (tail xs)
+    diffs = zipWith subtract xxs xs

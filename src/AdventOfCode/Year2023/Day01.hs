@@ -1,23 +1,21 @@
 module AdventOfCode.Year2023.Day01 where
 
 import AdventOfCode.Input (parseString, rawInput)
-import AdventOfCode.TH (inputFilePath)
+import AdventOfCode.TH (defaultMainIO, inputFilePath)
 import AdventOfCode.Util ((<.>))
 import Control.Applicative ((<|>))
 import Control.Monad (void)
 import Data.Char (digitToInt)
+import Data.List.NonEmpty qualified as NE
 import Text.Parser.LookAhead (lookAhead)
 import Text.Trifecta hiding (digit, parseString)
 import Text.Trifecta qualified as Trifecta
 
 main :: IO ()
-main =
-  do
-    input <- rawInput $(inputFilePath)
-    putStr "Part One: "
-    print =<< partOne input
-    putStr "Part Two: "
-    print =<< partTwo input
+main = $(defaultMainIO)
+
+getInput :: IO String
+getInput = rawInput $(inputFilePath)
 
 partOne :: String -> IO Int
 partOne = calibrate digit
@@ -29,9 +27,9 @@ calibrate :: Parser Int -> String -> IO Int
 calibrate p = sum <.> parseString (calibrationDocument p)
 
 calibrationDocument :: Parser Int -> Parser [Int]
-calibrationDocument p = (calibrationValue <$> some p) `sepEndBy` newline
+calibrationDocument p = (calibrationValue <$> NE.some1 p) `sepEndBy` newline
   where
-    calibrationValue = (+) <$> (10 *) . head <*> last
+    calibrationValue = (+) <$> (10 *) . NE.head <*> NE.last
 
 digit :: Parser Int
 digit = digitToInt <$> Trifecta.digit `surroundedBy` many letter

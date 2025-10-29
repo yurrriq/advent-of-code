@@ -3,7 +3,7 @@ module AdventOfCode.Year2020.Day13 where
 import AdventOfCode.Input (parseInput, parseString)
 import AdventOfCode.TH (defaultMain, inputFilePath)
 import Control.Applicative ((<|>))
-import Data.List.Extra (foldl', minimumOn)
+import Data.List.Extra (minimumOn)
 import Data.Maybe (catMaybes, mapMaybe)
 import Text.Trifecta (Parser, char, commaSep, decimal, newline)
 
@@ -15,8 +15,8 @@ partOne (timestamp, busIDs) =
   uncurry (*) $
     minimumOn snd $
       [ (busID, wait)
-        | busID <- catMaybes busIDs,
-          let wait = busID - (timestamp `mod` busID)
+      | busID <- catMaybes busIDs,
+        let wait = busID - (timestamp `mod` busID)
       ]
 
 partTwo :: (Integer, [Maybe Integer]) -> Integer

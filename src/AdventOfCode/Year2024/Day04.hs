@@ -6,6 +6,7 @@ import AdventOfCode.Util (count)
 import Data.List (tails, transpose)
 import Data.List.Extra (dropEnd, sumOn')
 import Data.Universe.Helpers (diagonals)
+import Linear (V2 (..))
 import Text.Trifecta (Parser, manyTill, newline, oneOf, some)
 
 main :: IO ()
@@ -28,45 +29,27 @@ partOne grid =
 
 partTwo :: [[Char]] -> Int
 partTwo grid =
-  sum
-    [ 1
-      | x <- [0 .. width - 3],
-        y <- [0 .. height - 3],
-        (grid !! (y + 1) !! (x + 1) == 'A')
-          && ( ( grid !! y !! x == 'M'
-                   && grid !! y !! (x + 2) == 'M'
-                   && grid !! (y + 2) !! x == 'S'
-                   && grid !! (y + 2) !! (x + 2) == 'S'
-               )
-                 || ( grid !! y !! x == 'M'
-                        && grid !! y !! (x + 2) == 'S'
-                        && grid !! (y + 2) !! x == 'M'
-                        && grid !! (y + 2) !! (x + 2) == 'S'
-                    )
-                 || ( grid !! y !! x == 'S'
-                        && grid !! y !! (x + 2) == 'S'
-                        && grid !! (y + 2) !! x == 'M'
-                        && grid !! (y + 2) !! (x + 2) == 'M'
-                    )
-                 || ( grid !! y !! x == 'S'
-                        && grid !! y !! (x + 2) == 'M'
-                        && grid !! (y + 2) !! x == 'S'
-                        && grid !! (y + 2) !! (x + 2) == 'M'
-                    )
-             )
+  count
+    ((`elem` ["MMSS", "MSMS", "SMSM", "SSMM"]) . map (square grid) . corners)
+    [ V2 x y
+    | x <- [0 .. size - 3],
+      y <- [0 .. size - 3],
+      square grid (V2 x y + 1) == 'A'
     ]
   where
-    width = length (head grid)
-    height = length grid
+    size = length grid
+
+corners :: (Num a) => V2 a -> [V2 a]
+corners xy = [xy + V2 a b | a <- [0, 2], b <- [0, 2]]
+
+square :: [[Char]] -> V2 Int -> Char
+square grid (V2 x y) = grid !! y !! x
 
 getInput :: IO [[Char]]
-getInput =
-  parseInput wordSearch $(inputFilePath)
+getInput = parseInput wordSearch $(inputFilePath)
 
 wordSearch :: Parser [[Char]]
-wordSearch = some (manyTill xmas newline)
-  where
-    xmas = oneOf "XMAS"
+wordSearch = some (manyTill (oneOf "XMAS") newline)
 
 getExample :: IO [[Char]]
 getExample =

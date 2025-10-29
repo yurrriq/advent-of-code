@@ -23,6 +23,17 @@ defaultMain =
       noBindS [|$(doPartTwo)|]
     ]
 
+defaultMainIO :: Q Exp
+defaultMainIO =
+  [|
+    do
+      input <- getInput
+      putStr "Part One: "
+      print =<< partOne input
+      putStr "Part Two: "
+      print =<< partTwo input
+    |]
+
 defaultMainMaybe :: Q Exp
 defaultMainMaybe =
   doE

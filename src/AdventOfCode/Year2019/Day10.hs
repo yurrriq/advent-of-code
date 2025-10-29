@@ -1,30 +1,56 @@
-{-# OPTIONS_GHC -Wno-type-defaults #-}
+{-# LANGUAGE BlockArguments #-}
 
 module AdventOfCode.Year2019.Day10 where
 
 import AdventOfCode.Input (parseInput)
-import AdventOfCode.TH (inputFilePath)
+import AdventOfCode.TH (defaultMain, inputFilePath)
 import Control.Applicative ((<|>))
-import Control.Monad (foldM)
-import Data.Foldable (minimumBy)
+import Control.Lens (ifoldl', makeLenses, over, views, (%~), _1, _2, _3, _4)
+import Data.Bifunctor (bimap, first)
+import Data.Function (on)
 import Data.Functor (($>))
 import Data.HashMap.Strict (HashMap, (!))
 import Data.HashMap.Strict qualified as HM
-import Data.List (delete, maximumBy, sortOn)
-import Data.Ord (comparing)
+import Data.List (sort)
+import Data.List.Extra (maximumOn, minimumOn)
+import Data.Map.Strict (Map)
+import Data.Map.Strict qualified as Map
+import Data.Ratio (denominator, numerator)
 import Data.Set qualified as Set
 import GHC.Real (Ratio (..))
+import Linear (V2 (..), V4 (..), distance)
 import Text.Trifecta (Parser, char, newline, sepEndBy, some)
 
+type DetectionMap = HashMap Angle (Map Location Distance)
+
+type Location = V2 Int
+
+type Angle = Ratio Int
+
+type Distance = Double
+
+data Grid
+  = Grid
+  { _dimensions :: !(V2 Int),
+    _stations :: !(Map Location DetectionMap)
+  }
+  deriving (Eq)
+
+makeLenses ''Grid
+
+instance Show Grid where
+  show (Grid (V2 width height) asteroids) =
+    concat $
+      [ '\n'
+          : concat
+            [ maybe "." (show . HM.size) (Map.lookup (V2 x y) asteroids)
+            | x <- [0 .. width - 1]
+            ]
+      | y <- [0 .. height - 1]
+      ]
+
 main :: IO ()
-main =
-  do
-    putStrLn "[2019] Day 10: Monitoring Station"
-    input <- getInput
-    putStr "Part One: "
-    print (partOne input)
-    putStr "Part Two: "
-    print (partTwo input)
+main = $(defaultMain)
 
 getInput :: IO Grid
 getInput = parseInput grid $(inputFilePath)
@@ -37,101 +63,72 @@ partTwo asteroidBelt = x * 100 + y
   where
     (_from, visible) = bestLocation asteroidBelt
     angles = clockwise (HM.keys visible)
-    (x, y) = vaporize visible angles !! 199
-
-data Grid
-  = Grid (Int, Int) (HashMap Location (HashMap Angle (HashMap Location Distance)))
-  deriving (Eq)
-
-instance Show Grid where
-  show (Grid (width, height) asteroids) =
-    concat $
-      [ '\n'
-          : concat
-            [ maybe "." (show . HM.size) (HM.lookup (x, y) asteroids)
-              | x <- [0 .. width - 1]
-            ]
-        | y <- [0 .. height - 1]
-      ]
-
-type Location = (Int, Int)
-
-type Angle = Ratio Integer
-
-type Distance = Double
+    V2 x y = vaporize visible angles !! 199
 
 grid :: Parser Grid
-grid =
-  do
-    input <- some asteroid `sepEndBy` newline
-    let height = length input
-    let width = length (head input)
-    let inner y z x = pure (HM.insert (x, y) ((input !! y) !! x, Set.empty) z)
-    let outer z y = foldM (inner y) z [0 .. width - 1]
-    gridDetection
-      . Grid (width, height)
-      . fmap (const HM.empty)
-      . HM.filter fst
-      <$> foldM outer HM.empty [0 .. height - 1]
+grid = gridDetection . mkGrid <$> some asteroid `sepEndBy` newline
+
+mkGrid :: [[Bool]] -> Grid
+mkGrid = uncurry Grid . ifoldl' (ifoldl' . go) (0, Map.empty)
+  where
+    go y x = flip \case
+      True -> bimap (const position) (Map.insert position HM.empty)
+      False -> first (const position)
+      where
+        position = V2 x y
 
 asteroid :: Parser Bool
 asteroid = (char '.' $> False) <|> (char '#' $> True)
 
-bestLocation :: Grid -> (Location, HashMap Angle (HashMap Location Distance))
-bestLocation (Grid _ asteroids) = maximumBy go (HM.toList asteroids)
-  where
-    go (_, xmap) (_, ymap) = comparing HM.size xmap ymap
+bestLocation :: Grid -> (Location, DetectionMap)
+bestLocation = views stations (maximumOn (HM.size . snd) . Map.toList)
 
-vaporize :: HashMap Angle (HashMap Location Distance) -> [Angle] -> [Location]
-vaporize visible allAngles = go [] visible allAngles
+vaporize :: DetectionMap -> [Angle] -> [Location]
+vaporize visible allAngles =
+  reverse . fst $
+    until
+      (all Map.null . snd)
+      (flip (foldl' go) allAngles)
+      ([], visible)
   where
-    go :: [Location] -> HashMap Angle (HashMap Location Distance) -> [Angle] -> [Location]
-    go vaporized remaining [] =
-      if all HM.null remaining
-        then reverse vaporized
-        else go vaporized remaining allAngles
-    go vaporized remaining (a : as) =
-      let targets = (remaining ! a)
-       in if HM.null targets
-            then go vaporized remaining as
-            else
-              let (target, _) = minimumBy (comparing snd) (HM.toList targets)
-               in go (target : vaporized) (HM.adjust (HM.delete target) a remaining) as
+    go :: ([Location], DetectionMap) -> Angle -> ([Location], DetectionMap)
+    go (vaporized, remaining) angle
+      | Map.null targets = (vaporized, remaining)
+      | otherwise = (target : vaporized, HM.adjust (Map.delete target) angle remaining)
+      where
+        targets = remaining ! angle
+        (target, _) = minimumOn snd (Map.toList targets)
 
 clockwise :: [Angle] -> [Angle]
-clockwise angles =
-  let (i, ii, iii, iv) = foldl go ([], [], [], []) angles
-   in sortOn fromRational i
-        ++ sortOn fromRational iv
-        ++ sortOn fromRational iii
-        ++ sortOn fromRational ii
+clockwise = foldMap sort . foldr go (pure @V4 [])
   where
-    go (i, ii, iii, iv) a@(n :% d)
-      | n <= 0 && d >= 0 = (a : i, ii, iii, iv)
-      | n > 0 && d >= 0 = (i, ii, iii, a : iv)
-      | n >= 0 && d <= 0 = (i, ii, a : iii, iv)
-      | n < 0 && d < 0 = (i, a : ii, iii, iv)
-      | otherwise = error (show a)
+    go angle =
+      flip over (angle :) $
+        case (isRightward angle, isUpward angle) of
+          (True, True) -> _1
+          (True, False) -> _2
+          (False, False) -> _3
+          (False, True) -> _4
+
+isRightward :: Angle -> Bool
+isRightward = (>= 0) . denominator
+
+isUpward :: Angle -> Bool
+isUpward = (<= 0) . numerator
 
 gridDetection :: Grid -> Grid
-gridDetection (Grid dimensions asteroids) =
-  Grid dimensions (HM.mapWithKey stationDetection asteroids)
-  where
-    stationDetection from knownDetections =
-      foldl (detect from) knownDetections (delete from (HM.keys asteroids))
+gridDetection =
+  stations %~ \asteroids ->
+    flip Map.mapWithKey asteroids \from detections ->
+      foldl' (detect from) detections $
+        Set.delete from (Map.keysSet asteroids)
 
-detect :: Location -> HashMap Angle (HashMap Location Distance) -> Location -> HashMap Angle (HashMap Location Distance)
-detect (fromX, fromY) detections (toX, toY) = HM.alter go angle detections
+detect :: Location -> DetectionMap -> Location -> DetectionMap
+detect from detections to = HM.alter go angle detections
   where
-    distance = sqrt (fromIntegral dX ** 2 + fromIntegral dY ** 2)
-    angle
-      | dX == 0 = if dY > 0 then 1 :% 0 else (-1) :% 0
-      | dY == 0 = if dX > 0 then 0 :% 1 else 0 :% (-1)
-      | otherwise = reduce dY dX
-    dX = fromIntegral (toX - fromX)
-    dY = fromIntegral (toY - fromY)
-    reduce x y = (x `quot` d) :% (y `quot` d)
-      where
-        d = gcd x y
-    go Nothing = Just (HM.singleton (toX, toY) distance)
-    go (Just visible) = Just (HM.insert (toX, toY) distance visible)
+    dist = (distance @V2 @Double `on` fmap fromIntegral) from to
+    angle = case to - from of
+      V2 0 y -> signum y :% 0
+      V2 x 0 -> 0 :% signum x
+      V2 x y -> let d = gcd x y in (y `quot` d) :% (x `quot` d)
+    go = pure . maybe (Map.singleton to dist) (Map.insert to dist)

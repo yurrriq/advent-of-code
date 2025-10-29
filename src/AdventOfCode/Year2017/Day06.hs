@@ -6,7 +6,7 @@ import Control.Monad ((<=<))
 import Data.Foldable (maximumBy)
 import Data.IntMap.Strict (IntMap)
 import Data.IntMap.Strict qualified as IntMap
-import Data.List (elemIndex, foldl', uncons)
+import Data.List (elemIndex, uncons)
 import Data.Set (Set)
 import Data.Set qualified as Set
 import Text.Trifecta (natural, some)

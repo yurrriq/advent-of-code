@@ -4,9 +4,10 @@ import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (inputFilePath)
 import AdventOfCode.Util (wigglesum)
 import Control.Applicative ((<|>))
-import Control.Lens
+import Control.Lens (makeLenses, view, (%=), (+=), _1)
 import Control.Monad.State (State, evalState, get, gets)
 import Data.Either (fromLeft, rights)
+import Data.Maybe (listToMaybe)
 import Text.Parser.Token.Highlight (Highlight (..))
 import Text.Trifecta (Parser, highlight, integer, some, symbol, (<?>))
 
@@ -39,12 +40,12 @@ main =
 getInput :: IO [Instruction]
 getInput = parseInput (some instruction) $(inputFilePath)
 
-partOne :: [Instruction] -> Int
-partOne prog = fromLeft 0 $ evalState (program prog) initialState
+partOne :: [Instruction] -> Maybe Int
+partOne prog = Just . fromLeft 0 $ evalState (program prog) initialState
 
-partTwo :: [Instruction] -> Int
+partTwo :: [Instruction] -> Maybe Int
 partTwo =
-  head
+  listToMaybe
     . rights
     . map (flip evalState initialState . program)
     . wigglesum (_1 wiggle)
