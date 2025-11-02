@@ -12,15 +12,14 @@ import AdventOfCode.Input (parseInput)
 import AdventOfCode.Puzzle
 import AdventOfCode.TH (evalPuzzle, inputFilePath)
 import Control.Foldl qualified as Foldl
-import Control.Lens (assign, makeLenses, use, (<.=))
+import Control.Lens (makeLenses, use, (<.=))
 import Data.Bifoldable (bisum)
 import Relude
 import Text.Trifecta (natural)
 
 data PuzzleState
   = PuzzleState
-  { _input :: ![Int],
-    _answerOne :: !(Maybe Int),
+  { _answerOne :: !(Maybe Int),
     _answerTwo :: !(Maybe Int)
   }
   deriving (Eq, Generic, Show)
@@ -28,7 +27,7 @@ data PuzzleState
 makeLenses ''PuzzleState
 
 emptyPuzzleState :: PuzzleState
-emptyPuzzleState = PuzzleState [] Nothing Nothing
+emptyPuzzleState = PuzzleState Nothing Nothing
 
 main :: IO ()
 main = $(evalPuzzle)
@@ -36,9 +35,9 @@ main = $(evalPuzzle)
 getInput :: IO [Int]
 getInput = parseInput (some (fromInteger <$> natural)) $(inputFilePath)
 
-partOne :: Puzzle PuzzleState (Maybe Int)
+partOne :: Puzzle [Int] PuzzleState (Maybe Int)
 partOne = do
-  numbers <- use input
+  numbers <- ask
   answerOne
     <.= (listToMaybe . snd =<< find (null . go) (splitAt 25 <$> tails numbers))
   where
@@ -53,10 +52,10 @@ partOne = do
       ]
     go _ = []
 
-partTwo :: Puzzle PuzzleState (Maybe Int)
+partTwo :: Puzzle [Int] PuzzleState (Maybe Int)
 partTwo = do
   Just n <- use answerOne
-  numbers <- use input
+  numbers <- ask
   answerTwo
     <.= ( fmap bisum
             . bisequence

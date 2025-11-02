@@ -1,94 +1,69 @@
 {-# LANGUAGE BlockArguments #-}
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 
 module AdventOfCode.Year2016.Day14 where
 
-import Control.Applicative ((<|>))
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (evalPuzzle)
 import Control.Lens (makeLenses, use, uses, (%=))
-import Control.Monad.Extra (anyM, guard, ifM, notM, (>=>))
-import Control.Monad.IO.Class (MonadIO)
-import Control.Monad.Logger (LoggingT, MonadLogger, logDebug, runStderrLoggingT)
-import Control.Monad.Reader (MonadReader, ReaderT, asks, runReaderT)
-import Control.Monad.State (MonadState, StateT, evalStateT)
+import Control.Monad.Extra (notM)
+import Control.Monad.Logger (logDebug)
 import Crypto.Hash.MD5 qualified as MD5
-import Data.ByteString (ByteString)
 import Data.ByteString qualified as BS
 import Data.ByteString.Base16 qualified as Base16
 import Data.ByteString.Builder (Builder)
 import Data.ByteString.Builder qualified as Builder
 import Data.ByteString.Lazy qualified as BSL
-import Data.IntMap (IntMap, (!))
+import Data.IntMap ((!))
 import Data.IntMap qualified as IntMap
-import Data.String (fromString)
-import Data.Word (Word8)
+import Relude
+import Relude.Unsafe ((!!))
 import Text.Printf (printf)
 
-newtype Puzzle a = Puzzle
-  {runPuzzle :: ReaderT Builder (StateT PuzzleState (LoggingT IO)) a}
-  deriving
-    ( Functor,
-      Applicative,
-      Monad,
-      MonadIO,
-      MonadLogger,
-      MonadState PuzzleState,
-      MonadReader Builder,
-      MonadFail
-    )
-
 data PuzzleState = PuzzleState
-  { _index :: Int,
-    _digests :: IntMap ByteString
+  { _index :: !Int,
+    _digests :: !(IntMap ByteString)
   }
+  deriving (Generic, Show)
 
-$(makeLenses ''PuzzleState)
+makeLenses ''PuzzleState
+
+emptyPuzzleState :: PuzzleState
+emptyPuzzleState = PuzzleState 0 IntMap.empty
 
 main :: IO ()
-main = do
-  salt <- getInput
-  putStr "Part One: "
-  print =<< partOne salt
-  putStr "Part Two: "
-  print =<< partTwo salt
+main = $(evalPuzzle)
 
-getInput :: IO ByteString
+getInput :: IO Builder
 getInput = pure "yjdafjpo"
 
-partOne :: ByteString -> IO Int
-partOne = flip partOne' 64
+partOne :: Puzzle Builder PuzzleState Int
+partOne = partOne' 64
 
-partOne' :: ByteString -> Int -> IO Int
+partOne' :: Int -> Puzzle Builder PuzzleState Int
 partOne' = solveWith md5
 
-partTwo :: ByteString -> IO Int
-partTwo = flip partTwo' 64
+partTwo :: Puzzle Builder PuzzleState Int
+partTwo = partTwo' 64
 
-partTwo' :: ByteString -> Int -> IO Int
+partTwo' :: Int -> Puzzle Builder PuzzleState Int
 partTwo' = solveWith \string ->
   iterate md5 string !! 2017
 
-solveWith :: (ByteString -> ByteString) -> ByteString -> Int -> IO Int
-solveWith hash = solve go
+solveWith :: (ByteString -> ByteString) -> Int -> Puzzle Builder PuzzleState Int
+solveWith hash = \case
+  0 -> fail "Must specify a strictly positive number"
+  1 -> nextKey
+  k -> nextKey *> solveWith hash (k - 1)
   where
-    go 0 = fail "Must specify a strictly positive number"
-    go 1 = nextKey
-    go k = nextKey *> go (k - 1)
-
     nextKey = nextKeyWith hashFor hasRun
     hashFor = hashForWith hash
     hasRun = hasRunWith hashFor
 
-solve :: (Int -> Puzzle Int) -> ByteString -> Int -> IO Int
-solve loop salt =
-  runStderrLoggingT
-    . flip evalStateT (PuzzleState {_index = 0, _digests = IntMap.empty})
-    . flip runReaderT (Builder.byteString salt)
-    . runPuzzle
-    . loop
-
 -- | Find the next index that produces a key using given hash and run detection
 -- functions.
-nextKeyWith :: (Int -> Puzzle ByteString) -> (Int -> Word8 -> Int -> Puzzle Bool) -> Puzzle Int
+nextKeyWith :: (Int -> Puzzle Builder PuzzleState ByteString) -> (Int -> Word8 -> Int -> Puzzle Builder PuzzleState Bool) -> Puzzle Builder PuzzleState Int
 nextKeyWith hashFor hasRun = do
   digest <- use index >>= hashFor
   i <- use index
@@ -101,16 +76,16 @@ nextKeyWith hashFor hasRun = do
 
 -- | Determine whether the hash for an integer index contains @k@ of a given
 -- character in a row.
-hasRunWith :: (Int -> Puzzle ByteString) -> Int -> Word8 -> Int -> Puzzle Bool
+hasRunWith :: (Int -> Puzzle Builder PuzzleState ByteString) -> Int -> Word8 -> Int -> Puzzle Builder PuzzleState Bool
 hasRunWith hashFor k character =
   fmap (BS.replicate k character `BS.isInfixOf`) . hashFor
 
 -- | Append an integer index to the salt and compute the hash using a given
 -- algorithm.
-hashForWith :: (ByteString -> ByteString) -> Int -> Puzzle ByteString
-hashForWith go i = do
+hashForWith :: (ByteString -> ByteString) -> Int -> Puzzle Builder PuzzleState ByteString
+hashForWith hash i = do
   string <- asks (appendInt i)
-  digests %= IntMap.alter (<|> Just (go string)) i
+  digests %= IntMap.alter (<|> Just (hash string)) i
   uses digests (! i)
 
 -- | Compute the hexademical representation of the MD5 hash of a 'ByteString'.
@@ -122,17 +97,19 @@ md5 = Base16.encode . MD5.hash
 hasTriple :: ByteString -> Maybe Word8
 hasTriple =
   BS.uncons >=> \(character, characters) ->
-    character <$ guard (BS.replicate 2 character `BS.isPrefixOf` characters)
+    character
+      <$ guard (BS.replicate 2 character `BS.isPrefixOf` characters)
       <|> hasTriple characters
 
 -- | Append the decimal encoding of an 'Int' to a 'Builder' to generate a
 -- 'ByteString'.
 appendInt :: Int -> Builder -> ByteString
 appendInt n salt =
-  BSL.toStrict $
-    Builder.toLazyByteString $
-      salt <> Builder.intDec n
+  BSL.toStrict
+    $ Builder.toLazyByteString
+    $ salt
+    <> Builder.intDec n
 
 -- | Increment the integer index.
-incrementIndex :: Puzzle ()
+incrementIndex :: (MonadState PuzzleState m) => m ()
 incrementIndex = index %= (+ 1)

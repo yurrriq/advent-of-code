@@ -237,6 +237,7 @@ executables:
       - containers
       - cryptohash-md5
       - mtl
+      - relude
   aoc-2017-day01:
     <<: *executable
     main: AdventOfCode.Year2017.Day01
