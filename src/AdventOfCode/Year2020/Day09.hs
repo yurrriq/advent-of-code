@@ -1,5 +1,6 @@
 {-# LANGUAGE BlockArguments #-}
 {-# LANGUAGE StrictData #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 
 module AdventOfCode.Year2020.Day09
   ( main,
@@ -11,12 +12,11 @@ where
 
 import AdventOfCode.Input (parseInput)
 import AdventOfCode.TH (inputFilePath)
+import Control.Foldl qualified as Foldl
 import Control.Lens (makeLenses, use, (.=), (<.=))
-import Control.Monad (liftM2)
-import Control.Monad.State (StateT, evalStateT, gets, liftIO)
-import Data.List (find, inits, tails)
-import Data.Maybe (listToMaybe)
-import Text.Trifecta (natural, some)
+import Data.Bifoldable (bisum)
+import Relude
+import Text.Trifecta (natural)
 
 data PuzzleState
   = PuzzleState
@@ -28,26 +28,38 @@ data PuzzleState
 
 makeLenses ''PuzzleState
 
-type Puzzle = StateT PuzzleState IO
+newtype Puzzle a
+  = Puzzle {runPuzzle :: StateT PuzzleState IO a}
+  deriving
+    ( Functor,
+      Applicative,
+      Monad,
+      MonadIO,
+      MonadState PuzzleState,
+      MonadFail
+    )
+
+emptyPuzzleState :: PuzzleState
+emptyPuzzleState = PuzzleState [] Nothing Nothing
 
 main :: IO ()
 main =
-  do
-    flip evalStateT (PuzzleState [] Nothing Nothing) do
-      numbers <- liftIO getInput
-      input .= numbers
-      liftIO $ putStr "Part One: "
-      liftIO . print =<< maybeFail =<< partOne
-      liftIO $ putStr "Part Two: "
-      liftIO . print =<< maybeFail =<< partTwo
+  evaluatingStateT emptyPuzzleState $ runPuzzle do
+    numbers <- getInput
+    input .= numbers
+    putStr "Part One: "
+    print =<< partOne
+    putStr "Part Two: "
+    print =<< partTwo
 
-getInput :: IO [Int]
-getInput = parseInput (some (fromInteger <$> natural)) $(inputFilePath)
+getInput :: (MonadIO m) => m [Int]
+getInput = liftIO $ parseInput (some (fromInteger <$> natural)) $(inputFilePath)
 
 partOne :: Puzzle (Maybe Int)
 partOne = do
   numbers <- gets _input
-  answerOne <.= (listToMaybe . snd =<< find (null . go) (splitAt 25 <$> tails numbers))
+  answerOne
+    <.= (listToMaybe . snd =<< find (null . go) (splitAt 25 <$> tails numbers))
   where
     go (preamble, z : _) =
       [ (z, x, y)
@@ -65,9 +77,8 @@ partTwo = do
   Just n <- use answerOne
   numbers <- gets _input
   answerTwo
-    <.= ( liftM2 (+) minimum maximum
-            <$> find ((n ==) . sum) (concatMap inits (tails numbers))
+    <.= ( fmap bisum
+            . bisequence
+            . Foldl.fold ((,) <$> Foldl.minimum <*> Foldl.maximum)
+            =<< find ((n ==) . sum) (concatMap inits (tails numbers))
         )
-
-maybeFail :: (MonadFail m) => Maybe a -> m a
-maybeFail = maybe (fail "failed!") pure
