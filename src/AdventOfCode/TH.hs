@@ -1,7 +1,10 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+
 module AdventOfCode.TH where
 
 import Data.List.Split (splitOn)
 import Language.Haskell.TH
+import Relude
 
 inputFilePath :: Q Exp
 inputFilePath =
@@ -13,7 +16,7 @@ inputFilePath =
           pure $ "input/" <> year <> "/day" <> day <> ".txt"
         ["AdventOfCode", 'Y' : 'e' : 'a' : 'r' : year, 'D' : 'a' : 'y' : day] ->
           pure $ "input/" <> year <> "/day" <> day <> ".txt"
-        _ -> fail "Oops!"
+        _parts -> fail "Oops!"
 
 defaultMain :: Q Exp
 defaultMain =
@@ -49,3 +52,14 @@ doPartOne = [|putStr "Part One: " *> print (partOne input)|]
 
 doPartTwo :: Q Exp
 doPartTwo = [|putStr "Part Two: " *> print (partTwo input)|]
+
+evalPuzzle :: Q Exp
+evalPuzzle =
+  [|
+    evaluatingStateT emptyPuzzleState . runPuzzle $ do
+      assign input =<< liftIO getInput
+      putStr "Part One: "
+      print =<< partOne
+      putStr "Part Two: "
+      print =<< partTwo
+    |]

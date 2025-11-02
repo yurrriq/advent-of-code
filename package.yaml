@@ -83,6 +83,7 @@ _executable: &executable
     - -threaded
   other-modules:
     - AdventOfCode.Input
+    - AdventOfCode.Puzzle
     - AdventOfCode.TH
     - AdventOfCode.Util
     - Paths_advent_of_code

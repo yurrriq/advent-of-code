@@ -1,5 +1,3 @@
-{-# LANGUAGE BlockArguments #-}
-{-# LANGUAGE StrictData #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
 module AdventOfCode.Year2020.Day09
@@ -11,53 +9,36 @@ module AdventOfCode.Year2020.Day09
 where
 
 import AdventOfCode.Input (parseInput)
-import AdventOfCode.TH (inputFilePath)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (evalPuzzle, inputFilePath)
 import Control.Foldl qualified as Foldl
-import Control.Lens (makeLenses, use, (.=), (<.=))
+import Control.Lens (assign, makeLenses, use, (<.=))
 import Data.Bifoldable (bisum)
 import Relude
 import Text.Trifecta (natural)
 
 data PuzzleState
   = PuzzleState
-  { _input :: [Int],
-    _answerOne :: Maybe Int,
-    _answerTwo :: Maybe Int
+  { _input :: ![Int],
+    _answerOne :: !(Maybe Int),
+    _answerTwo :: !(Maybe Int)
   }
-  deriving (Eq, Show)
+  deriving (Eq, Generic, Show)
 
 makeLenses ''PuzzleState
-
-newtype Puzzle a
-  = Puzzle {runPuzzle :: StateT PuzzleState IO a}
-  deriving
-    ( Functor,
-      Applicative,
-      Monad,
-      MonadIO,
-      MonadState PuzzleState,
-      MonadFail
-    )
 
 emptyPuzzleState :: PuzzleState
 emptyPuzzleState = PuzzleState [] Nothing Nothing
 
 main :: IO ()
-main =
-  evaluatingStateT emptyPuzzleState $ runPuzzle do
-    numbers <- getInput
-    input .= numbers
-    putStr "Part One: "
-    print =<< partOne
-    putStr "Part Two: "
-    print =<< partTwo
+main = $(evalPuzzle)
 
-getInput :: (MonadIO m) => m [Int]
-getInput = liftIO $ parseInput (some (fromInteger <$> natural)) $(inputFilePath)
+getInput :: IO [Int]
+getInput = parseInput (some (fromInteger <$> natural)) $(inputFilePath)
 
-partOne :: Puzzle (Maybe Int)
+partOne :: Puzzle PuzzleState (Maybe Int)
 partOne = do
-  numbers <- gets _input
+  numbers <- use input
   answerOne
     <.= (listToMaybe . snd =<< find (null . go) (splitAt 25 <$> tails numbers))
   where
@@ -72,10 +53,10 @@ partOne = do
       ]
     go _ = []
 
-partTwo :: Puzzle (Maybe Int)
+partTwo :: Puzzle PuzzleState (Maybe Int)
 partTwo = do
   Just n <- use answerOne
-  numbers <- gets _input
+  numbers <- use input
   answerTwo
     <.= ( fmap bisum
             . bisequence
