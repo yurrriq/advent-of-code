@@ -22,6 +22,7 @@ dependencies:
   - lens
   - monad-logger
   - parsers
+  - relude
   - split
   - tasty
   - tasty-hunit
@@ -67,7 +68,6 @@ library:
     - parser-combinators
     - pointless-fun
     - recursion-schemes
-    - relude
     - safe
     - scientific
     - semirings
@@ -237,7 +237,6 @@ executables:
       - containers
       - cryptohash-md5
       - mtl
-      - relude
   aoc-2017-day01:
     <<: *executable
     main: AdventOfCode.Year2017.Day01
@@ -397,7 +396,6 @@ executables:
     main: AdventOfCode.Year2020.Day09
     dependencies:
       - mtl
-      - relude
   aoc-2020-day10:
     <<: *executable
     main: AdventOfCode.Year2020.Day10
