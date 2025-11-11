@@ -1,22 +1,45 @@
+{-# LANGUAGE BlockArguments #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+
 module AdventOfCode.Year2024.Day02 where
 
-import AdventOfCode.Input (parseInput)
-import AdventOfCode.TH (defaultMain, inputFilePath)
+import AdventOfCode.Input (parseInputAoC)
+import AdventOfCode.Puzzle (Puzzle, runPuzzle)
+import AdventOfCode.TH (evalPuzzle)
 import AdventOfCode.Util (count, holes)
+import Control.Lens (makeLenses, (<.=))
 import Data.Ix (inRange)
+import Relude
+import Relude.Extra.Bifunctor (bimapBoth)
 import Text.Trifecta (char, decimal, newline, sepBy1, sepEndBy)
 
+data PuzzleState
+  = PuzzleState
+  { _answerOne :: !Int,
+    _answerTwo :: !Int
+  }
+  deriving (Eq, Generic, Show)
+
+makeLenses ''PuzzleState
+
+emptyPuzzleState :: PuzzleState
+emptyPuzzleState = PuzzleState 0 0
+
 main :: IO ()
-main = $(defaultMain)
+main = $(evalPuzzle)
 
-partOne :: [[Integer]] -> Int
-partOne = count isSafe
+partOne :: Puzzle [[Integer]] PuzzleState Int
+partOne = do
+  reports <- ask
+  answerOne <.= count isSafe reports
 
-partTwo :: [[Integer]] -> Int
-partTwo = count (any isSafe) . map (map snd . holes)
+partTwo :: Puzzle [[Integer]] PuzzleState Int
+partTwo = do
+  reports <- ask
+  answerTwo <.= count (liftA2 (||) isSafe (any (isSafe . snd) . holes)) reports
 
 getInput :: IO [[Integer]]
-getInput = parseInput ((decimal `sepBy1` char ' ') `sepEndBy` newline) $(inputFilePath)
+getInput = parseInputAoC 2024 2 ((decimal `sepBy1` char ' ') `sepEndBy` newline)
 
 example :: [[Integer]]
 example =
@@ -29,7 +52,8 @@ example =
   ]
 
 isSafe :: [Integer] -> Bool
-isSafe [] = False
-isSafe xxs@(_ : xs) = any (all (inRange (1, 3))) [diffs, negate <$> diffs]
-  where
-    diffs = zipWith subtract xxs xs
+isSafe =
+  uncons >>> maybe False \(x, xs) ->
+    biany getAll getAll
+      $ foldMap (bimapBoth (All . inRange (1, 3)) . (id &&& negate))
+      $ zipWith subtract (x : xs) xs
