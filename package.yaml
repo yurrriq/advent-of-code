@@ -13,6 +13,7 @@ extra-source-files:
 data-files:
   - input/*/day*.txt
 dependencies:
+  - advent-of-code-api
   - base
   - bytestring
   - comonad
@@ -31,6 +32,7 @@ dependencies:
   - trifecta
   - universe-base
   - unordered-containers
+  - utf8-string
 default-extensions:
   - TemplateHaskell
 ghc-options:
@@ -46,7 +48,6 @@ library:
     - astar
     - base16-bytestring
     - combinatorial
-    - comonad
     - composition
     - conduit
     - containers
@@ -54,14 +55,12 @@ library:
     - data-interval
     - data-ordlist
     - dlist
-    - extra
     - fast-digits
     - finite-typelits
     - free-algebras
     - groups
     - hashable
     - infinite-list
-    - lens
     - linear
     - monoid-extras
     - mtl
@@ -563,8 +562,6 @@ executables:
   aoc-2024-day01:
     <<: *executable
     main: AdventOfCode.Year2024.Day01
-    dependencies:
-      - extra
   aoc-2024-day02:
     <<: *executable
     main: AdventOfCode.Year2024.Day02

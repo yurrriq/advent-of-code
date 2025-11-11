@@ -1,28 +1,45 @@
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+
 module AdventOfCode.Year2024.Day01 where
 
-import AdventOfCode.Input (parseInput)
-import AdventOfCode.TH (defaultMain, inputFilePath)
+import AdventOfCode.Input (parseInputAoC)
+import AdventOfCode.Puzzle (Puzzle, runPuzzle)
+import AdventOfCode.TH (evalPuzzle)
 import AdventOfCode.Util (frequencies)
-import Data.List (sort, transpose)
-import Data.List.Extra (sumOn')
+import Control.Foldl qualified as Foldl
+import Control.Lens (makeLenses, (<.=))
 import Data.Map qualified as Map
-import Text.Trifecta (count, natural, some)
+import Relude
+import Text.Trifecta (count, natural)
+
+data PuzzleState
+  = PuzzleState
+  { _answerOne :: !Integer,
+    _answerTwo :: !Integer
+  }
+  deriving (Eq, Generic, Show)
+
+makeLenses ''PuzzleState
+
+emptyPuzzleState :: PuzzleState
+emptyPuzzleState = PuzzleState 0 0
 
 main :: IO ()
-main = $(defaultMain)
+main = $(evalPuzzle)
 
-partOne :: (Num a, Ord a) => ([a], [a]) -> a
-partOne (xs, ys) = sumOn' abs $ zipWith subtract (sort xs) (sort ys)
+partOne :: Puzzle ([Integer], [Integer]) PuzzleState Integer
+partOne = do
+  (xs, ys) <- ask
+  answerOne <.= Foldl.fold (Foldl.premap abs Foldl.sum) (ZipList (zipWith subtract (sort xs) (sort ys)))
 
-partTwo :: (Num a, Ord a) => ([a], [a]) -> a
-partTwo (xs, ys) = sumOn' go xs
-  where
-    go x = x * fromIntegral (Map.findWithDefault 0 x (frequencies ys))
+partTwo :: Puzzle ([Integer], [Integer]) PuzzleState Integer
+partTwo = do
+  (xs, ys) <- ask
+  let go x = x * toInteger (Map.findWithDefault 0 x (frequencies ys))
+  answerTwo <.= Foldl.fold (Foldl.premap go Foldl.sum) xs
 
 getInput :: IO ([Integer], [Integer])
-getInput =
-  do
-    [xs, ys] <-
-      transpose
-        <$> parseInput (some (count 2 natural)) $(inputFilePath)
-    pure (xs, ys)
+getInput = do
+  [xs, ys] <- transpose <$> parseInputAoC 2024 1 (some (count 2 natural))
+  pure (xs, ys)

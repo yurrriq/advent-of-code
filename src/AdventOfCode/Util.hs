@@ -1,6 +1,7 @@
 {-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 
 module AdventOfCode.Util
   ( CyclicEnum (..),
@@ -27,18 +28,12 @@ module AdventOfCode.Util
   )
 where
 
-import Control.Arrow (second, (>>>))
 import Control.Comonad.Store (experiment)
 import Control.Lens (holesOf)
-import Control.Monad (join, (>=>))
-import Data.ByteString (ByteString)
-import Data.Function (fix)
 import Data.IntMap qualified as IM
-import Data.List (unfoldr)
-import Data.Map (Map)
 import Data.Map qualified as Map
-import Data.Set (Set)
 import Data.Set qualified as Set
+import Relude
 import Text.Trifecta (Parser, Result (..), parseByteString)
 
 -- https://github.com/bravit/hid-examples/blob/master/ch02/radar/Radar.hs
