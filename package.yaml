@@ -83,6 +83,7 @@ _executable: &executable
   other-modules:
     - AdventOfCode.Input
     - AdventOfCode.Puzzle
+    - AdventOfCode.SimplePuzzle
     - AdventOfCode.TH
     - AdventOfCode.Util
     - Paths_advent_of_code
@@ -91,10 +92,6 @@ executables:
   aoc-2015-day01:
     <<: *executable
     main: AdventOfCode.Year2015.Day01
-    other-modules:
-      - AdventOfCode.Input
-      - AdventOfCode.TH
-      - Paths_advent_of_code
   aoc-2015-day02:
     <<: *executable
     main: AdventOfCode.Year2015.Day02
