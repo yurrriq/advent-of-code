@@ -1,4 +1,5 @@
 {-# LANGUAGE MonadComprehensions #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 
 -- |
 -- Module      : AdventOfCode.Year2024.Day07
@@ -31,12 +32,13 @@ module AdventOfCode.Year2024.Day07
   )
 where
 
-import AdventOfCode.Input (parseInput, parseString)
-import AdventOfCode.TH (defaultMain, inputFilePath)
+import AdventOfCode.Input (parseInputAoC, parseString)
+import AdventOfCode.Puzzle (Puzzle, runPuzzle)
+import AdventOfCode.TH (evalPuzzle)
 import AdventOfCode.Util (numDigits)
+import Control.Lens (makeLenses, (<.=))
 import Data.Foldable (foldrM)
-import Data.List.NonEmpty (NonEmpty (..))
-import Data.Maybe (mapMaybe)
+import Relude
 import Text.Trifecta (Parser, char, decimal, newline, sepEndBy, sepEndByNonEmpty, string)
 
 -- $intro
@@ -82,21 +84,37 @@ execInverseOperation operator x y =
           (d, m) = y `divMod` (10 ^ pow)
        in [d | m == x]
 
+data PuzzleState
+  = PuzzleState
+  { _answerOne :: !Int,
+    _answerTwo :: !Int
+  }
+  deriving (Eq, Generic, Show)
+
+makeLenses ''PuzzleState
+
+emptyPuzzleState :: PuzzleState
+emptyPuzzleState = PuzzleState 0 0
+
 -- | Solve the puzzle and print the results.
 main :: IO ()
-main = $(defaultMain)
+main = $(evalPuzzle)
 
 -- | Calibrate the equations using addition and multiplication.
 --
 -- @partOne = 'calibrate' ['(:+:)', '(:*:)']@
-partOne :: [CalibrationEquation] -> Int
-partOne = calibrate [(:+:), (:*:)]
+partOne :: Puzzle [CalibrationEquation] PuzzleState Int
+partOne = do
+  equations <- ask
+  answerOne <.= calibrate [(:+:), (:*:)] equations
 
 -- | Calibrate the equations using addition, multiplication, and concatenation.
 --
 -- @partTwo = 'calibrate' ['(:+:)', '(:*:)', '(:||:)']@
-partTwo :: [CalibrationEquation] -> Int
-partTwo = calibrate [(:+:), (:*:), (:||:)]
+partTwo :: Puzzle [CalibrationEquation] PuzzleState Int
+partTwo = do
+  equations <- ask
+  answerTwo <.= calibrate [(:+:), (:*:), (:||:)] equations
 
 -- | Given a list of operators and a list of calibration equations, compute the
 -- sum of the test values from just the equations that could possibly be true.
@@ -148,14 +166,15 @@ isPossible operators (testValue, operand :| operands) =
 
 -- | Parse the input into a list of calibration equations.
 getInput :: IO [CalibrationEquation]
-getInput = parseInput (calibrationEquation `sepEndBy` newline) $(inputFilePath)
+getInput = parseInputAoC 2024 7 (calibrationEquation `sepEndBy` newline)
 
 -- | Parse a calibration equation.
 calibrationEquation :: Parser CalibrationEquation
 calibrationEquation =
   (,)
     <$> (decimalInt <* string ": ")
-    <*> decimalInt `sepEndByNonEmpty` char ' '
+    <*> decimalInt
+    `sepEndByNonEmpty` char ' '
   where
     decimalInt = fromInteger <$> decimal
 
