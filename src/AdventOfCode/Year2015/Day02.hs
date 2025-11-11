@@ -1,3 +1,7 @@
+{-# LANGUAGE ApplicativeDo #-}
+{-# LANGUAGE BlockArguments #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+
 module AdventOfCode.Year2015.Day02
   ( main,
     partOne,
@@ -6,23 +10,27 @@ module AdventOfCode.Year2015.Day02
   )
 where
 
-import AdventOfCode.Input (parseInput)
-import AdventOfCode.TH (defaultMain, inputFilePath)
-import Data.List.Extra (sumOn')
-import Linear (V3 (..))
-import Text.Trifecta (char, natural, some)
+import AdventOfCode.Input (parseInputAoC)
+import AdventOfCode.SimplePuzzle
+import AdventOfCode.TH (evalPuzzle)
+import Control.Foldl qualified as Foldl
+import Control.Lens (view)
+import Control.Monad (ap)
+import Linear (V3 (..), _yzx)
+import Relude
+import Text.Trifecta (char, natural)
 
 main :: IO ()
-main = $(defaultMain)
+main = $(evalPuzzle)
 
-partOne :: [V3 Integer] -> Integer
-partOne = sumOn' paperNeededFor
+partOne :: SimplePuzzle [V3 Integer] (Maybe Integer)
+partOne = asks (fmap getSum . foldMap paperNeededFor)
 
-partTwo :: [V3 Integer] -> Integer
-partTwo = sumOn' ribbonNeededFor
+partTwo :: SimplePuzzle [V3 Integer] (Maybe Integer)
+partTwo = asks (fmap getSum . foldMap ribbonNeededFor)
 
 getInput :: IO [V3 Integer]
-getInput = parseInput (some box) $(inputFilePath)
+getInput = parseInputAoC 2015 2 (some box)
   where
     box =
       V3
@@ -30,11 +38,16 @@ getInput = parseInput (some box) $(inputFilePath)
         <*> (natural <* char 'x')
         <*> natural
 
-paperNeededFor :: (Ord a, Num a) => V3 a -> a
-paperNeededFor (V3 l w h) = minimum sides + 2 * sum sides
-  where
-    sides = V3 (l * w) (w * h) (h * l)
+paperNeededFor :: (Ord a, Num a) => V3 a -> Maybe (Sum a)
+paperNeededFor =
+  (*) `ap` view _yzx >>> Foldl.fold do
+    m <- Foldl.minimum
+    z <- 2 * Foldl.sum
+    return (Sum . (z +) <$> m)
 
-ribbonNeededFor :: (Ord a, Num a) => V3 a -> a
-ribbonNeededFor dimensions =
-  product dimensions + 2 * (sum dimensions - maximum dimensions)
+ribbonNeededFor :: (Ord a, Num a) => V3 a -> Maybe (Sum a)
+ribbonNeededFor = Foldl.fold do
+  p <- Foldl.product
+  z <- Foldl.sum
+  x <- Foldl.maximum
+  return (Sum . (p +) . (2 *) . (z -) <$> x)
