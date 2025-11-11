@@ -2,7 +2,14 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
-module AdventOfCode.Input where
+module AdventOfCode.Input
+  ( parseInput,
+    parseInputAoC,
+    parseString,
+    rawInput,
+    rawInputAoC,
+  )
+where
 
 import Advent (AoC (..), AoCUserAgent (..), defaultAoCOpts, mkDay_, runAoC_)
 import Data.ByteString.UTF8 qualified as UTF8
@@ -28,10 +35,8 @@ parseInputAoC year day parser = do
   case runParser parser mempty input of
     Success result -> pure result
     Failure reason -> error (show reason)
-  where
-    userAgent = AoCUserAgent "github.com/yurrriq/advent-of-code" "eric@ericb.me"
 
-parseString :: Parser a -> String -> IO a
+parseString :: (MonadIO m) => Parser a -> String -> m a
 parseString parser =
   Trifecta.parseString parser mempty >>> \case
     Success result -> pure result
@@ -39,3 +44,11 @@ parseString parser =
 
 rawInput :: FilePath -> IO String
 rawInput = getDataFileName >=> readFileBS >>> fmap UTF8.toString
+
+rawInputAoC :: Integer -> Integer -> IO String
+rawInputAoC year day = do
+  opts <- defaultAoCOpts userAgent year <$> getEnv "AOC_SESSION_KEY"
+  toString <$> runAoC_ opts (AoCInput (mkDay_ day))
+
+userAgent :: AoCUserAgent
+userAgent = AoCUserAgent "github.com/yurrriq/advent-of-code" "eric@ericb.me"
