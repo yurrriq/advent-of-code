@@ -33,7 +33,7 @@ module AdventOfCode.Year2024.Day07
 where
 
 import AdventOfCode.Input (parseInputAoC, parseString)
-import AdventOfCode.Puzzle (Puzzle, runPuzzle)
+import AdventOfCode.Puzzle (Puzzle)
 import AdventOfCode.TH (evalPuzzle)
 import AdventOfCode.Util (numDigits)
 import Control.Lens (makeLenses, (<.=))

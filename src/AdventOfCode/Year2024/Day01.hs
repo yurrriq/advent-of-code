@@ -4,7 +4,7 @@
 module AdventOfCode.Year2024.Day01 where
 
 import AdventOfCode.Input (parseInputAoC)
-import AdventOfCode.Puzzle (Puzzle, runPuzzle)
+import AdventOfCode.Puzzle (Puzzle)
 import AdventOfCode.TH (evalPuzzle)
 import AdventOfCode.Util (frequencies)
 import Control.Foldl qualified as Foldl

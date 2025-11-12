@@ -3,7 +3,7 @@
 module AdventOfCode.Year2024.Day04 where
 
 import AdventOfCode.Input (parseInputAoC, parseString)
-import AdventOfCode.Puzzle (Puzzle, runPuzzle)
+import AdventOfCode.Puzzle (Puzzle)
 import AdventOfCode.TH (evalPuzzle)
 import AdventOfCode.Util (count)
 import Control.Lens (makeLenses, (<.=))

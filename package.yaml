@@ -101,11 +101,6 @@ executables:
   aoc-2015-day06:
     <<: *executable
     main: AdventOfCode.Year2015.Day06
-    other-modules:
-      - AdventOfCode.Input
-      - AdventOfCode.TH
-      - AdventOfCode.Util
-      - Paths_advent_of_code
     dependencies:
       - containers
       - linear
@@ -188,6 +183,7 @@ executables:
       - unordered-containers
     other-modules:
       - AdventOfCode.Input
+      - AdventOfCode.Puzzle
       - AdventOfCode.TH
       - AdventOfCode.Util
       - AdventOfCode.Year2015.Day22.Types
@@ -372,6 +368,7 @@ executables:
     main: AdventOfCode.Year2020.Day07
     other-modules:
       - AdventOfCode.Input
+      - AdventOfCode.Puzzle
       - AdventOfCode.TH
       - AdventOfCode.Util
       - Data.Digraph
@@ -414,6 +411,7 @@ executables:
       - mtl
     other-modules:
       - AdventOfCode.Input
+      - AdventOfCode.Puzzle
       - AdventOfCode.TH
       - AdventOfCode.Util
       - AdventOfCode.Year2020.Day14.Parsers

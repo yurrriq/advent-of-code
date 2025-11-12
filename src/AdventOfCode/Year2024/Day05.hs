@@ -3,7 +3,7 @@
 module AdventOfCode.Year2024.Day05 where
 
 import AdventOfCode.Input (parseInputAoC, parseString)
-import AdventOfCode.Puzzle (Puzzle, runPuzzle)
+import AdventOfCode.Puzzle (Puzzle)
 import AdventOfCode.TH (evalPuzzle)
 import Control.Lens (makeLenses, (<.=))
 import Data.Graph qualified as Graph
