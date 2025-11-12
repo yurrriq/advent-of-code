@@ -2,11 +2,11 @@
 
 module AdventOfCode.Puzzle where
 
-import Control.Monad.Logger (LoggingT, MonadLogger)
+import Control.Monad.Logger (LoggingT, MonadLogger, runStderrLoggingT)
 import Relude
 
-newtype Puzzle i s a = Puzzle
-  {runPuzzle :: ReaderT i (StateT s (LoggingT IO)) a}
+newtype Puzzle r s a = Puzzle
+  {runPuzzle :: ReaderT r (StateT s (LoggingT IO)) a}
   deriving
     ( Functor,
       Applicative,
@@ -14,6 +14,14 @@ newtype Puzzle i s a = Puzzle
       MonadIO,
       MonadLogger,
       MonadState s,
-      MonadReader i,
+      MonadReader r,
       MonadFail
     )
+
+evalPart :: (MonadIO m) => r -> s -> Puzzle r s a -> m a
+evalPart input initialState =
+  liftIO
+    . runStderrLoggingT
+    . evaluatingStateT initialState
+    . usingReaderT input
+    . runPuzzle
