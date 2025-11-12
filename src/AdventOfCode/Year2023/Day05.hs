@@ -1,29 +1,38 @@
+{-# LANGUAGE BlockArguments #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+
 module AdventOfCode.Year2023.Day05 where
 
-import AdventOfCode.Input (parseInput, parseString)
-import AdventOfCode.TH (defaultMain, inputFilePath)
+import AdventOfCode.Input (parseInputAoC, parseString)
+import AdventOfCode.SimplePuzzle
+import AdventOfCode.TH (evalPuzzle)
+import Control.Foldl qualified as Foldl
 import Data.Interval (Extended (..), Interval, (<=..<))
 import Data.Interval qualified as Interval
 import Data.IntervalMap.Strict (IntervalMap)
 import Data.IntervalMap.Strict qualified as IMap
 import Data.IntervalSet qualified as ISet
 import Data.List.Split (chunksOf)
+import Relude
 import Text.Trifecta hiding (parseString)
 
 main :: IO ()
-main = $(defaultMain)
+main = $(evalPuzzle)
 
-partOne :: Almanac -> Int
-partOne (Almanac (seeds, mappings)) =
-  minimum $ map (flip (foldl' convert) mappings) seeds
+partOne :: SimplePuzzle Almanac (Maybe Int)
+partOne = asks \(Almanac (seeds, mappings)) ->
+  Foldl.fold (Foldl.premap (flip (foldl' convert) mappings) Foldl.minimum) seeds
   where
     convert seed = maybe seed (seed +) . IMap.lookup seed
 
-partTwo :: Almanac -> Int
-partTwo (Almanac (seeds, mappings)) =
-  fromFinite . Interval.lowerBound . ISet.span $
-    flip (foldl' convert) mappings $
-      ISet.fromList [mkInterval src len | [src, len] <- chunksOf 2 seeds]
+partTwo :: SimplePuzzle Almanac Int
+partTwo = asks \(Almanac (seeds, mappings)) ->
+  fromFinite
+    . Interval.lowerBound
+    . ISet.span
+    $ flip (foldl' convert) mappings
+    $ ISet.fromList [mkInterval src len | [src, len] <- chunksOf 2 seeds]
   where
     convert iset imap = unmapped <> mapped
       where
@@ -37,7 +46,7 @@ partTwo (Almanac (seeds, mappings)) =
         seen = IMap.fromList [(interval, ()) | interval <- ISet.toList iset]
 
 getInput :: IO Almanac
-getInput = parseInput almanac $(inputFilePath)
+getInput = parseInputAoC 2023 5 almanac
 
 newtype Almanac = Almanac {unAlmanac :: ([Int], [IntervalMap Int Int])}
   deriving (Show)
@@ -60,8 +69,9 @@ almanac =
 
 mapping :: Parser (IntervalMap Int Int)
 mapping =
-  fmap IMap.fromList . some $
-    do
+  fmap IMap.fromList
+    . some
+    $ do
       dst <- posInt
       src <- posInt
       len <- posInt
