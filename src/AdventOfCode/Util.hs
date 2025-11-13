@@ -22,6 +22,7 @@ module AdventOfCode.Util
     neighborsOf,
     holes,
     numDigits,
+    bitraverseBoth,
     (<&&>),
     (<||>),
     (<.>),
@@ -119,6 +120,12 @@ holes (x : xs) = (x, xs) : map (second (x :)) (holes xs)
 
 numDigits :: (Integral a) => a -> Int
 numDigits n = truncate @Double (logBase 10 (fromIntegral n) + 1)
+
+bitraverseBoth ::
+  (Bitraversable t, Applicative f) =>
+  (a -> f b) -> t a a -> f (t b b)
+bitraverseBoth f = bitraverse f f
+{-# INLINE bitraverseBoth #-}
 
 (<&&>) :: (Applicative f) => f Bool -> f Bool -> f Bool
 (<&&>) = liftA2 (&&)
