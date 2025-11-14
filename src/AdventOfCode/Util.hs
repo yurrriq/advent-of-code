@@ -13,6 +13,7 @@ module AdventOfCode.Util
     hammingDistance,
     hammingSimilar,
     iterateMaybe,
+    maybeFail,
     scan,
     count,
     snoc,
@@ -81,6 +82,10 @@ hammingSimilar n xs = maybe False (<= n) . hammingDistance xs
 
 iterateMaybe :: (a -> Maybe a) -> a -> [a]
 iterateMaybe f x = x : unfoldr (fmap (join (,)) . f) x
+
+-- | Lift a 'Maybe' to 'MonadFail' with a given failure reason.
+maybeFail :: (MonadFail m) => String -> Maybe a -> m a
+maybeFail reason = maybe (fail reason) return
 
 findFirstDup :: (Ord a) => [a] -> Maybe a
 findFirstDup = go Set.empty

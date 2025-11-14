@@ -11,7 +11,7 @@ where
 
 import AdventOfCode.Input (parseInput, parseString)
 import AdventOfCode.TH (inputFilePath)
-import AdventOfCode.Util (iterateMaybe)
+import AdventOfCode.Util (iterateMaybe, maybeFail)
 import Control.Arrow ((&&&), (>>>))
 import Control.Foldl qualified as Foldl
 import Control.Monad (MonadPlus (mzero), ap, liftM2, (>=>))
@@ -162,10 +162,6 @@ uniqueMaximumOn f = Foldl.fold $ Foldl.Fold step (Nothing, True) finish
         LT -> (Just x, unique)
     finish (Just x, True) = Just x
     finish _ = Nothing
-
--- | Lift a 'Maybe' to 'MonadFail' with a given failure reason.
-maybeFail :: (MonadFail m) => String -> Maybe a -> m a
-maybeFail reason = maybe (fail reason) return
 
 dropThd3 :: (a, b, c) -> (a, b)
 dropThd3 (x, y, _) = (x, y)
