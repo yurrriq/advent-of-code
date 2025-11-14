@@ -502,6 +502,8 @@ executables:
   aoc-2022-day01:
     <<: *executable
     main: AdventOfCode.Year2022.Day01
+    dependencies:
+      - parser-combinators
   aoc-2022-day02:
     <<: *executable
     main: AdventOfCode.Year2022.Day02
