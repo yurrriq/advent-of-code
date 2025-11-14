@@ -1,12 +1,14 @@
 {-# LANGUAGE DerivingVia #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 
 module AdventOfCode.Year2018.Day01 where
 
-import AdventOfCode.Input (parseInput)
-import AdventOfCode.TH (defaultMainMaybe, inputFilePath)
-import AdventOfCode.Util (findFirstDup, scan)
-import Data.Monoid (Sum (..))
-import Text.Trifecta (integer, some)
+import AdventOfCode.Input (parseInputAoC)
+import AdventOfCode.SimplePuzzle
+import AdventOfCode.TH (evalPuzzle)
+import AdventOfCode.Util (findFirstDup, maybeFail, scan)
+import Relude
+import Text.Trifecta (integer)
 
 newtype FrequencyChange = FrequencyChange
   {unFrequencyChange :: Integer}
@@ -17,17 +19,19 @@ newtype FrequencyChange = FrequencyChange
     via (Sum Integer)
 
 main :: IO ()
-main = $(defaultMainMaybe)
+main = $(evalPuzzle)
 
 getInput :: IO [FrequencyChange]
-getInput = parseInput (some (FrequencyChange <$> integer)) $(inputFilePath)
+getInput = parseInputAoC 2018 1 (some (FrequencyChange <$> integer))
 
-partOne :: [FrequencyChange] -> Maybe Integer
-partOne = Just . unFrequencyChange . mconcat
+partOne :: SimplePuzzle [FrequencyChange] Integer
+partOne = asks $ unFrequencyChange . mconcat
 
-partTwo :: [FrequencyChange] -> Maybe Integer
+partTwo :: SimplePuzzle [FrequencyChange] Integer
 partTwo =
-  fmap unFrequencyChange
+  ask
+    >>= maybeFail "ope!"
+    . fmap unFrequencyChange
     . findFirstDup
     . scan
     . cycle
