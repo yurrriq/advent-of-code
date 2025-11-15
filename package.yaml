@@ -271,6 +271,8 @@ executables:
   aoc-2018-day03:
     <<: *executable
     main: AdventOfCode.Year2018.Day03
+    dependencies:
+      - linear
   aoc-2018-day04:
     <<: *executable
     main: AdventOfCode.Year2018.Day04
