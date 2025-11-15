@@ -2,6 +2,7 @@
 
 module AdventOfCode.TH where
 
+import AdventOfCode.Puzzle (runPuzzle)
 import Control.Monad.Logger qualified as Logger
 import Data.List.Split (splitOn)
 import Language.Haskell.TH
@@ -62,7 +63,7 @@ evalPuzzle =
       $(varE 'Logger.runStderrLoggingT)
         $ evaluatingStateT emptyPuzzleState
         $ usingReaderT input
-        $ runPuzzle
+        $ $(varE 'AdventOfCode.Puzzle.runPuzzle)
         $ do
           putStr "Part One: "
           print =<< partOne
