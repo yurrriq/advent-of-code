@@ -70,6 +70,7 @@ library:
     - safe
     - scientific
     - semirings
+    - time
     - transformers
     - unordered-containers
     - utility-ht
@@ -276,6 +277,8 @@ executables:
   aoc-2018-day04:
     <<: *executable
     main: AdventOfCode.Year2018.Day04
+    dependencies:
+      - time
   aoc-2018-day05:
     <<: *executable
     main: AdventOfCode.Year2018.Day05

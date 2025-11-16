@@ -1,4 +1,5 @@
 {-# LANGUAGE TupleSections #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 
 module AdventOfCode.Year2018.Day04
   ( main,
@@ -7,65 +8,60 @@ module AdventOfCode.Year2018.Day04
   )
 where
 
-import AdventOfCode.Input (parseInput)
-import AdventOfCode.TH (inputFilePath)
+import AdventOfCode.Input (parseInputAoC)
+import AdventOfCode.SimplePuzzle
+import AdventOfCode.TH (evalPuzzle)
 import AdventOfCode.Util (frequencies)
-import Control.Applicative ((<|>))
-import Control.Arrow (first)
-import Data.List (maximumBy, sort)
-import Data.Map (Map)
-import Data.Map qualified as Map
-import Data.Ord (comparing)
-import Text.Trifecta (Parser, brackets, char, colon, many, natural, symbol, (<?>))
+import Data.List.Extra (maximumOn)
+import Data.Map.Strict qualified as Map
+import Data.Time (Day, LocalTime (..), TimeOfDay (..), fromGregorian)
+import Relude hiding (guard)
+import Text.Trifecta (Parser, brackets, char, colon, natural, symbol, (<?>))
 
--- ------------------------------------------------------------------- [ Types ]
+-- ------------------------------------------------------- [ Types and Parsers ]
 
-data Time = Time
-  { _tYear :: Integer,
-    _tMonth :: Integer,
-    _tDay :: Integer,
-    _tHour :: Integer,
-    _tMinute :: Integer
-  }
-  deriving (Eq, Ord, Show)
-
-time :: Parser Time
+time :: Parser LocalTime
 time =
-  brackets
-    ( Time
-        <$> ((natural <* char '-') <?> "year")
-        <*> ((natural <* char '-') <?> "month")
-        <*> (natural <?> "day")
-        <*> ((natural <* colon) <?> "hour")
-        <*> (natural <?> "minute")
-    )
+  brackets (LocalTime <$> day <*> timeOfDay)
     <?> "time"
 
-newtype Guard = Guard {unGuard :: Integer}
+day :: Parser Day
+day =
+  fromGregorian
+    <$> ((natural <* char '-') <?> "year")
+    <*> ((posInt <* char '-') <?> "month")
+    <*> (posInt <?> "day")
+
+timeOfDay :: Parser TimeOfDay
+timeOfDay =
+  TimeOfDay
+    <$> ((posInt <* colon) <?> "hour")
+    <*> (posInt <?> "minute")
+    <*> pure 0
+
+posInt :: Parser Int
+posInt = fromInteger <$> natural
+
+newtype Guard = Guard {unGuard :: Int}
   deriving (Eq, Ord, Show)
 
 data Event
-  = Shift Guard
+  = Shift !Guard
   | Asleep
   | Awake
   deriving (Eq, Ord, Show)
 
-shift :: Parser Event
-shift =
-  Shift . Guard
-    <$> ( symbol "Guard"
-            *> char '#'
-            *> natural
-            <* symbol "begins shift"
-        )
-
 event :: Parser Event
-event =
-  shift
-    <|> (Asleep <$ symbol "falls asleep")
-    <|> (Awake <$ symbol "wakes up")
+event = shift <|> asleep <|> awake
+  where
+    shift =
+      Shift
+        . Guard
+        <$> (symbol "Guard" *> char '#' *> posInt <* symbol "begins shift")
+    asleep = Asleep <$ symbol "falls asleep"
+    awake = Awake <$ symbol "wakes up"
 
-type Entry = (Time, Event)
+type Entry = (LocalTime, Event)
 
 entry :: Parser Entry
 entry = (,) <$> time <*> event
@@ -78,12 +74,12 @@ isShiftChange :: Entry -> Bool
 isShiftChange (_, Shift _) = True
 isShiftChange (_, _) = False
 
-napTimes :: [Entry] -> [Integer]
-napTimes ((from, Asleep) : (to, Awake) : rest) =
-  [_tMinute from .. _tMinute to - 1] ++ napTimes rest
+napTimes :: [Entry] -> [Int]
+napTimes ((LocalTime _ from, Asleep) : (LocalTime _ to, Awake) : rest) =
+  [todMin from .. todMin to - 1] ++ napTimes rest
 napTimes _ = []
 
-napsByGuard :: [Entry] -> Map Guard [[Integer]]
+napsByGuard :: [Entry] -> Map Guard [[Int]]
 napsByGuard = fmap (map napTimes) . shifts
 
 shifts :: [Entry] -> TimeCards
@@ -94,7 +90,7 @@ shifts = go Map.empty . sort
        in go (Map.insertWith (++) who [events] acc) rest
     go acc _ = acc
 
-sleepiestGuard :: [Entry] -> Maybe (Int, (Guard, [[Integer]]))
+sleepiestGuard :: [Entry] -> Maybe (Int, (Guard, [[Int]]))
 sleepiestGuard = Map.foldrWithKey go Nothing . napsByGuard
   where
     go a xxs Nothing = Just (sum (length <$> xxs), (a, xxs))
@@ -102,14 +98,14 @@ sleepiestGuard = Map.foldrWithKey go Nothing . napsByGuard
       let n = sum (length <$> xxs)
        in if n > m then Just (n, (a, xxs)) else old
 
-sleepiestMinute :: [[Integer]] -> (Integer, Int)
+sleepiestMinute :: [[Int]] -> (Int, Int)
 sleepiestMinute =
-  maximumBy (comparing snd)
+  maximumOn snd
     . Map.toList
     . frequencies
     . concat
 
-mostConsistentSleeper :: [Entry] -> Maybe ((Guard, Integer), Int)
+mostConsistentSleeper :: [Entry] -> Maybe ((Guard, Int), Int)
 mostConsistentSleeper =
   Map.foldrWithKey go Nothing
     . fmap (filter (not . null))
@@ -125,22 +121,18 @@ mostConsistentSleeper =
 
 -- ------------------------------------------------------------------- [ Parts ]
 
-partOne :: [Entry] -> Maybe Integer
-partOne entries =
-  case sleepiestGuard entries of
-    Just (_, (Guard gid, naps)) -> Just (gid * fst (sleepiestMinute naps))
-    _ -> Nothing
+partOne :: SimplePuzzle [Entry] Int
+partOne = do
+  Just (_, (Guard gid, naps)) <- asks sleepiestGuard
+  pure (gid * fst (sleepiestMinute naps))
 
-partTwo :: [Entry] -> Maybe Integer
-partTwo entries =
-  case mostConsistentSleeper entries of
-    Just ((Guard gid, minute), _) -> Just (gid * minute)
-    _ -> Nothing
+partTwo :: SimplePuzzle [Entry] Int
+partTwo = do
+  Just ((Guard gid, minute), _) <- asks mostConsistentSleeper
+  pure (gid * minute)
+
+getInput :: IO [Entry]
+getInput = parseInputAoC 2018 4 (many entry)
 
 main :: IO ()
-main = do
-  input <- parseInput (many entry) $(inputFilePath)
-  putStr "Part One: "
-  putStrLn $ maybe "failed!" show (partOne input)
-  putStr "Part Two: "
-  putStrLn $ maybe "failed!" show (partTwo input)
+main = $(evalPuzzle)
