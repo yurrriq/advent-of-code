@@ -1,56 +1,104 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+
 module AdventOfCode.Year2017.Day08 where
 
-import AdventOfCode.Input (parseInput)
-import AdventOfCode.TH (defaultMain, inputFilePath)
-import Control.Applicative ((<|>))
-import Data.Map.Strict (Map)
+import AdventOfCode.Input (parseInputAoC, parseString)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (evalPuzzle)
+import Control.Applicative.Combinators.NonEmpty qualified as NE
+import Data.Foldable (maximum)
 import Data.Map.Strict qualified as Map
-import Data.Maybe (fromMaybe)
-import Data.Text (Text)
-import Data.Text qualified as Text
-import Text.Trifecta (Parser, choice, integer, letter, some, symbol, whiteSpace)
+import Relude
+import Text.Show qualified
+import Text.Trifecta (Parser, choice, integer, letter, symbol, whiteSpace)
 
-data Op = Dec | Inc
-  deriving (Eq, Show)
+data Modification
+  = Modify !BinOp !String !Int
+  deriving (Eq)
 
-data Comparison
+instance Show Modification where
+  show (Modify op reg val) =
+    reg <> " " <> show op <> " " <> show val
+
+evalModification :: (MonadState (Map String Int) m) => Modification -> m ()
+evalModification (Modify op regAlter delta) =
+  modify (Map.alter (Just . flip (evalBinOp op) delta . fromMaybe 0) regAlter)
+
+data BinOp = Dec | Inc
+  deriving (Eq)
+
+instance Show BinOp where
+  show = \case
+    Dec -> "dec"
+    Inc -> "inc"
+
+data CondOp
   = CLT
   | CLE
   | CEQ
   | CNE
   | CGE
   | CGT
+  deriving (Eq)
 
-data Instruction = Ins Op Text Int Comparison Text Int
+instance Show CondOp where
+  show = \case
+    CLT -> "<"
+    CLE -> "<="
+    CEQ -> "=="
+    CNE -> "/="
+    CGE -> ">="
+    CGT -> ">"
+
+data Conditional
+  = Cond !CondOp !String !Int
+  deriving (Eq)
+
+instance Show Conditional where
+  show (Cond cmp reg val) = reg <> " " <> show cmp <> " " <> show val
+
+evalConditional :: (MonadState (Map String Int) m) => Conditional -> m Bool
+evalConditional (Cond cmp reg n) =
+  flip (condOp cmp) n <$> gets (fromMaybe 0 . Map.lookup reg)
+
+data Instruction
+  = Ins !Modification !Conditional
+  deriving (Eq)
+
+instance Show Instruction where
+  show (Ins change cond) = show change <> " if " <> show cond
+
+evalInstruction :: (MonadState (Map String Int) m) => Instruction -> m ()
+evalInstruction (Ins change cond) =
+  evalConditional cond
+    >>= flip when (evalModification change)
 
 main :: IO ()
-main = $(defaultMain)
+main = $(evalPuzzle)
 
-partOne :: [Instruction] -> Int
-partOne = maximum . Map.elems . foldl' go Map.empty
+emptyPuzzleState :: Map String Int
+emptyPuzzleState = Map.empty
+
+partOne :: Puzzle (NonEmpty Instruction) (Map String Int) Int
+partOne = do
+  ask >>= mapM_ evalInstruction
+  gets maximum
+
+partTwo :: Puzzle (NonEmpty Instruction) (Map String Int) Int
+partTwo =
+  maximum
+    . fmap maximum
+    . init
+    <$> asks (foldl' go (Map.empty :| []))
   where
-    go mem (Ins op regAlter delta cmp regCompare comparate) =
-      if compareReg mem cmp regCompare comparate
-        then Map.alter (Just . flip (binOp op) delta . fromMaybe 0) regAlter mem
-        else mem
+    go (mem :| history) ins =
+      execState (evalInstruction ins) mem :| mem : history
 
-partTwo :: [Instruction] -> Int
-partTwo = maximum . map (maximum . Map.elems) . init . foldl' go [Map.empty]
-  where
-    go (mem : history) (Ins op regAlter delta cmp regCompare comparate) =
-      mem' : mem : history
-      where
-        mem' =
-          if compareReg mem cmp regCompare comparate
-            then Map.alter (Just . flip (binOp op) delta . fromMaybe 0) regAlter mem
-            else mem
-    go [] _ = []
+getInput :: IO (NonEmpty Instruction)
+getInput = parseInputAoC 2017 8 (NE.some instruction)
 
-getInput :: IO [Instruction]
-getInput = parseInput (some instruction) $(inputFilePath)
-
-kompare :: Comparison -> (Int -> Int -> Bool)
-kompare cmp = case cmp of
+condOp :: CondOp -> (Int -> Int -> Bool)
+condOp = \case
   CLT -> (<)
   CLE -> (<=)
   CEQ -> (==)
@@ -58,25 +106,37 @@ kompare cmp = case cmp of
   CGE -> (>=)
   CGT -> (>)
 
-binOp :: Op -> Int -> Int -> Int
-binOp Dec = (-)
-binOp Inc = (+)
+binOp :: Parser BinOp
+binOp =
+  (Dec <$ symbol "dec")
+    <|> (Inc <$ symbol "inc")
 
-compareReg :: Map Text Int -> Comparison -> Text -> Int -> Bool
-compareReg mem cmp = kompare cmp . fromMaybe 0 . flip Map.lookup mem
+evalBinOp :: BinOp -> Int -> Int -> Int
+evalBinOp = \case
+  Dec -> (-)
+  Inc -> (+)
+
+modification :: Parser Modification
+modification =
+  flip Modify
+    <$> (some letter <* whiteSpace)
+    <*> binOp
+    <*> (fromInteger <$> integer)
+
+compareReg :: Map String Int -> CondOp -> String -> Int -> Bool
+compareReg mem cmp = condOp cmp . fromMaybe 0 . flip Map.lookup mem
+
+conditional :: Parser Conditional
+conditional =
+  flip Cond
+    <$> (symbol "if" *> some letter <* whiteSpace)
+    <*> comparison
+    <*> (fromInteger <$> integer)
 
 instruction :: Parser Instruction
-instruction =
-  do
-    regAlter <- Text.pack <$> some letter <* whiteSpace
-    op <- (Dec <$ symbol "dec") <|> (Inc <$ symbol "inc")
-    delta <- fromInteger <$> integer
-    regCompare <- symbol "if" *> (Text.pack <$> some letter) <* whiteSpace
-    cmp <- comparison
-    comparate <- fromInteger <$> integer
-    pure (Ins op regAlter delta cmp regCompare comparate)
+instruction = Ins <$> modification <*> conditional
 
-comparison :: Parser Comparison
+comparison :: Parser CondOp
 comparison =
   choice
     [ CLE <$ symbol "<=",
@@ -86,3 +146,13 @@ comparison =
       CGE <$ symbol ">=",
       CGT <$ symbol ">"
     ]
+
+getExample :: IO (NonEmpty Instruction)
+getExample = parseString (NE.some instruction) example
+
+example :: String
+example =
+  "b inc 5 if a > 1\n\
+  \a inc 1 if b < 5\n\
+  \c dec -10 if a >= 1\n\
+  \c inc -20 if c == 10\n"
