@@ -1,41 +1,43 @@
-{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 
 module AdventOfCode.Year2017.Day05 where
 
-import AdventOfCode.Input (parseInput)
-import AdventOfCode.TH (defaultMain, inputFilePath)
+import AdventOfCode.Input (parseInputAoC)
+import AdventOfCode.SimplePuzzle
+import AdventOfCode.TH (evalPuzzle)
 import AdventOfCode.Util (iterateMaybe)
-import Control.Lens (over, view)
+import Control.Lens (over, views)
 import Control.Monad (ap)
 import Control.Zipper
-import Text.Trifecta (integer, some)
+import Relude
+import Text.Trifecta (integer)
 
 type CPU = Top :>> [Int] :>> Int
 
 main :: IO ()
-main = $(defaultMain)
+main = $(evalPuzzle)
+
+getExample :: IO [Int]
+getExample = pure [0, 3, 0, 1, -3]
 
 getInput :: IO [Int]
-getInput = parseInput (some (fromInteger <$> integer)) $(inputFilePath)
+getInput = parseInputAoC 2017 5 (some (fromInteger <$> integer))
 
-example :: [Int]
-example = [0, 3, 0, 1, -3]
+partOne :: SimplePuzzle [Int] Int
+partOne = asks (solve (+ 1))
 
-partOne :: [Int] -> Int
-partOne = solve (+ 1)
-
-partTwo :: [Int] -> Int
-partTwo = solve updateOffset
+partTwo :: SimplePuzzle [Int] Int
+partTwo = asks (solve updateOffset)
   where
     updateOffset offset
       | offset >= 3 = offset - 1
       | otherwise = offset + 1
 
 solve :: (Int -> Int) -> [Int] -> Int
-solve f = length . iterateMaybe (step f) . (fromWithin traverse . zipper)
+solve f = length . iterateMaybe (step f) . fromWithin traverse . zipper
 
 step :: (Int -> Int) -> CPU -> Maybe CPU
-step = ap (move . view focus) . over focus
+step f = views focus move `ap` over focus f
 
 move :: Int -> CPU -> Maybe CPU
 move n = case compare n 0 of
