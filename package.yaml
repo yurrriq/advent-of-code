@@ -20,6 +20,7 @@ dependencies:
   - containers
   - extra
   - foldl
+  - generic-data
   - lens
   - monad-logger
   - parsers
@@ -84,7 +85,6 @@ _executable: &executable
   other-modules:
     - AdventOfCode.Input
     - AdventOfCode.Puzzle
-    - AdventOfCode.SimplePuzzle
     - AdventOfCode.TH
     - AdventOfCode.Util
     - Paths_advent_of_code
@@ -262,6 +262,8 @@ executables:
   aoc-2017-day08:
     <<: *executable
     main: AdventOfCode.Year2017.Day08
+    dependencies:
+      - parser-combinators
   aoc-2018-day01:
     <<: *executable
     main: AdventOfCode.Year2018.Day01

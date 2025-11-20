@@ -3,8 +3,8 @@
 module AdventOfCode.Year2022.Day01 where
 
 import AdventOfCode.Input (parseInputAoC)
-import AdventOfCode.SimplePuzzle
-import AdventOfCode.TH (evalPuzzle)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
 import Control.Monad.Combinators.NonEmpty (sepBy1)
 import Data.Foldable1 (maximum)
 import Data.List.NonEmpty qualified as NE
@@ -12,7 +12,7 @@ import Relude
 import Text.Trifecta (Parser, decimal, newline)
 
 main :: IO ()
-main = $(evalPuzzle)
+main = $(defaultMainPuzzle)
 
 getInput :: IO (NonEmpty Integer)
 getInput = parseInputAoC 2022 1 inventory

@@ -11,8 +11,8 @@ module AdventOfCode.Year2023.Day01
 where
 
 import AdventOfCode.Input (parseString, rawInputAoC)
-import AdventOfCode.SimplePuzzle
-import AdventOfCode.TH (evalPuzzle)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
 import Data.Char (digitToInt)
 import Data.List.NonEmpty qualified as NE
 import Relude
@@ -21,7 +21,7 @@ import Text.Trifecta hiding (digit, parseString)
 import Text.Trifecta qualified as Trifecta
 
 main :: IO ()
-main = $(evalPuzzle)
+main = $(defaultMainPuzzle)
 
 getInput :: IO String
 getInput = rawInputAoC 2023 1

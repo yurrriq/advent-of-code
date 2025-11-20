@@ -4,8 +4,8 @@
 module AdventOfCode.Year2018.Day02 where
 
 import AdventOfCode.Input (parseInputAoC, parseString)
-import AdventOfCode.SimplePuzzle
-import AdventOfCode.TH (evalPuzzle)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
 import AdventOfCode.Util (count, frequencies, hammingSimilar, maybeFail)
 import Data.List (intersect)
 import Relude
@@ -16,7 +16,7 @@ type BoxID = String
 type Checksum = Integer
 
 main :: IO ()
-main = $(evalPuzzle)
+main = $(defaultMainPuzzle)
 
 getInput :: IO [BoxID]
 getInput = parseInputAoC 2018 2 (some letter `sepEndBy` newline)
@@ -25,13 +25,13 @@ partOne :: SimplePuzzle [BoxID] Checksum
 partOne = asks checksum
 
 partOneExample :: IO Checksum
-partOneExample = flip evalPart partOne =<< getExampleOne
+partOneExample = evaluatingPuzzle partOne =<< getExampleOne
 
 partTwo :: SimplePuzzle [BoxID] String
 partTwo = ask >>= maybeFail "ope!" . fmap (uncurry intersect) . correctBoxIDs
 
 partTwoExample :: IO String
-partTwoExample = flip evalPart partTwo =<< getExampleTwo
+partTwoExample = evaluatingPuzzle partTwo =<< getExampleTwo
 
 checksum :: [BoxID] -> Checksum
 checksum =

@@ -9,8 +9,8 @@ module AdventOfCode.Year2018.Day04
 where
 
 import AdventOfCode.Input (parseInputAoC)
-import AdventOfCode.SimplePuzzle
-import AdventOfCode.TH (evalPuzzle)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
 import AdventOfCode.Util (frequencies)
 import Data.List.Extra (maximumOn)
 import Data.Map.Strict qualified as Map
@@ -135,4 +135,4 @@ getInput :: IO [Entry]
 getInput = parseInputAoC 2018 4 (many entry)
 
 main :: IO ()
-main = $(evalPuzzle)
+main = $(defaultMainPuzzle)

@@ -10,8 +10,8 @@ module AdventOfCode.Year2017.Day01
 where
 
 import AdventOfCode.Input (parseInputAoC)
-import AdventOfCode.SimplePuzzle
-import AdventOfCode.TH (evalPuzzle)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
 import Data.Char (digitToInt)
 import Data.Vector (Vector)
 import Data.Vector qualified as V
@@ -19,7 +19,7 @@ import Relude
 import Text.Trifecta (Parser, digit)
 
 main :: IO ()
-main = $(evalPuzzle)
+main = $(defaultMainPuzzle)
 
 getInput :: IO (Vector (Sum Int))
 getInput = parseInputAoC 2017 1 digits

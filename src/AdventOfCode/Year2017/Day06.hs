@@ -3,8 +3,8 @@
 module AdventOfCode.Year2017.Day06 where
 
 import AdventOfCode.Input (parseInputAoC)
-import AdventOfCode.SimplePuzzle
-import AdventOfCode.TH (evalPuzzle)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
 import AdventOfCode.Util (maybeFail)
 import Data.IntMap.Strict qualified as IntMap
 import Data.List (elemIndex)
@@ -14,7 +14,7 @@ import Relude
 import Text.Trifecta (natural)
 
 main :: IO ()
-main = $(evalPuzzle)
+main = $(defaultMainPuzzle)
 
 partOne :: SimplePuzzle (IntMap Int) Int
 partOne = asks (Set.size . fst . reallocate)

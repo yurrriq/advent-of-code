@@ -3,15 +3,15 @@
 module AdventOfCode.Year2022.Day06 where
 
 import AdventOfCode.Input (rawInputAoC)
-import AdventOfCode.SimplePuzzle
-import AdventOfCode.TH (evalPuzzle)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
 import AdventOfCode.Util (maybeFail)
 import Data.List (findIndex)
 import Data.Set qualified as Set
 import Relude
 
 main :: IO ()
-main = $(evalPuzzle)
+main = $(defaultMainPuzzle)
 
 partOne :: SimplePuzzle String Int
 partOne = ask >>= maybeFail "no start-of-packet marker detected" . day06 4

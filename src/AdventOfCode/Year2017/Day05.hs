@@ -3,8 +3,8 @@
 module AdventOfCode.Year2017.Day05 where
 
 import AdventOfCode.Input (parseInputAoC)
-import AdventOfCode.SimplePuzzle
-import AdventOfCode.TH (evalPuzzle)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
 import AdventOfCode.Util (iterateMaybe)
 import Control.Lens (over, views)
 import Control.Monad (ap)
@@ -15,7 +15,7 @@ import Text.Trifecta (integer)
 type CPU = Top :>> [Int] :>> Int
 
 main :: IO ()
-main = $(evalPuzzle)
+main = $(defaultMainPuzzle)
 
 getExample :: IO [Int]
 getExample = pure [0, 3, 0, 1, -3]

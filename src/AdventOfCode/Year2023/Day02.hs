@@ -11,8 +11,8 @@ module AdventOfCode.Year2023.Day02
 where
 
 import AdventOfCode.Input (parseInputAoC)
-import AdventOfCode.SimplePuzzle
-import AdventOfCode.TH (evalPuzzle)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
 import Data.List.Extra (sumOn')
 import Data.Traversable (for)
 import Linear (V3 (..))
@@ -27,7 +27,7 @@ data Game
   deriving (Eq, Generic, Show)
 
 main :: IO ()
-main = $(evalPuzzle)
+main = $(defaultMainPuzzle)
 
 partOne :: SimplePuzzle [Game] Integer
 partOne = asks (sumOn' idNumber . filter (isPossible . revelations))

@@ -33,10 +33,10 @@ module AdventOfCode.Year2024.Day07
 where
 
 import AdventOfCode.Input (parseInputAoC, parseString)
-import AdventOfCode.Puzzle (Puzzle)
-import AdventOfCode.TH (evalPuzzle)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
 import AdventOfCode.Util (numDigits)
-import Control.Lens (makeLenses, (<.=))
+import Control.Lens ((<.=))
 import Data.Foldable (foldrM)
 import Relude
 import Text.Trifecta (Parser, char, decimal, newline, sepEndBy, sepEndByNonEmpty, string)
@@ -84,21 +84,11 @@ execInverseOperation operator x y =
           (d, m) = y `divMod` (10 ^ pow)
        in [d | m == x]
 
-data PuzzleState
-  = PuzzleState
-  { _answerOne :: !Int,
-    _answerTwo :: !Int
-  }
-  deriving (Eq, Generic, Show)
-
-makeLenses ''PuzzleState
-
-emptyPuzzleState :: PuzzleState
-emptyPuzzleState = PuzzleState 0 0
+type PuzzleState = GPuzzleState1 Int
 
 -- | Solve the puzzle and print the results.
 main :: IO ()
-main = $(evalPuzzle)
+main = $(defaultMainPuzzle)
 
 -- | Calibrate the equations using addition and multiplication.
 --

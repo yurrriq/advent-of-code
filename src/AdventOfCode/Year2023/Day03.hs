@@ -4,8 +4,8 @@
 module AdventOfCode.Year2023.Day03 where
 
 import AdventOfCode.Input (parseInputAoC, parseString)
-import AdventOfCode.SimplePuzzle
-import AdventOfCode.TH (evalPuzzle)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
 import AdventOfCode.Util (neighborsOf)
 import Control.Lens (ifoldl')
 import Data.Char (digitToInt)
@@ -47,7 +47,7 @@ withNumber f = \case
 type Schematic = HashMap (V2 Int) Datum
 
 main :: IO ()
-main = $(evalPuzzle)
+main = $(defaultMainPuzzle)
 
 partOne :: SimplePuzzle Schematic Int
 partOne = do
@@ -74,7 +74,7 @@ allNeighborsOf (V2 x y) n =
     points = flip V2 y <$> [x .. x + length (show @String n) - 1]
 
 partOneExample :: IO Int
-partOneExample = flip evalPart partOne =<< getExample
+partOneExample = evaluatingPuzzle partOne =<< getExample
 
 partTwo :: SimplePuzzle Schematic Int
 partTwo = fail "Not yet implemented"

@@ -5,15 +5,15 @@
 module AdventOfCode.Year2017.Day02 where
 
 import AdventOfCode.Input (parseInputAoC)
-import AdventOfCode.SimplePuzzle
-import AdventOfCode.TH (evalPuzzle)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
 import AdventOfCode.Util (holes)
 import Data.List.Extra (maximum, minimum, sumOn')
 import Relude
 import Text.Trifecta (decimal, newline, sepBy1, sepEndBy1, tab)
 
 main :: IO ()
-main = $(evalPuzzle)
+main = $(defaultMainPuzzle)
 
 getInput :: IO [[Int]]
 getInput = parseInputAoC 2017 2 (row `sepEndBy1` newline)

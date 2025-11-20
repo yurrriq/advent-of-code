@@ -4,29 +4,19 @@
 module AdventOfCode.Year2024.Day01 where
 
 import AdventOfCode.Input (parseInputAoC)
-import AdventOfCode.Puzzle (Puzzle)
-import AdventOfCode.TH (evalPuzzle)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
 import AdventOfCode.Util (frequencies)
 import Control.Foldl qualified as Foldl
-import Control.Lens (makeLenses, (<.=))
+import Control.Lens ((<.=))
 import Data.Map qualified as Map
 import Relude
 import Text.Trifecta (count, natural)
 
-data PuzzleState
-  = PuzzleState
-  { _answerOne :: !Integer,
-    _answerTwo :: !Integer
-  }
-  deriving (Eq, Generic, Show)
-
-makeLenses ''PuzzleState
-
-emptyPuzzleState :: PuzzleState
-emptyPuzzleState = PuzzleState 0 0
+type PuzzleState = GPuzzleState1 Integer
 
 main :: IO ()
-main = $(evalPuzzle)
+main = $(defaultMainPuzzle)
 
 partOne :: Puzzle ([Integer], [Integer]) PuzzleState Integer
 partOne = do

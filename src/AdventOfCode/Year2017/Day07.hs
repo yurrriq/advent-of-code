@@ -10,8 +10,8 @@ module AdventOfCode.Year2017.Day07
 where
 
 import AdventOfCode.Input (parseInputAoC, parseString)
-import AdventOfCode.SimplePuzzle
-import AdventOfCode.TH (evalPuzzle)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
 import AdventOfCode.Util (iterateMaybe, maybeFail, (<.>))
 import Control.Foldl qualified as Foldl
 import Control.Monad (liftM2)
@@ -42,7 +42,7 @@ type ProgramName = Text
 type ProgramNode = (Weight, ProgramName, [ProgramName])
 
 main :: IO ()
-main = $(evalPuzzle)
+main = $(defaultMainPuzzle)
 
 getInput :: IO GraphTuple
 getInput = parseInputAoC 2017 7 parseGraph

@@ -3,14 +3,14 @@
 module AdventOfCode.Year2022.Day04 where
 
 import AdventOfCode.Input (parseInputAoC, parseString)
-import AdventOfCode.SimplePuzzle
-import AdventOfCode.TH (evalPuzzle)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
 import Data.Ix (inRange)
 import Relude
 import Text.Trifecta (Parser, char, comma, decimal, newline, sepEndBy)
 
 main :: IO ()
-main = $(evalPuzzle)
+main = $(defaultMainPuzzle)
 
 partOne :: SimplePuzzle [((Integer, Integer), (Integer, Integer))] Int
 partOne = asks (solveWith fullyContains)

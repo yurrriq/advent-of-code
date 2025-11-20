@@ -11,8 +11,8 @@ module AdventOfCode.Year2015.Day02
 where
 
 import AdventOfCode.Input (parseInputAoC)
-import AdventOfCode.SimplePuzzle
-import AdventOfCode.TH (evalPuzzle)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
 import Control.Foldl qualified as Foldl
 import Control.Lens (view)
 import Control.Monad (ap)
@@ -21,7 +21,7 @@ import Relude
 import Text.Trifecta (char, natural)
 
 main :: IO ()
-main = $(evalPuzzle)
+main = $(defaultMainPuzzle)
 
 partOne :: SimplePuzzle [V3 Integer] (Maybe Integer)
 partOne = asks (fmap getSum . foldMap paperNeededFor)

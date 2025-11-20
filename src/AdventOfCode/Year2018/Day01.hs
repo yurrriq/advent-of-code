@@ -4,8 +4,8 @@
 module AdventOfCode.Year2018.Day01 where
 
 import AdventOfCode.Input (parseInputAoC)
-import AdventOfCode.SimplePuzzle
-import AdventOfCode.TH (evalPuzzle)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
 import AdventOfCode.Util (findFirstDup, maybeFail, scan)
 import Relude
 import Text.Trifecta (integer)
@@ -19,7 +19,7 @@ newtype FrequencyChange = FrequencyChange
     via (Sum Integer)
 
 main :: IO ()
-main = $(evalPuzzle)
+main = $(defaultMainPuzzle)
 
 getInput :: IO [FrequencyChange]
 getInput = parseInputAoC 2018 1 (some (FrequencyChange <$> integer))

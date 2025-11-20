@@ -4,7 +4,7 @@ module AdventOfCode.Year2017.Day08 where
 
 import AdventOfCode.Input (parseInputAoC, parseString)
 import AdventOfCode.Puzzle
-import AdventOfCode.TH (evalPuzzle)
+import AdventOfCode.TH (defaultMainPuzzle)
 import Control.Applicative.Combinators.NonEmpty qualified as NE
 import Data.Foldable (maximum)
 import Data.Map.Strict qualified as Map
@@ -74,7 +74,7 @@ evalInstruction (Ins change cond) =
     >>= flip when (evalModification change)
 
 main :: IO ()
-main = $(evalPuzzle)
+main = $(defaultMainPuzzle)
 
 emptyPuzzleState :: Map String Int
 emptyPuzzleState = Map.empty

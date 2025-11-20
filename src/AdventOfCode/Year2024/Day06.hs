@@ -9,8 +9,8 @@
 module AdventOfCode.Year2024.Day06 where
 
 import AdventOfCode.Input (parseInputAoC, parseString)
-import AdventOfCode.Puzzle (Puzzle)
-import AdventOfCode.TH (evalPuzzle)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
 import AdventOfCode.Util (CyclicEnum (..), count)
 import Control.Lens (ifoldl', makeLenses, to, (%=), (%~), (&~), (+~), (.=), (.~), (<.=), (^.))
 import Data.Ix (inRange)
@@ -71,20 +71,10 @@ instance Show SituationMap where
       | y <- [0 .. situation ^. mapBounds . _y]
       ]
 
-data PuzzleState
-  = PuzzleState
-  { _answerOne :: !Int,
-    _answerTwo :: !Int
-  }
-  deriving (Eq, Generic, Show)
-
-makeLenses ''PuzzleState
-
-emptyPuzzleState :: PuzzleState
-emptyPuzzleState = PuzzleState 0 0
+type PuzzleState = GPuzzleState1 Int
 
 main :: IO ()
-main = $(evalPuzzle)
+main = $(defaultMainPuzzle)
 
 partOne :: Puzzle SituationMap PuzzleState Int
 partOne = do
@@ -108,7 +98,6 @@ partTwo = do
           coords /= situation ^. mapGuard . position,
           situation ^. mapObstacles . to (Set.notMember coords)
         ]
-
   answerTwo <.= count (not . causesParadox situation) candidates
 
 causesParadox :: SituationMap -> Coordinates -> Bool

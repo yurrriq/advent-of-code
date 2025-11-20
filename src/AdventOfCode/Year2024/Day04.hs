@@ -3,30 +3,20 @@
 module AdventOfCode.Year2024.Day04 where
 
 import AdventOfCode.Input (parseInputAoC, parseString)
-import AdventOfCode.Puzzle (Puzzle)
-import AdventOfCode.TH (evalPuzzle)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
 import AdventOfCode.Util (count)
-import Control.Lens (makeLenses, (<.=))
+import Control.Lens ((<.=))
 import Data.List.Extra (dropEnd, sumOn')
 import Data.Universe.Helpers (diagonals)
 import Linear (V2 (..))
 import Relude
 import Text.Trifecta (Parser, manyTill, newline, oneOf)
 
-data PuzzleState
-  = PuzzleState
-  { _answerOne :: !Int,
-    _answerTwo :: !Int
-  }
-  deriving (Eq, Generic, Show)
-
-makeLenses ''PuzzleState
-
-emptyPuzzleState :: PuzzleState
-emptyPuzzleState = PuzzleState 0 0
+type PuzzleState = GPuzzleState1 Int
 
 main :: IO ()
-main = $(evalPuzzle)
+main = $(defaultMainPuzzle)
 
 partOne :: Puzzle [[Char]] PuzzleState Int
 partOne = do

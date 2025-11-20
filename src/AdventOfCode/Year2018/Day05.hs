@@ -4,8 +4,8 @@
 module AdventOfCode.Year2018.Day05 where
 
 import AdventOfCode.Input (rawInputAoC)
-import AdventOfCode.SimplePuzzle
-import AdventOfCode.TH (evalPuzzle)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
 import Data.Algebra.Free (foldMapFree, returnFree)
 import Data.Char (isLower, isUpper, toLower)
 import Data.Finite (Finite, finite, finites)
@@ -23,7 +23,7 @@ type Unit = Finite 26
 type Polymer = FreeGroupL Unit
 
 main :: IO ()
-main = $(evalPuzzle)
+main = $(defaultMainPuzzle)
 
 -- | Solve Part One.
 partOne :: SimplePuzzle String Int

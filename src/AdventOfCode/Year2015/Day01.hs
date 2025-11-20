@@ -3,14 +3,14 @@
 module AdventOfCode.Year2015.Day01 where
 
 import AdventOfCode.Input (parseInputAoC)
-import AdventOfCode.SimplePuzzle
-import AdventOfCode.TH (evalPuzzle)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
 import Data.List (elemIndex)
 import Relude
 import Text.Trifecta (char)
 
 main :: IO ()
-main = $(evalPuzzle)
+main = $(defaultMainPuzzle)
 
 partOne :: SimplePuzzle [Int] Int
 partOne = asks sum

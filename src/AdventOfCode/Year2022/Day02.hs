@@ -4,8 +4,8 @@
 module AdventOfCode.Year2022.Day02 where
 
 import AdventOfCode.Input (parseInputAoC)
-import AdventOfCode.SimplePuzzle
-import AdventOfCode.TH (evalPuzzle)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
 import Data.Finite (Finite, getFinite)
 import Relude
 import Text.Trifecta (Parser, char, choice, newline, sepEndBy, space)
@@ -13,7 +13,7 @@ import Text.Trifecta (Parser, char, choice, newline, sepEndBy, space)
 type Z3 = Finite 3
 
 main :: IO ()
-main = $(evalPuzzle)
+main = $(defaultMainPuzzle)
 
 getInput :: IO [(Z3, Z3)]
 getInput = parseInputAoC 2022 2 strategyGuide

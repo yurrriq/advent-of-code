@@ -5,8 +5,8 @@
 module AdventOfCode.Year2023.Day04 where
 
 import AdventOfCode.Input (parseInputAoC, parseString)
-import AdventOfCode.SimplePuzzle
-import AdventOfCode.TH (evalPuzzle)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
 import Data.IntMap.Strict ((!))
 import Data.IntMap.Strict qualified as IntMap
 import Data.List.Extra (sumOn')
@@ -18,7 +18,7 @@ newtype Scratchcard = Scratchcard {unScratchcard :: (Int, (Set Int, Set Int))}
   deriving (Eq, Ord, Show)
 
 main :: IO ()
-main = $(evalPuzzle)
+main = $(defaultMainPuzzle)
 
 partOne :: SimplePuzzle [Scratchcard] Int
 partOne =
@@ -58,10 +58,10 @@ posInt :: Parser Int
 posInt = fromInteger <$> natural
 
 partOneExample :: IO Int
-partOneExample = flip evalPart partOne =<< getExample
+partOneExample = evaluatingPuzzle partOne =<< getExample
 
 partTwoExample :: IO Int
-partTwoExample = flip evalPart partTwo =<< getExample
+partTwoExample = evaluatingPuzzle partTwo =<< getExample
 
 getExample :: IO [Scratchcard]
 getExample = parseString (some scratchcard) example

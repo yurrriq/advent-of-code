@@ -5,8 +5,8 @@
 module AdventOfCode.Year2023.Day05 where
 
 import AdventOfCode.Input (parseInputAoC, parseString)
-import AdventOfCode.SimplePuzzle
-import AdventOfCode.TH (evalPuzzle)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
 import Control.Foldl qualified as Foldl
 import Data.Interval (Extended (..), Interval, (<=..<))
 import Data.Interval qualified as Interval
@@ -18,7 +18,7 @@ import Relude
 import Text.Trifecta hiding (parseString)
 
 main :: IO ()
-main = $(evalPuzzle)
+main = $(defaultMainPuzzle)
 
 partOne :: SimplePuzzle Almanac (Maybe Int)
 partOne = asks \(Almanac (seeds, mappings)) ->

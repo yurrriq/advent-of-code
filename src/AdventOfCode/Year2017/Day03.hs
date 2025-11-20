@@ -9,8 +9,8 @@ module AdventOfCode.Year2017.Day03
 where
 
 import AdventOfCode.Input (parseInputAoC)
-import AdventOfCode.SimplePuzzle
-import AdventOfCode.TH (evalPuzzle)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
 import AdventOfCode.Util (neighborsOf)
 import Data.List.Infinite (Infinite (..), (!!), (...))
 import Data.List.Infinite qualified as Infinite
@@ -20,7 +20,7 @@ import Relude
 import Text.Trifecta (integer)
 
 main :: IO ()
-main = $(evalPuzzle)
+main = $(defaultMainPuzzle)
 
 getInput :: IO Word
 getInput = parseInputAoC 2017 3 (fromInteger <$> integer)

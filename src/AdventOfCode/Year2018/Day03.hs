@@ -5,7 +5,7 @@ module AdventOfCode.Year2018.Day03 where
 
 import AdventOfCode.Input (parseInputAoC, parseString)
 import AdventOfCode.Puzzle
-import AdventOfCode.TH (evalPuzzle)
+import AdventOfCode.TH (defaultMainPuzzle)
 import AdventOfCode.Util (Frequencies, frequencies, maybeFail)
 import Control.Monad.Extra (findM)
 import Data.Ix (range)
@@ -50,16 +50,10 @@ squaresCovered (Claim _ origin size) = range (origin, origin + size - 1)
 
 -- ------------------------------------------------------------------- [ Parts ]
 
-emptyPuzzleState :: Frequencies (V2 Integer)
-emptyPuzzleState = Map.empty
-
 partOne :: Puzzle [Claim] (Frequencies (V2 Integer)) Int
-partOne =
-  asks
-    $ Map.size
-    . Map.filter (>= 2)
-    . frequencies
-    . concatMap squaresCovered
+partOne = do
+  put =<< asks (frequencies . concatMap squaresCovered)
+  gets (Map.size . Map.filter (>= 2))
 
 partTwo :: Puzzle [Claim] (Frequencies (V2 Integer)) Integer
 partTwo = do
@@ -73,7 +67,7 @@ getInput :: IO [Claim]
 getInput = parseInputAoC 2018 3 (many parseClaim)
 
 main :: IO ()
-main = $(evalPuzzle)
+main = $(defaultMainPuzzle)
 
 getExample :: IO [Claim]
 getExample = parseString (many parseClaim) example

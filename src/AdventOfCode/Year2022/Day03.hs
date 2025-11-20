@@ -3,15 +3,15 @@
 module AdventOfCode.Year2022.Day03 where
 
 import AdventOfCode.Input (parseInputAoC, parseString)
-import AdventOfCode.SimplePuzzle
-import AdventOfCode.TH (evalPuzzle)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
 import Data.List (foldl1, intersect)
 import Data.List.Split (chunksOf)
 import Relude
 import Text.Trifecta (Parser, lower, newline, sepEndBy, upper)
 
 main :: IO ()
-main = $(evalPuzzle)
+main = $(defaultMainPuzzle)
 
 partOne :: SimplePuzzle [[Int]] Int
 partOne = asks $ day03 (uncurry intersect . halve)
