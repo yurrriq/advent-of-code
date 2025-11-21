@@ -504,6 +504,7 @@ executables:
     <<: *executable
     main: AdventOfCode.Year2021.Day11
     dependencies:
+      - finite-typelits
       - linear
   aoc-2022-day01:
     <<: *executable

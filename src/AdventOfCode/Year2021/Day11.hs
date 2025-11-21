@@ -1,88 +1,118 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE TupleSections #-}
-{-# LANGUAGE TypeApplications #-}
-{-# LANGUAGE TypeOperators #-}
+{-# LANGUAGE DerivingVia #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 
 module AdventOfCode.Year2021.Day11 where
 
-import AdventOfCode.Input (parseInput, parseString)
-import AdventOfCode.TH (defaultMain, inputFilePath)
+import AdventOfCode.Input (parseInputAoC, parseString)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
 import AdventOfCode.Util (neighborsOf)
-import Control.Lens (ifoldl')
+import Control.Lens (ifoldl', makeLenses, use, uses, (%=), (+=), (.=), (<~))
+import Control.Monad.Extra (whileM)
 import Data.Char (digitToInt)
-import Data.Foldable (forM_)
+import Data.Finite (Finite, finites, getFinite, modulo)
 import Data.Ix (Ix, inRange)
-import Data.Map (Map)
-import Data.Map qualified as M
-import Data.Set (Set)
-import Data.Set qualified as S
+import Data.Map qualified as Map
+import Data.Set qualified as Set
+import Generic.Data (GenericProduct (..))
 import Linear (V2 (..))
-import Text.Trifecta (Parser, digit, newline, sepEndBy, some)
+import Relude
+import Text.Trifecta (Parser, digit, newline, sepEndBy)
+
+type EnergyLevel = Finite 10
+
+type Grid = Map (V2 Int) EnergyLevel
+
+grid :: Parser Grid
+grid = mkGrid <$> some (fromIntegral . digitToInt <$> digit) `sepEndBy` newline
+
+mkGrid :: [[EnergyLevel]] -> Grid
+mkGrid = ifoldl' (ifoldl' . f) Map.empty
+  where
+    f y x = flip (Map.insert (V2 x y))
+
+printGrid :: Grid -> IO ()
+printGrid m = forM_ (finites @10) $ \y -> do
+  forM_ (finites @10) $ \x ->
+    putStr (show (getFinite (m Map.! (fromIntegral <$> V2 x y))))
+  putStrLn ""
+
+data PuzzleState' a
+  = PuzzleState
+  { _theCount :: !a,
+    _theGrid :: !Grid
+  }
+  deriving (Eq, Generic, Show)
+  deriving
+    (Semigroup, Monoid)
+    via (GenericProduct (PuzzleState' (Sum a)))
+
+makeLenses ''PuzzleState'
+
+type PuzzleState = PuzzleState' Int
 
 main :: IO ()
-main = $(defaultMain)
+main = $(defaultMainPuzzle)
 
-getInput :: IO (Map (V2 Int) Int)
-getInput = parseInput grid $(inputFilePath)
+getInput :: IO Grid
+getInput = parseInputAoC 2021 11 grid
 
-example :: IO (Map (V2 Int) Int)
+getExample :: IO Grid
+getExample = parseString grid example
+
+example :: String
 example =
-  parseString grid . unlines $
-    [ "5483143223",
-      "2745854711",
-      "5264556173",
-      "6141336146",
-      "6357385478",
-      "4167524645",
-      "2176841721",
-      "6882881134",
-      "4846848554",
-      "5283751526"
-    ]
+  "5483143223\n\
+  \2745854711\n\
+  \5264556173\n\
+  \6141336146\n\
+  \6357385478\n\
+  \4167524645\n\
+  \2176841721\n\
+  \6882881134\n\
+  \4846848554\n\
+  \5283751526\n"
 
-partOne :: Map (V2 Int) Int -> Int
-partOne = fst . (!! 100) . iterate step . (0,)
+partOne :: Puzzle Grid PuzzleState Int
+partOne = do
+  theGrid <~ ask
+  runSteps 100
 
-step :: (Int, Map (V2 Int) Int) -> (Int, Map (V2 Int) Int)
-step (n, octopuses) =
-  ( \(flashes, octopuses') ->
-      (n + S.size flashes, foldl (\m coords -> M.insert coords 0 m) octopuses' flashes)
-  )
-    $ go (S.empty, fmap succ octopuses)
+partTwo :: Puzzle Grid PuzzleState Int
+partTwo = do
+  theGrid <~ ask
+  theCount .= 0
+  whileM
+    $ stepM (const 1)
+    *> uses theGrid (any (/= 0))
+  use theCount
 
-go :: (Set (V2 Int), Map (V2 Int) Int) -> (Set (V2 Int), Map (V2 Int) Int)
-go (flashes, octopuses) =
-  if any (> 9) octopuses
-    then M.foldlWithKey flash (flashes, octopuses) octopuses
-    else (flashes, octopuses)
+runSteps :: Int -> Puzzle Grid PuzzleState Int
+runSteps 0 = use theCount
+runSteps k = stepM Set.size *> runSteps (k - 1)
 
-flash :: (Set (V2 Int), Map (V2 Int) Int) -> V2 Int -> Int -> (Set (V2 Int), Map (V2 Int) Int)
+stepM :: (MonadState PuzzleState m) => (Set (V2 Int) -> Int) -> m ()
+stepM f = do
+  theGrid %= fmap increase
+  (flashes, steppedGrid) <- uses theGrid (handleFlashes Set.empty)
+  theGrid .= steppedGrid
+  theCount += f flashes
+
+increase :: EnergyLevel -> EnergyLevel
+increase = modulo . succ . getFinite
+
+handleFlashes :: Set (V2 Int) -> Grid -> (Set (V2 Int), Grid)
+handleFlashes seen current =
+  Map.foldlWithKey flash (seen, current) current & \(flashes, next) ->
+    (flashes, foldl' (\m coords -> Map.insert coords 0 m) next flashes)
+
+flash :: (Set (V2 Int), Grid) -> V2 Int -> EnergyLevel -> (Set (V2 Int), Grid)
 flash (flashes, octopuses) coords octopus
-  | octopus > 9 =
-      let neighbors = neighborsInRange (pure 0, pure 9) coords
-          flashes' = S.insert coords flashes
-          octopuses' = M.delete coords octopuses
-       in go (flashes', foldl (flip (M.alter (fmap succ))) octopuses' neighbors)
+  | octopus == 0 && coords `Set.notMember` flashes =
+      handleFlashes (Set.insert coords flashes)
+        $ foldl' (flip (Map.alter (fmap increase))) octopuses
+        $ neighborsInRange (0, 9) coords
   | otherwise = (flashes, octopuses)
 
-partTwo :: Map (V2 Int) Int -> Int
-partTwo = undefined
-
-grid :: Parser (Map (V2 Int) Int)
-grid = mkGrid <$> some (digitToInt <$> digit) `sepEndBy` newline
-
-mkGrid :: [[a]] -> Map (V2 Int) a
-mkGrid = ifoldl' (ifoldl' . f) M.empty
-  where
-    f y x = flip (M.insert (V2 x y))
-
--- FIXME: generalize
 neighborsInRange :: (Ix a, Num a) => (V2 a, V2 a) -> V2 a -> Set (V2 a)
-neighborsInRange range point = S.filter (inRange range) (neighborsOf point)
-
-printGrid :: Map (V2 Int) Int -> IO ()
-printGrid m = forM_ [0 .. 9] $ \y ->
-  do
-    forM_ [0 .. 9] $ \x ->
-      putStr (show (m M.! V2 x y))
-    putStrLn ""
+neighborsInRange range point = Set.filter (inRange range) (neighborsOf point)
