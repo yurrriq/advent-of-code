@@ -2,7 +2,7 @@
 
 module AdventOfCode.TH where
 
-import Control.Monad.Logger qualified as Logger
+import AdventOfCode.Puzzle (evalPuzzle)
 import Data.List.Split (splitOn)
 import Language.Haskell.TH
 import Relude
@@ -54,15 +54,12 @@ doPartOne = [|putStr "Part One: " *> print (partOne input)|]
 doPartTwo :: Q Exp
 doPartTwo = [|putStr "Part Two: " *> print (partTwo input)|]
 
-evalPuzzle :: Q Exp
-evalPuzzle =
+defaultMainPuzzle :: Q Exp
+defaultMainPuzzle =
   [|
     do
       input <- getInput
-      $(varE 'Logger.runStderrLoggingT)
-        $ evaluatingStateT emptyPuzzleState
-        $ usingReaderT input
-        $ runPuzzle
+      $(varE 'AdventOfCode.Puzzle.evalPuzzle) input mempty
         $ do
           putStr "Part One: "
           print =<< partOne

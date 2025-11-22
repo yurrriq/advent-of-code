@@ -1,91 +1,92 @@
-{-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE DeriveAnyClass #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 
 module AdventOfCode.Year2021.Day10 where
 
-import AdventOfCode.Input (parseInput, parseString)
-import AdventOfCode.TH (defaultMain, inputFilePath)
-import Control.Applicative ((<|>))
-import Data.Either (fromLeft)
-import Data.Foldable (foldlM)
-import Data.Functor (($>))
-import Data.List (sort)
-import Data.Maybe (mapMaybe)
-import Text.Trifecta (Parser, char, newline, sepEndBy, some)
+import AdventOfCode.Input (parseInputAoC, parseString)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
+import Data.Either.Extra (eitherToMaybe)
+import Data.Finitary (Finitary (toFinite))
+import Data.List ((!!))
+import Data.List.Extra (sumOn')
+import Relude
+import Text.Show qualified
+import Text.Trifecta (Parser, char, choice, newline, sepEndBy)
 
 data Bracket
   = Paren
   | Square
   | Curly
   | Angle
-  deriving (Eq, Show)
+  deriving (Eq, Generic)
+  deriving anyclass (Finitary)
+
+type Line = [Either Bracket Bracket]
+
+instance {-# OVERLAPPING #-} Show Line where
+  show = concatMap (either open close)
+    where
+      open = pure . ("([{<" !!) . fromIntegral . toFinite
+      close = pure . (")]}>" !!) . fromIntegral . toFinite
 
 main :: IO ()
-main = $(defaultMain)
+main = $(defaultMainPuzzle)
 
-getInput :: IO [[Either Bracket Bracket]]
-getInput = parseInput (some bracket `sepEndBy` newline) $(inputFilePath)
+getInput :: IO [Line]
+getInput = parseInputAoC 2021 10 (some bracket `sepEndBy` newline)
 
-example :: IO [[Either Bracket Bracket]]
+getExample :: IO [Line]
+getExample = parseString (some bracket `sepEndBy` newline) example
+
+example :: String
 example =
-  parseString (some bracket `sepEndBy` newline) . unlines $
-    [ "[({(<(())[]>[[{[]{<()<>>",
-      "[(()[<>])]({[<{<<[]>>(",
-      "{([(<{}[<>[]}>{[]{[(<()>",
-      "(((({<>}<{<{<>}{[]{[]{}",
-      "[[<[([]))<([[{}[[()]]]",
-      "[{[{({}]{}}([{[{{{}}([]",
-      "{<[[]]>}<{[{[{[]{()[[[]",
-      "[<(<(<(<{}))><([]([]()",
-      "<{([([[(<>()){}]>(<<{{",
-      "<{([{{}}[<[[[<>{}]]]>[]]"
-    ]
+  "[({(<(())[]>[[{[]{<()<>>\n\
+  \[(()[<>])]({[<{<<[]>>(\n\
+  \{([(<{}[<>[]}>{[]{[(<()>\n\
+  \(((({<>}<{<{<>}{[]{[]{}\n\
+  \[[<[([]))<([[{}[[()]]]\n\
+  \[{[{({}]{}}([{[{{{}}([]\n\
+  \{<[[]]>}<{[{[{[]{()[[[]\n\
+  \[<(<(<(<{}))><([]([]()\n\
+  \<{([([[(<>()){}]>(<<{{\n\
+  \<{([{{}}[<[[[<>{}]]]>[]]\n"
 
-partOne :: [[Either Bracket Bracket]] -> Int
-partOne = sum . map (fromLeft 0 . foldlM go [])
+partOne :: SimplePuzzle [Line] Int
+partOne = asks (sumOn' (fromLeft 0 . scoreLine))
+
+partTwo :: SimplePuzzle [Line] Int
+partTwo = asks (middle . mapMaybe (eitherToMaybe . scoreLine))
+
+scoreLine :: Line -> Either Int Int
+scoreLine = foldlM scoreIncomplete [] >>> second (foldl' scoreCorrupt 0)
   where
-    go [] next = Right [next]
-    go (Left lhs : rest) (Right rhs)
+    scoreIncomplete [] next = Right [next]
+    scoreIncomplete (Left lhs : rest) ket@(Right rhs)
       | lhs == rhs = Right rest
-      | otherwise = Left (scoreBracket (Right rhs))
-    go stack next = Right (next : stack)
+      | otherwise = Left (scoreBracket ket)
+    scoreIncomplete stack next = Right (next : stack)
 
-partTwo :: [[Either Bracket Bracket]] -> Int
-partTwo =
-  medianOdd
-    . map (foldl ((+) . (5 *)) 0 . map scoreBracket)
-    . mapMaybe (foldlM go [])
-  where
-    go [] next = Just [next]
-    go (Left lhs : rest) (Right rhs)
-      | lhs == rhs = Just rest
-      | otherwise = Nothing
-    go stack next = Just (next : stack)
+    scoreCorrupt total ket = total * 5 + scoreBracket ket
 
 bracket :: Parser (Either Bracket Bracket)
 bracket =
-  char '(' $> Left Paren
-    <|> char ')' $> Right Paren
-    <|> char '[' $> Left Square
-    <|> char ']' $> Right Square
-    <|> char '{' $> Left Curly
-    <|> char '}' $> Right Curly
-    <|> char '<' $> Left Angle
-    <|> char '>' $> Right Angle
+  choice
+    [ char '(' $> Left Paren,
+      char ')' $> Right Paren,
+      char '[' $> Left Square,
+      char ']' $> Right Square,
+      char '{' $> Left Curly,
+      char '}' $> Right Curly,
+      char '<' $> Left Angle,
+      char '>' $> Right Angle
+    ]
 
 scoreBracket :: Either Bracket Bracket -> Int
 scoreBracket = either autocomplete illegal
   where
-    autocomplete = \case
-      Paren -> 1
-      Square -> 2
-      Curly -> 3
-      Angle -> 4
-    illegal = \case
-      Paren -> 3
-      Square -> 57
-      Curly -> 1197
-      Angle -> 25137
+    autocomplete = (1 +) . fromIntegral . toFinite
+    illegal = ([3, 57, 1197, 25137] !!) . fromIntegral . toFinite
 
--- length must be odd
-medianOdd :: (Ord a) => [a] -> a
-medianOdd xs = sort xs !! (length xs `div` 2)
+middle :: (Ord a) => [a] -> a
+middle xs = sort xs !! (length xs `div` 2)

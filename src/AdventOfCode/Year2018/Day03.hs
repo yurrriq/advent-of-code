@@ -1,93 +1,79 @@
-module AdventOfCode.Year2018.Day03
-  ( main,
-    partOne,
-    partTwo,
-  )
-where
+{-# LANGUAGE BlockArguments #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 
-import AdventOfCode.Input (parseInput)
-import AdventOfCode.TH (inputFilePath)
-import AdventOfCode.Util (Frequencies, frequencies)
-import Data.List (find)
+module AdventOfCode.Year2018.Day03 where
+
+import AdventOfCode.Input (parseInputAoC, parseString)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
+import AdventOfCode.Util (Frequencies, frequencies, maybeFail)
+import Control.Monad.Extra (findM)
+import Data.Ix (range)
 import Data.Map qualified as Map
-import Data.Maybe (fromMaybe)
-import Text.Trifecta (Parser, comma, digit, many, natural, some, space, symbol)
+import Linear.V2 (V2 (..))
+import Relude
+import Text.Trifecta (Parser, comma, natural, symbol)
 
 -- ------------------------------------------------------------------  [ Types ]
 
-data Point = Point
-  { _left :: Integer,
-    _top :: Integer
-  }
-  deriving (Eq, Ord)
-
-instance Show Point where
-  showsPrec _ (Point left top) =
-    showString $ "(" <> show left <> ", " <> show top <> ")"
-
-data Size = Size
-  { _width :: Integer,
-    _height :: Integer
-  }
-  deriving (Eq)
-
-instance Show Size where
-  showsPrec _ (Size w h) = showString (show w <> "x" <> show h)
-
-type ClaimID = String
-
 data Claim = Claim
-  { _id :: ClaimID,
-    _origin :: Point,
-    _size :: Size
+  { _id :: !Integer,
+    _origin :: !(V2 Integer),
+    _size :: !(V2 Integer)
   }
   deriving (Eq, Show)
 
 -- ----------------------------------------------------------------- [ Parsers ]
 
-claim :: Parser Claim
-claim =
+parseClaim :: Parser Claim
+parseClaim =
   Claim
-    <$> (symbol "#" *> some digit <* space)
+    <$> (symbol "#" *> natural)
     <*> (symbol "@" *> point)
     <*> (symbol ":" *> size)
-
-point :: Parser Point
-point = Point <$> natural <*> (comma *> natural)
-
-size :: Parser Size
-size = Size <$> natural <*> (symbol "x" *> natural)
+  where
+    point = V2 <$> natural <*> (comma *> natural)
+    size = V2 <$> natural <*> (symbol "x" *> natural)
 
 -- ----------------------------------------------------------------- [ Helpers ]
 
-isClaimOverlapping :: Frequencies Point -> Claim -> Bool
-isClaimOverlapping covered = any (isPointOverlapping covered) . squaresCovered
+nonoverlappingClaim :: Claim -> Puzzle [Claim] (Frequencies (V2 Integer)) Bool
+nonoverlappingClaim =
+  liftA2 all (gets nonoverlappingSquare) . pure . squaresCovered
 
-isPointOverlapping :: Frequencies Point -> Point -> Bool
-isPointOverlapping covered = maybe False (> 1) . flip Map.lookup covered
+nonoverlappingSquare :: Frequencies (V2 Integer) -> V2 Integer -> Bool
+nonoverlappingSquare covered square =
+  Map.lookup square covered == Just 1
 
-squaresCovered :: Claim -> [Point]
-squaresCovered (Claim _ (Point x0 y0) (Size w h)) =
-  [Point x1 y1 | x1 <- [x0 .. x0 + w - 1], y1 <- [y0 .. y0 + h - 1]]
+squaresCovered :: Claim -> [V2 Integer]
+squaresCovered (Claim _ origin size) = range (origin, origin + size - 1)
 
 -- ------------------------------------------------------------------- [ Parts ]
 
-partOne :: [Claim] -> Int
-partOne =
-  Map.size
-    . Map.filter (>= 2)
-    . frequencies
-    . concatMap squaresCovered
+partOne :: Puzzle [Claim] (Frequencies (V2 Integer)) Int
+partOne = do
+  put =<< asks (frequencies . concatMap squaresCovered)
+  gets (Map.size . Map.filter (>= 2))
 
-partTwo :: [Claim] -> Maybe ClaimID
-partTwo claims = _id <$> find (not . isClaimOverlapping covered) claims
-  where
-    covered = frequencies (concatMap squaresCovered claims)
+partTwo :: Puzzle [Claim] (Frequencies (V2 Integer)) Integer
+partTwo = do
+  put =<< asks (frequencies . concatMap squaresCovered)
+  maybeFail "could not find nonoverlapping claim"
+    . fmap _id
+    =<< findM nonoverlappingClaim
+    =<< ask
+
+getInput :: IO [Claim]
+getInput = parseInputAoC 2018 3 (many parseClaim)
 
 main :: IO ()
-main = do
-  input <- parseInput (many claim) $(inputFilePath)
-  putStr "Part One: "
-  print (partOne input)
-  putStr "Part Two: "
-  putStrLn $ fromMaybe "failed!" (partTwo input)
+main = $(defaultMainPuzzle)
+
+getExample :: IO [Claim]
+getExample = parseString (many parseClaim) example
+
+example :: String
+example =
+  "#1 @ 1,3: 4x4\n\
+  \#2 @ 3,1: 4x4\n\
+  \#3 @ 5,5: 2x2\n"
