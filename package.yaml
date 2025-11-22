@@ -57,6 +57,7 @@ library:
     - data-ordlist
     - dlist
     - fast-digits
+    - finitary
     - finite-typelits
     - free-algebras
     - groups
@@ -500,6 +501,8 @@ executables:
   aoc-2021-day10:
     <<: *executable
     main: AdventOfCode.Year2021.Day10
+    dependencies:
+      - finitary
   aoc-2021-day11:
     <<: *executable
     main: AdventOfCode.Year2021.Day11
