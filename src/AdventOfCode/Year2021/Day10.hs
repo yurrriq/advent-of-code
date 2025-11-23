@@ -6,6 +6,7 @@ module AdventOfCode.Year2021.Day10 where
 import AdventOfCode.Input (parseInputAoC, parseString)
 import AdventOfCode.Puzzle
 import AdventOfCode.TH (defaultMainPuzzle)
+import AdventOfCode.Util (medianUnsafe)
 import Data.Either.Extra (eitherToMaybe)
 import Data.Finitary (Finitary (toFinite))
 import Data.List ((!!))
@@ -56,7 +57,7 @@ partOne :: SimplePuzzle [Line] Int
 partOne = asks (sumOn' (fromLeft 0 . scoreLine))
 
 partTwo :: SimplePuzzle [Line] Int
-partTwo = asks (middle . mapMaybe (eitherToMaybe . scoreLine))
+partTwo = asks (medianUnsafe . mapMaybe (eitherToMaybe . scoreLine))
 
 scoreLine :: Line -> Either Int Int
 scoreLine = foldlM scoreIncomplete [] >>> second (foldl' scoreCorrupt 0)
@@ -87,6 +88,3 @@ scoreBracket = either autocomplete illegal
   where
     autocomplete = (1 +) . fromIntegral . toFinite
     illegal = ([3, 57, 1197, 25137] !!) . fromIntegral . toFinite
-
-middle :: (Ord a) => [a] -> a
-middle xs = sort xs !! (length xs `div` 2)

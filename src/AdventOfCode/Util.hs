@@ -22,6 +22,8 @@ module AdventOfCode.Util
     adjacencies,
     neighborsOf,
     holes,
+    middle,
+    medianUnsafe,
     numDigits,
     bitraverseBoth,
     (<&&>),
@@ -33,6 +35,7 @@ where
 import Control.Comonad.Store (experiment)
 import Control.Lens (holesOf)
 import Data.IntMap qualified as IM
+import Data.List ((!!))
 import Data.Map qualified as Map
 import Data.Set qualified as Set
 import Relude
@@ -122,6 +125,12 @@ neighborsOf = Set.fromList . flip map adjacencies . (+)
 holes :: [a] -> [(a, [a])]
 holes [] = []
 holes (x : xs) = (x, xs) : map (second (x :)) (holes xs)
+
+medianUnsafe :: (Ord a) => [a] -> a
+medianUnsafe xs = sort xs !! (length xs `div` 2)
+
+middle :: [a] -> Maybe a
+middle xs = xs !!? (length xs `div` 2)
 
 numDigits :: (Integral a) => a -> Int
 numDigits n = truncate @Double (logBase 10 (fromIntegral n) + 1)

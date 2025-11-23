@@ -5,6 +5,7 @@ module AdventOfCode.Year2024.Day05 where
 import AdventOfCode.Input (parseInputAoC, parseString)
 import AdventOfCode.Puzzle
 import AdventOfCode.TH (defaultMainPuzzle)
+import AdventOfCode.Util (middle)
 import Control.Lens ((<.=))
 import Data.Graph qualified as Graph
 import Data.Semigroup (Max (..), Min (..))
@@ -97,6 +98,3 @@ example =
   \75,97,47,61,53\n\
   \61,13,29\n\
   \97,13,75,29,47\n"
-
-middle :: [a] -> Maybe a
-middle xs = xs !!? (length xs `div` 2)
