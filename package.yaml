@@ -64,6 +64,7 @@ library:
     - hashable
     - infinite-list
     - linear
+    - matrix
     - monoid-extras
     - mtl
     - parser-combinators
@@ -483,7 +484,7 @@ executables:
     dependencies:
       - finite-typelits
       - linear
-      - vector
+      - matrix
       - vector-sized
   aoc-2021-day07:
     <<: *executable
