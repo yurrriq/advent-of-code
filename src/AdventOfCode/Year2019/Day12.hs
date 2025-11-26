@@ -1,81 +1,55 @@
-{-# LANGUAGE TupleSections #-}
+{-# LANGUAGE BlockArguments #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 
-module AdventOfCode.Year2019.Day12
-  ( main,
-    getInput,
-    partOne,
-    partTwo,
-  )
-where
+module AdventOfCode.Year2019.Day12 where
 
-import AdventOfCode.Input (parseInput)
-import AdventOfCode.TH (inputFilePath)
-import Control.Arrow (second, (&&&), (>>>))
-import Data.Function (on)
-import Linear (V3 (..))
-import Text.Trifecta (Parser, angles, between, integer, some, string)
+import AdventOfCode.Input (parseInputAoC)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
+import AdventOfCode.Util ((<.>))
+import Data.Foldable.Extra (sumOn')
+import Data.List.Infinite ((!!))
+import Data.List.Infinite qualified as Infinite
+import Linear (V2 (..), V3 (..))
+import Relude
+import Text.Trifecta (Parser, angles, between, integer, string)
+
+type Moon = V2 (V3 Int)
 
 main :: IO ()
-main =
-  do
-    putStrLn "[2019] Day 12: The N-Body Problem"
-    input <- getInput
-    putStr "Part One: "
-    print (partOne input)
-    putStr "Part Two: "
-    print (partTwo input)
+main = $(defaultMainPuzzle)
 
-getInput :: IO [Pair]
-getInput = fmap mkPair <$> parseInput (some dimensions) $(inputFilePath)
+getInput :: IO [Moon]
+getInput = parseInputAoC 2019 12 (some (flip V2 0 <$> dimensions))
 
-partOne :: [Pair] -> Int
-partOne = sum . fmap totalEnergy . (!! 1000) . iterate step
-
-partTwo :: [Pair] -> Int
-partTwo = foldr (lcm . period) 1 . traverse transpose
-
-type Pair = (Dimensions, Dimensions)
-
-mkPair :: V3 Int -> Pair
-mkPair = (,pure 0)
-
-type Dimensions = V3 Int
-
-dimensions :: Parser Dimensions
-dimensions =
-  angles $
-    V3
-      <$> (fromIntegral <$> between (string "x=") (string ", ") integer)
-      <*> (fromIntegral <$> between (string "y=") (string ", ") integer)
-      <*> (fromIntegral <$> (string "z=" *> integer))
-
-transpose :: (V3 Int, V3 Int) -> V3 (Int, Int)
-transpose (V3 x y z, V3 u v w) = V3 (x, u) (y, v) (z, w)
-
-period :: (Eq a, Num a) => [(a, a)] -> Int
-period initial =
-  1 + length (takeWhile (/= initial) (iterate step (step initial)))
-
-step :: (Num a) => [(a, a)] -> [(a, a)]
-step = fmap applyVelocity . applyGravities
-
-applyGravities :: (Num a) => [(a, a)] -> [(a, a)]
-applyGravities moons = fmap (`applyGravity` moons) moons
-
-applyGravity :: (Num a) => (a, a) -> [(a, a)] -> (a, a)
-applyGravity = foldr stepVelocity
+partOne :: SimplePuzzle [Moon] Int
+partOne = asks (sumOn' totalEnergy . (!! 1000) . Infinite.iterate step)
   where
-    stepVelocity there = second =<< (pull `on` fst) there
-    pull there here = (+ signum (there - here))
+    totalEnergy (V2 position velocity) =
+      ((*) `on` (sum . abs)) position velocity
 
-applyVelocity :: (Num a) => (a, a) -> (a, a)
-applyVelocity (pos, vel) = (pos + vel, vel)
+partTwo :: SimplePuzzle [Moon] Int
+partTwo = asks (foldr (lcm . period) 1 . traverse twist)
+  where
+    twist (V2 (V3 x y z) (V3 u v w)) = V3 (V2 x u) (V2 y v) (V2 z w)
 
-totalEnergy :: Pair -> Int
-totalEnergy = potentialEnergy &&& kineticEnergy >>> uncurry (*)
+dimensions :: Parser (V3 Int)
+dimensions =
+  fmap fromInteger
+    <.> angles
+    $ V3
+    <$> between (string "x=") (string ", ") integer
+    <*> between (string "y=") (string ", ") integer
+    <*> (string "z=" *> integer)
 
-potentialEnergy :: Pair -> Int
-potentialEnergy = sum . abs . fst
+period :: (Functor f, Foldable f, Eq (f (V2 a)), Num a) => f (V2 a) -> Int
+period initial =
+  1 + length (Infinite.takeWhile (/= initial) (Infinite.iterate step (step initial)))
 
-kineticEnergy :: Pair -> Int
-kineticEnergy = sum . abs . snd
+step :: (Functor f, Foldable f, Num a) => f (V2 a) -> f (V2 a)
+step = fmap applyVelocity . applyGravities
+  where
+    applyVelocity (V2 position velocity) = V2 (position + velocity) velocity
+    applyGravities moons = fmap (`applyGravity` moons) moons
+    applyGravity = foldr \(V2 there _) (V2 here velocity) ->
+      V2 here (velocity + signum (there - here))
