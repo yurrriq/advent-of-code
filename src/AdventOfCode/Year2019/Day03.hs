@@ -1,60 +1,38 @@
+{-# LANGUAGE BlockArguments #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+
 module AdventOfCode.Year2019.Day03 where
 
-import AdventOfCode.Input (parseInput)
-import AdventOfCode.TH (inputFilePath)
-import Control.Applicative ((<|>))
-import Control.Arrow (second, (&&&))
-import Control.Category ((>>>))
-import Data.Foldable (minimumBy)
-import Data.Function (on)
+import AdventOfCode.Input (parseInputAoC, parseString)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
+import Data.Foldable (maximum, minimum, minimumBy)
 import Data.Ix (Ix (..))
-import Data.Set (Set)
 import Data.Set qualified as Set
-import GHC.Arr (unsafeIndex, unsafeRangeSize)
-import Text.Trifecta
+import Linear (V2 (..), (^*))
+import Relude
+import Relude.Extra.Bifunctor (bimapBoth)
+import Text.Trifecta (Parser, char, choice, comma, natural, sepBy)
 
 -- ------------------------------------------------------------------- [ Types ]
 
 data Segment
-  = Segment Direction Int
-  deriving (Eq, Show)
+  = Segment !Direction !Int
+  deriving (Eq, Generic, Show)
 
 data Direction
   = D
   | L
   | R
   | U
-  deriving (Eq, Show)
+  deriving (Eq, Generic, Show)
 
-data Point = Point
-  { _x :: Int,
-    _y :: Int
-  }
-  deriving (Eq, Ord)
-
-instance Ix Point where
-  {-# SPECIALIZE instance Ix Point #-}
-
-  range (Point x0 y0, Point x1 y1) =
-    [ Point x y | x <- range (x0, x1), y <- range (y0, y1)
-    ]
-  {-# INLINE range #-}
-
-  unsafeIndex (Point x0 y0, Point x1 y1) (Point x y) =
-    unsafeIndex (x0, x1) x * unsafeRangeSize (y0, y1) + unsafeIndex (y0, y1) y
-  {-# INLINE unsafeIndex #-}
-
-  inRange (Point x0 y0, Point x1 y1) (Point x y) =
-    inRange (x0, x1) x && inRange (y0, y1) y
-  {-# INLINE inRange #-}
-
-instance Show Point where
-  show (Point x y) = concat ["(", show x, ",", show y, ")"]
+type Point = V2 Int
 
 -- ----------------------------------------------------------------- [ Parsers ]
 
 point :: Parser Point
-point = Point <$> nonnegInt <*> (comma *> nonnegInt)
+point = V2 <$> nonnegInt <*> (comma *> nonnegInt)
 
 wires :: Parser ([Segment], [Segment])
 wires = (,) <$> segments <*> segments
@@ -67,10 +45,12 @@ segment = Segment <$> direction <*> nonnegInt
 
 direction :: Parser Direction
 direction =
-  (D <$ char 'D')
-    <|> (L <$ char 'L')
-    <|> (R <$ char 'R')
-    <|> (U <$ char 'U')
+  choice
+    [ D <$ char 'D',
+      L <$ char 'L',
+      R <$ char 'R',
+      U <$ char 'U'
+    ]
 
 nonnegInt :: Parser Int
 nonnegInt = fromIntegral <$> natural
@@ -78,76 +58,80 @@ nonnegInt = fromIntegral <$> natural
 -- ----------------------------------------------------------------- [ Helpers ]
 
 manhattanDistance :: Point -> Point -> Int
-manhattanDistance = curry $ (distanceOn _x &&& distanceOn _y) >>> uncurry (+)
-  where
-    distanceOn :: (Num a) => (b -> a) -> (b, b) -> a
-    distanceOn f = abs . uncurry (subtract `on` f)
+manhattanDistance from to = sum (abs (to - from))
 
 findCrossings :: [Point] -> [Point] -> Set Point
 findCrossings = Set.intersection `on` Set.fromList
 
 runSegments :: [Segment] -> [Point]
-runSegments = snd . foldl go (Point 0 0, [])
+runSegments = snd . foldl' go (0, [])
   where
     go (start, pointses) seg =
       second (pointses ++) (runSegment (start, seg))
 
 runSegment :: (Point, Segment) -> (Point, [Point])
-runSegment (Point x y, Segment D distance) =
-  let to = Point x (y - distance) in (to, reverse (range (to, Point x (y - 1))))
-runSegment (Point x y, Segment L distance) =
-  let to = Point (x - distance) y in (to, reverse (range (to, Point (x - 1) y)))
-runSegment (Point x y, Segment R distance) =
-  let to = Point (x + distance) y in (to, range (Point (x + 1) y, to))
-runSegment (Point x y, Segment U distance) =
-  let to = Point x (y + distance) in (to, range (Point x (y + 1), to))
+runSegment (from, Segment direktion distance)
+  | 1 == maximum (signum delta) = (to, range (from + delta, to))
+  | otherwise = (to, reverse (range (to, from + delta)))
+  where
+    delta = directionToPoint direktion
+    to = from + delta ^* distance
+
+directionToPoint :: Direction -> Point
+directionToPoint = \case
+  D -> V2 0 (-1)
+  L -> V2 (-1) 0
+  R -> V2 1 0
+  U -> V2 0 1
 
 -- ---------------------------------------------------------------- [ Examples ]
 
-exampleOne :: Result Int
+exampleOne :: IO ()
 exampleOne =
   runExample
-    "R8,U5,L5,D3\
-    \ U7,R6,D4,L4"
+    "R8,U5,L5,D3\n\
+    \U7,R6,D4,L4"
 
-exampleTwo :: Result Int
+exampleTwo :: IO ()
 exampleTwo =
   runExample
-    "R75,D30,R83,U83,L12,D49,R71,U7,L72\
-    \ U62,R66,U55,R34,D71,R55,D58,R83"
+    "R75,D30,R83,U83,L12,D49,R71,U7,L72\n\
+    \U62,R66,U55,R34,D71,R55,D58,R83"
 
-exampleThree :: Result Int
+exampleThree :: IO ()
 exampleThree =
   runExample
-    "R98,U47,R26,D63,R33,U87,L62,D20,R33,U53,R51\
-    \ U98,R91,D20,R16,D67,R40,U7,R15,U6,R7"
+    "R98,U47,R26,D63,R33,U87,L62,D20,R33,U53,R51\n\
+    \U98,R91,D20,R16,D67,R40,U7,R15,U6,R7"
 
-runExample :: String -> Result Int
-runExample = fmap partOne . parseString wires mempty
+runExample :: String -> IO ()
+runExample =
+  parseString wires >=> evaluatingPuzzle do
+    putStr "Part One: "
+    print =<< partOne
+    putStr "Part Two: "
+    print =<< partTwo
 
 -- ------------------------------------------------------------------- [ Parts ]
 
-partOne :: ([Segment], [Segment]) -> Int
+partOne :: SimplePuzzle ([Segment], [Segment]) Int
 partOne =
-  distance
+  asks
+    $ distance
     . minimumBy (compare `on` distance)
     . uncurry (findCrossings `on` runSegments)
   where
-    distance = manhattanDistance (Point 0 0)
+    distance = manhattanDistance 0
 
-partTwo :: ([Segment], [Segment]) -> Int
-partTwo (xs, ys) =
-  minimum $
-    Set.map (\p -> ((+) `on` (+ 1) . length . takeWhile (/= p)) xs' ys') $
-      findCrossings xs' ys'
-  where
-    (xs', ys') = (runSegments xs, runSegments ys)
+partTwo :: SimplePuzzle ([Segment], [Segment]) Int
+partTwo =
+  asks $ bimapBoth runSegments >>> \(xs, ys) ->
+    findCrossings xs ys
+      & Set.map (\p -> 2 + ((+) `on` length . takeWhile (/= p)) xs ys)
+      & minimum
+
+getInput :: IO ([Segment], [Segment])
+getInput = parseInputAoC 2019 3 wires
 
 main :: IO ()
-main =
-  do
-    input <- parseInput wires $(inputFilePath)
-    putStr "Part One: "
-    print $ partOne input
-    putStr "Part Two: "
-    print $ partTwo input
+main = $(defaultMainPuzzle)
