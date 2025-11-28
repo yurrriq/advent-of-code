@@ -45,7 +45,7 @@ applyRules rules update = filter (`elem` update) (Graph.topSort graph)
     relevantRules = filter (all (`elem` update)) rules
     bounds =
       bimap getMin getMax
-        $ foldMap (\(before, after) -> (Min (min before after), Max (max before after))) relevantRules
+        $ foldMap (Min . uncurry min &&& Max . uncurry max) relevantRules
 
 getInput :: IO ([(Int, Int)], [[Int]])
 getInput = parseInputAoC 2024 5 safetyManual
