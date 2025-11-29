@@ -1,3 +1,5 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+
 module AdventOfCode.Year2020.Day17
   ( main,
     getInput,
@@ -6,37 +8,46 @@ module AdventOfCode.Year2020.Day17
   )
 where
 
-import AdventOfCode.Input (parseInput)
-import AdventOfCode.TH (inputFilePath)
+import AdventOfCode.Input (parseInputAoC)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
 import AdventOfCode.Util (neighborsOf)
-import Control.Applicative ((<|>))
 import Control.Lens (ifoldl', set)
-import Data.Functor (($>))
+import Data.List.Infinite ((!!))
+import Data.List.Infinite qualified as Infinite
 import Data.Map qualified as Map
-import Data.Set (Set)
 import Data.Set qualified as Set
 import Linear (R2 (..), V2 (..), V3 (..), V4 (..))
+import Relude
 import Text.Trifecta
 
+type Domain f =
+  ( Applicative f,
+    Traversable f,
+    R2 f,
+    Num (f Int),
+    Ord (f Int)
+  ) ::
+    Constraint
+
+type Codomain f a = Set (f Int) -> a
+
 main :: IO ()
-main =
-  do
-    input <- getInput
-    putStr "Part One: "
-    print $ partOne (mkPocketDimension input)
-    putStr "Part Two: "
-    print $ partTwo (mkPocketDimension input)
+main = $(defaultMainPuzzle)
 
 getInput :: IO [[Bool]]
-getInput = parseInput region $(inputFilePath)
+getInput = parseInputAoC 2020 17 cubeRegion
 
-partOne :: Set (V3 Int) -> Int
-partOne = Set.size . (!! 6) . iterate stepCycle
+partOne :: SimplePuzzle [[Bool]] Int
+partOne = asks (solve . mkPocketDimension @V3)
 
-partTwo :: Set (V4 Int) -> Int
-partTwo = Set.size . (!! 6) . iterate stepCycle
+partTwo :: SimplePuzzle [[Bool]] Int
+partTwo = asks (solve . mkPocketDimension @V4)
 
-stepCycle :: (Applicative f, Traversable f, Num (f Int), Ord (f Int)) => Set (f Int) -> Set (f Int)
+solve :: (Domain f) => Codomain f Int
+solve = Set.size . (!! 6) . Infinite.iterate stepCycle
+
+stepCycle :: (Domain f) => Codomain f (Set (f Int))
 stepCycle activeCubes = stillActive <> activated
   where
     stillActive = filterNeighborCounts (\n -> n == 2 || n == 3) activeNeighborCounts
@@ -45,19 +56,22 @@ stepCycle activeCubes = stillActive <> activated
     inactiveNeighborCounts = neighborCounts `Map.withoutKeys` activeCubes
     filterNeighborCounts p = Map.keysSet . Map.filter p
     neighborCounts =
-      Map.unionsWith ((+) :: Int -> Int -> Int) $
-        Map.fromSet (const 1) . neighborsOf
-          <$> Set.toList activeCubes
+      Map.unionsWith ((+) :: Int -> Int -> Int)
+        $ Map.fromSet (const 1)
+        . neighborsOf
+        <$> Set.toList activeCubes
 
-mkPocketDimension :: (Applicative f, R2 f, Ord (f Int)) => [[Bool]] -> Set (f Int)
+mkPocketDimension :: (Domain f) => [[Bool]] -> Set (f Int)
 mkPocketDimension = ifoldl' (ifoldl' . go) Set.empty
   where
-    go y x activeCubes True = Set.insert (set _xy (V2 x y) (pure 0)) activeCubes
+    go y x activeCubes True = Set.insert (set _xy (V2 x y) 0) activeCubes
     go _ _ activeCubes False = activeCubes
 
-region :: Parser [[Bool]]
-region = some cube `sepEndBy` newline
+cubeRegion :: Parser [[Bool]]
+cubeRegion = some cube `sepEndBy` newline
   where
     cube =
-      char '#' $> True
-        <|> char '.' $> False
+      char '#'
+        $> True
+        <|> char '.'
+        $> False

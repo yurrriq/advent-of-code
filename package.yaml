@@ -443,6 +443,7 @@ executables:
     <<: *executable
     main: AdventOfCode.Year2020.Day17
     dependencies:
+      - infinite-list
       - linear
   aoc-2020-day18:
     <<: *executable
