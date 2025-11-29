@@ -438,7 +438,9 @@ executables:
     <<: *executable
     main: AdventOfCode.Year2020.Day16
     dependencies:
+      - infinite-list
       - linear
+      - pointless-fun
   aoc-2020-day17:
     <<: *executable
     main: AdventOfCode.Year2020.Day17
