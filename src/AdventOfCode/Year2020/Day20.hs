@@ -1,27 +1,21 @@
-module AdventOfCode.Year2020.Day20
-  ( main,
-    getInput,
-    partOne,
-  )
-where
+{-# LANGUAGE NoImplicitPrelude #-}
 
-import AdventOfCode.Input (parseInput)
-import AdventOfCode.TH (inputFilePath)
-import AdventOfCode.Util (frequencies)
-import Control.Applicative ((<|>))
-import Control.Arrow ((&&&))
+module AdventOfCode.Year2020.Day20 where
+
+import AdventOfCode.Input (parseInputAoC)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
+import AdventOfCode.Util (frequencies, maybeFail)
 import Control.Foldl qualified as Foldl
 import Control.Lens (ifoldl', view, (+~), (-~))
-import Control.Monad (ap, guard)
-import Data.Bool (bool)
-import Data.Foldable (toList)
-import Data.Map (Map, (!), (!?))
+import Control.Monad (ap)
+import Data.Foldable (maximum)
+import Data.Map ((!), (!?))
 import Data.Map qualified as Map
-import Data.Maybe (listToMaybe)
-import Data.Set (Set)
 import Data.Set qualified as Set
 import Linear.V2 (R1 (..), R2 (..), V2 (..), perp, _yx)
-import Text.Trifecta (Parser, char, natural, newline, sepEndBy, some, symbol)
+import Relude
+import Text.Trifecta (Parser, char, natural, newline, sepEndBy, symbol)
 
 type Image = Map Coords LabeledTile
 
@@ -32,22 +26,23 @@ type Tile = Set Coords
 type Coords = V2 Int
 
 main :: IO ()
-main =
-  do
-    input <- getInput
-    putStr "Part One: "
-    print (partOne input)
+main = $(defaultMainPuzzle)
 
 getInput :: IO [LabeledTile]
-getInput = parseInput (tile `sepEndBy` newline) $(inputFilePath)
+getInput = parseInputAoC 2020 20 (tile `sepEndBy` newline)
 
-partOne :: [LabeledTile] -> Maybe Int
-partOne pieces =
-  fmap (Foldl.fold (Foldl.premap fst Foldl.product) . corners) . listToMaybe $
-    arrange edges Map.empty (Set.fromList pieces) allHoles
+partOne :: SimplePuzzle [LabeledTile] Int
+partOne =
+  asks (Set.fromList &&& findEdges) >>= \(pieces, edges) ->
+    fmap (Foldl.fold (Foldl.premap fst Foldl.product) . corners)
+      . maybeFail "ope!"
+      . listToMaybe
+      $ arrange edges Map.empty pieces allHoles
   where
-    edges = findEdges pieces
     allHoles = [V2 x y | x <- [0 .. 11], y <- [0 .. 11]]
+
+partTwo :: SimplePuzzle [LabeledTile] Int
+partTwo = fail "not yet implemented"
 
 arrange :: Set [Int] -> Image -> Set LabeledTile -> [Coords] -> [Image]
 arrange _ layout _ [] = [layout]
@@ -60,13 +55,15 @@ arrange edges layout pieces (hole : holes) =
       $ maybe
         (normalizeEdge theTopEdge `Set.member` edges)
         ((theTopEdge ==) . bottomEdge . snd)
-      $ layout !? (_y -~ 1) hole
+      $ layout
+      !? (_y -~ 1) hole
     let theLeftEdge = leftEdge orientedTile
     guard
       $ maybe
         (normalizeEdge theLeftEdge `Set.member` edges)
         ((theLeftEdge ==) . rightEdge . snd)
-      $ layout !? (_x -~ 1) hole
+      $ layout
+      !? (_x -~ 1) hole
     arrange edges (Map.insert hole (n, orientedTile) layout) remainingPieces holes
 
 findEdges :: [LabeledTile] -> Set [Int]
@@ -96,8 +93,9 @@ choices xs =
 
 normalizedEdges :: Tile -> [[Int]]
 normalizedEdges points =
-  map normalizeEdge $
-    [topEdge, rightEdge, bottomEdge, leftEdge] <*> pure points
+  map normalizeEdge
+    $ [topEdge, rightEdge, bottomEdge, leftEdge]
+    <*> pure points
 
 normalizeEdge :: [Int] -> [Int]
 normalizeEdge = min `ap` (reverse . map (9 -))
@@ -116,8 +114,10 @@ tile = (,) <$> label <*> grid
 
 pixel :: Parser Bool
 pixel =
-  True <$ char '#'
-    <|> False <$ char '.'
+  True
+    <$ char '#'
+    <|> False
+    <$ char '.'
 
 label :: Parser Int
 label = symbol "Tile" *> nonnegInt <* symbol ":"
