@@ -47,3 +47,6 @@ evalPuzzle input initialState =
 
 evaluatingPuzzle :: (MonadIO m, Monoid s) => Puzzle r s a -> r -> m a
 evaluatingPuzzle puzzle input = evalPuzzle input mempty puzzle
+
+withPuzzle :: (r' -> r) -> Puzzle r s a -> Puzzle r' s a
+withPuzzle f puzzle = Puzzle $ withReaderT f (runPuzzle puzzle)
