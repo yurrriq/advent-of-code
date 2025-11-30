@@ -1,3 +1,7 @@
+{-# LANGUAGE BlockArguments #-}
+{-# LANGUAGE StrictData #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+
 module AdventOfCode.Year2020.Day15
   ( main,
     getInput,
@@ -6,47 +10,71 @@ module AdventOfCode.Year2020.Day15
   )
 where
 
-import Control.Monad.State (State, evalState, execState, get, put)
-import Data.IntMap (IntMap)
-import Data.IntMap qualified as IM
+import AdventOfCode.Input (parseInputAoC)
+import AdventOfCode.Puzzle
+import Control.Lens (makeLenses, use, uses, (%=), (+=), (.=), (<~))
+import Control.Monad.Logger (logDebug)
+import Data.IntMap qualified as IntMap
+import Relude
+import Text.Printf (printf)
+import Text.Trifecta (commaSep, natural)
+
+data PuzzleState
+  = PuzzleState
+  { _numbersToSay :: NonEmpty Int,
+    _turn :: Int,
+    _spokenNumbers :: IntMap Int
+  }
+  deriving (Eq, Generic, Show)
+
+makeLenses ''PuzzleState
+
+mkState :: NonEmpty Int -> PuzzleState
+mkState input = PuzzleState input 0 IntMap.empty
 
 main :: IO ()
 main =
-  do
-    input <- getInput
-    putStr "Part One: "
-    print (partOne input)
-    putStr "Part Two: "
-    print (partTwo input)
+  getInput <&> (id &&& mkState) >>= \(input, initialState) ->
+    evalPuzzle input initialState do
+      putStr "Part One: "
+      print =<< partOne
+      putStr "Part Two: "
+      print =<< partTwo
 
-getInput :: IO [Int]
-getInput = pure [0, 14, 1, 3, 7, 9]
+getInput :: IO (NonEmpty Int)
+getInput = fromList <$> parseInputAoC 2020 15 (commaSep posInt)
+  where
+    posInt = fromInteger <$> natural
 
-partOne :: [Int] -> Int
+partOne :: Puzzle (NonEmpty Int) PuzzleState Int
 partOne = memoryGame 2020
 
-partTwo :: [Int] -> Int
-partTwo = memoryGame 30000000
+partTwo :: Puzzle (NonEmpty Int) PuzzleState Int
+partTwo = memoryGame 30_000_000
 
-memoryGame :: Int -> [Int] -> Int
-memoryGame n input =
-  evalState memoryRound $
-    (!! pred n) $
-      iterate (execState memoryRound) (input, 1, IM.empty)
+memoryGame :: Int -> Puzzle (NonEmpty Int) PuzzleState Int
+memoryGame n = loop <* (numbersToSay <~ ask)
+  where
+    loop = do
+      turn += 1
+      number <- withPuzzle (const (max 1 (n `div` 100))) memoryRound
+      uses turn (== n) >>= bool loop (pure number)
 
-memoryRound :: State ([Int], Int, IntMap Int) Int
-memoryRound =
-  do
-    (input, now, seen) <- get
-    case input of
-      [] -> put ([0], now, seen) *> memoryRound
-      current : rest ->
-        case IM.lookup current seen of
-          Nothing ->
-            do
-              put (rest, now + 1, IM.insert current now seen)
-              pure current
-          Just before ->
-            do
-              put (now - before : rest, now + 1, IM.insert current now seen)
-              pure current
+memoryRound :: Puzzle Int PuzzleState Int
+memoryRound = do
+  number :| numbers <- use numbersToSay
+  uses spokenNumbers (IntMap.lookup number) >>= \case
+    Just before ->
+      numbersToSay <~ uses turn (subtract before >>> (:| numbers))
+    Nothing ->
+      numbersToSay .= fromMaybe (0 :| []) (nonEmpty numbers)
+  say number
+
+say :: Int -> Puzzle Int PuzzleState Int
+say number =
+  use turn >>= \i -> do
+    spokenNumbers %= IntMap.insert number i
+    m <- ask
+    when (i `mod` m == 0 || i `div` m >= 99)
+      $ $(logDebug) (fromString (printf "%d: %d" i number))
+    pure number
