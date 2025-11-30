@@ -1,3 +1,6 @@
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+
 module AdventOfCode.Year2017.Day03
   ( main,
     getInput,
@@ -5,64 +8,43 @@ module AdventOfCode.Year2017.Day03
   )
 where
 
+import AdventOfCode.Input (parseInputAoC)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
 import AdventOfCode.Util (neighborsOf)
-import Control.Arrow ((&&&), (>>>))
-import Control.Lens (view)
-import Data.Function (on)
-import Data.List (intersect)
-import Data.List.Extra (sumOn')
-import Data.Map ((!))
+import Data.List.Infinite (Infinite (..), (!!), (...))
+import Data.List.Infinite qualified as Infinite
 import Data.Map qualified as Map
-import Data.Set qualified as Set
-import Linear (V2 (..), _x, _y)
+import Linear (V2 (..))
+import Relude
+import Text.Trifecta (integer)
 
 main :: IO ()
-main =
-  do
-    input <- getInput
-    putStr "Part One: " *> print (partOne input)
-    putStr "Part Two: " *> print (partTwo input)
+main = $(defaultMainPuzzle)
 
-getInput :: IO Int
-getInput = pure 265149
+getInput :: IO Word
+getInput = parseInputAoC 2017 3 (fromInteger <$> integer)
 
-partOne :: Int -> Int
-partOne = manhattanDistance (pure 0) . (coords !!) . pred
+partOne :: SimplePuzzle Word Int
+partOne = asks (sum . abs . (spiral !!) . pred)
 
 -- https://oeis.org/A141481
-partTwo :: Int -> Int
-partTwo input = go (Map.singleton (pure 0) 1) (next (pure 0))
+partTwo :: SimplePuzzle Word Word
+partTwo = go (Map.singleton 0 1) (Infinite.tail spiral)
   where
-    go seen here =
-      if nextValue > input
-        then nextValue
-        else go (Map.insert here nextValue seen) (next here)
-      where
-        nextValue =
-          sumOn' (seen !) $
-            Map.keys seen `intersect` Set.toList (neighborsOf here)
+    go seen (here :< there) = do
+      let nextValue = sum $ Map.restrictKeys seen (neighborsOf here)
+      asks (< nextValue)
+        >>= bool (go (Map.insert here nextValue seen) there) (pure nextValue)
 
-coords :: [V2 Int]
-coords = iterate next (pure 0)
+spiral :: Infinite (V2 Int)
+spiral =
+  Infinite.scanl' (+) 0
+    $ Infinite.concat
+    $ Infinite.zipWith replicateNE (Infinite.concatMap (replicateNE 2) (1 ...))
+    $ Infinite.cycle (V2 1 0 :| [V2 0 1, V2 (-1) 0, V2 0 (-1)])
 
-next :: V2 Int -> V2 Int
-next (V2 0 0) = V2 1 0
-next (V2 x y) =
-  case (compare x y, signum x, signum y) of
-    (GT, _, -1) ->
-      if 1 <= x - abs y
-        then V2 x (succ y)
-        else V2 (succ x) y
-    (GT, _, _) -> V2 x (succ y)
-    (EQ, -1, _) -> V2 (succ x) y
-    (EQ, _, _) -> V2 (pred x) y
-    (LT, -1, _) ->
-      if 1 <= y - abs x
-        then V2 (pred x) y
-        else V2 x (pred y)
-    (LT, _, _) -> V2 (pred x) y
-
-manhattanDistance :: V2 Int -> V2 Int -> Int
-manhattanDistance = curry $ (distanceOn _x &&& distanceOn _y) >>> uncurry (+)
-  where
-    distanceOn l = abs . uncurry (subtract `on` view l)
+replicateNE :: (HasCallStack) => Int -> a -> NonEmpty a
+replicateNE n x
+  | n > 0 = x :| replicate (n - 1) x
+  | otherwise = error "must be positive"

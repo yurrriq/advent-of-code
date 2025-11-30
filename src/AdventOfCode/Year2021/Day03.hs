@@ -1,30 +1,30 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+
 module AdventOfCode.Year2021.Day03 where
 
-import AdventOfCode.Input (parseInput)
-import AdventOfCode.TH (defaultMain, inputFilePath)
-import Control.Applicative ((<|>))
-import Control.Arrow ((&&&))
-import Control.Category ((>>>))
-import Data.Bool (bool)
-import Data.Char (digitToInt)
-import Data.Functor (($>))
-import Data.List (foldl1')
-import Text.Trifecta (char, newline, sepEndBy, some)
+import AdventOfCode.Input (parseInputAoC)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
+import Data.List (foldl1', (!!))
+import Relude
+import Text.Trifecta (char, newline, sepEndBy)
 
 main :: IO ()
-main = $(defaultMain)
+main = $(defaultMainPuzzle)
 
 getInput :: IO [[Bool]]
-getInput = parseInput (some bit `sepEndBy` newline) $(inputFilePath)
+getInput = parseInputAoC 2021 3 (some bit `sepEndBy` newline)
   where
     bit =
-      char '0' $> False
-        <|> char '1' $> True
+      char '0'
+        $> False
+        <|> char '1'
+        $> True
 
 example :: [[Bool]]
 example =
   map
-    (map (toEnum . digitToInt))
+    (map (== '1'))
     [ "00100",
       "11110",
       "10110",
@@ -39,18 +39,17 @@ example =
       "01010"
     ]
 
-partOne :: [[Bool]] -> Int
-partOne diagnostics = gammaRate * epsilonRate
+partOne :: SimplePuzzle [[Bool]] Int
+partOne =
+  asks
+    $ (mkPivot &&& mkSums)
+    >>> (mkRate (>) &&& mkRate (<))
+    >>> uncurry (*)
   where
-    gammaRate = mkRate (>)
-    epsilonRate = mkRate (<)
+    mkRate cmp (pivot, sums) = binToDec ((`cmp` pivot) <$> sums)
 
-    mkRate cmp = binToDec ((`cmp` pivot) <$> sums)
-    pivot = mkPivot diagnostics
-    sums = mkSums diagnostics
-
-partTwo :: [[Bool]] -> Int
-partTwo = (generatorRating 0 &&& scrubberRating 0) >>> uncurry (*)
+partTwo :: SimplePuzzle [[Bool]] Int
+partTwo = asks $ (generatorRating 0 &&& scrubberRating 0) >>> uncurry (*)
   where
     generatorRating = keepBit (>=)
     scrubberRating = keepBit (<)
@@ -58,7 +57,7 @@ partTwo = (generatorRating 0 &&& scrubberRating 0) >>> uncurry (*)
     keepBit cmp n diagnostics =
       case filter p diagnostics of
         [rating] -> binToDec rating
-        diagnostics' -> keepBit cmp (succ n) diagnostics'
+        diagnostics' -> keepBit cmp (n + 1) diagnostics'
       where
         p = bool not id (sums !! n `cmp` pivot) . (!! n)
         pivot = mkPivot diagnostics

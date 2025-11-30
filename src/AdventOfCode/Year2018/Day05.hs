@@ -1,15 +1,19 @@
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 
 module AdventOfCode.Year2018.Day05 where
 
-import AdventOfCode.TH (defaultMain, inputFilePath)
+import AdventOfCode.Input (rawInputAoC)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
 import Data.Algebra.Free (foldMapFree, returnFree)
-import Data.Char (isLower, isUpper, ord, toLower)
+import Data.Char (isLower, isUpper, toLower)
 import Data.Finite (Finite, finite, finites)
-import Data.Function (on)
 import Data.Group (invert)
 import Data.Group.Free (FreeGroupL)
 import Data.Group.Free qualified as FG
+import Data.List (minimum)
+import Relude
 
 -- | Units' types are represented by letters, modelled by a finite number type
 -- inhabited by exactly 26 values.
@@ -19,26 +23,20 @@ type Unit = Finite 26
 type Polymer = FreeGroupL Unit
 
 main :: IO ()
-main = $(defaultMain)
+main = $(defaultMainPuzzle)
 
 -- | Solve Part One.
---
--- >>> partOne <$> getInput
--- 11894
-partOne :: String -> Int
-partOne = order . foldMap inject
+partOne :: SimplePuzzle String Int
+partOne = asks (order . foldMap inject)
 
 -- | Solve Part Two.
---
--- >>> partTwo <$> getInput
--- 5310
-partTwo :: String -> Int
-partTwo = minimum . cleanings . foldMap inject
-  where
-    cleanings polymer = [order (clean unit polymer) | unit <- finites]
+partTwo :: SimplePuzzle String Int
+partTwo =
+  asks $ foldMap inject >>> \polymer ->
+    minimum (map (order . flip clean polymer) finites)
 
 getInput :: IO String
-getInput = readFile $(inputFilePath)
+getInput = rawInputAoC 2018 5
 
 -- $setup
 --

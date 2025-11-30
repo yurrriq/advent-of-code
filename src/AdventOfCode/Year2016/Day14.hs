@@ -1,11 +1,13 @@
 {-# LANGUAGE BlockArguments #-}
+{-# LANGUAGE DerivingVia #-}
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
 module AdventOfCode.Year2016.Day14 where
 
+import AdventOfCode.Input (parseInputAoC)
 import AdventOfCode.Puzzle
-import AdventOfCode.TH (evalPuzzle)
+import AdventOfCode.TH (defaultMainPuzzle)
 import Control.Lens (makeLenses, use, uses, (%=))
 import Control.Monad.Extra (notM)
 import Control.Monad.Logger (logDebug)
@@ -17,26 +19,30 @@ import Data.ByteString.Builder qualified as Builder
 import Data.ByteString.Lazy qualified as BSL
 import Data.IntMap ((!))
 import Data.IntMap qualified as IntMap
+import Generic.Data (GenericProduct (..))
 import Relude
 import Relude.Unsafe ((!!))
 import Text.Printf (printf)
+import Text.Trifecta (letter)
 
-data PuzzleState = PuzzleState
-  { _index :: !Int,
+data PuzzleState' a = PuzzleState
+  { _index :: !a,
     _digests :: !(IntMap ByteString)
   }
-  deriving (Generic, Show)
+  deriving (Eq, Generic, Show)
+  deriving
+    (Semigroup, Monoid)
+    via (GenericProduct (PuzzleState' (Sum a)))
 
-makeLenses ''PuzzleState
+makeLenses ''PuzzleState'
 
-emptyPuzzleState :: PuzzleState
-emptyPuzzleState = PuzzleState 0 IntMap.empty
+type PuzzleState = PuzzleState' Int
 
 main :: IO ()
-main = $(evalPuzzle)
+main = $(defaultMainPuzzle)
 
 getInput :: IO Builder
-getInput = pure "yjdafjpo"
+getInput = parseInputAoC 2016 14 (fromString <$> some letter)
 
 partOne :: Puzzle Builder PuzzleState Int
 partOne = partOne' 64

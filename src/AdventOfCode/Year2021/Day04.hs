@@ -1,23 +1,20 @@
-{-# LANGUAGE DeriveTraversable #-}
-{-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE TypeFamilies #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 
 module AdventOfCode.Year2021.Day04 where
 
-import AdventOfCode.Input (parseInput, parseString)
-import AdventOfCode.TH (defaultMainMaybe, inputFilePath)
-import Control.Arrow (first)
-import Control.Lens (ifoldl')
+import AdventOfCode.Input (parseInputAoC, parseString)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
+import AdventOfCode.Util (maybeFail)
+import Control.Lens (ifoldl', makeLenses, views)
 import Data.Functor.Foldable (ana, hylo)
 import Data.Functor.Foldable.TH (makeBaseFunctor)
-import Data.IntMap (IntMap)
 import Data.IntMap qualified as IM
-import Data.IntSet (IntSet)
 import Data.IntSet qualified as IS
-import Data.Maybe (mapMaybe)
-import Data.Ord (comparing)
+import Relude
 import Safe.Foldable (maximumByMay)
-import Text.Trifecta (Parser, commaSep, count, natural, some)
+import Text.Trifecta (Parser, commaSep, count, natural)
 
 -- | A 'Board' is map from callable number to square.
 -- Squares are numbered left to right and top to bottom.
@@ -26,61 +23,107 @@ type Board = IntMap Int
 -- | A Bingo game has three potential states.
 data Bingo
   = -- | Ready to call a number.
-    Call Bingo
+    Call !Bingo
   | -- | Won with a score.
-    Won Int
+    Won !Int
   | -- | Lost.
     Lost
-  deriving (Eq, Ord, Show)
+  deriving (Eq, Generic, Ord, Show)
 
 makeBaseFunctor ''Bingo
 
+data BingoState
+  = BingoState
+  { _calls :: ![Int],
+    _boards :: ![Board]
+  }
+  deriving (Eq, Generic, Show)
+
+makeLenses ''BingoState
+
+type CallState = ([Int], IntSet)
+
 main :: IO ()
-main = $(defaultMainMaybe)
+main = $(defaultMainPuzzle)
 
 -- | The input is a list of numbers to call and list of bingo boards.
-getInput :: IO ([Int], [Board])
-getInput = parseInput callsAndBoards $(inputFilePath)
+getInput :: IO BingoState
+getInput = parseInputAoC 2021 4 callsAndBoards
 
-callsAndBoards :: Parser ([Int], [Board])
-callsAndBoards = (,) <$> calls <*> some (board 5)
+callsAndBoards :: Parser BingoState
+callsAndBoards = BingoState <$> commaSep int <*> some (board 5)
   where
-    calls = commaSep (fromInteger <$> natural)
-    board k = mkBoard <$> count k (count k (fromInteger <$> natural))
+    int = fromInteger <$> natural
+    board k = mkBoard <$> count k (count k int)
       where
         mkBoard = ifoldl' go IM.empty . concat
         go i m n = IM.insert n i m
 
+getExample :: IO BingoState
+getExample = parseString callsAndBoards example
+
+example :: String
+example =
+  "7,4,9,5,11,17,23,2,0,14,21,24,10,16,13,6,15,25,12,22,18,20,8,19,3,26,1\n\
+  \\n\
+  \22 13 17 11  0\n\
+  \ 8  2 23  4 24\n\
+  \21  9 14 16  7\n\
+  \ 6 10  3 18  5\n\
+  \ 1 12 20 15 19\n\
+  \\n\
+  \ 3 15  0  2 22\n\
+  \ 9 18 13 17  5\n\
+  \19  8  7 25 23\n\
+  \20 11 10 24  4\n\
+  \14 21 16 12  6\n\
+  \\n\
+  \14 21 17 24  4\n\
+  \10 16 15  9 19\n\
+  \18  8 23 26 20\n\
+  \22 11 13  6  5\n\
+  \ 2  0 12  3  7\n"
+
 -- | Given a list of called numbers and a list of boards, compute the score of
 -- the 'Board' that wins first.
-partOne :: ([Int], [Board]) -> Maybe Int
-partOne (_, []) = Nothing
-partOne (calls, boards) =
-  trampoline (traverse runGame)
-    . map (flip ana (calls, IS.empty) . bingoCoalg 5)
-    $ boards
+partOne :: SimplePuzzle BingoState Int
+partOne =
+  solve ana
+    $ trampoline
+    $ traverse runGame
 
 -- | Given a list of called numbers and a list of boards, compute the score of
 -- the 'Board' that wins last.
-partTwo :: ([Int], [Board]) -> Maybe Int
-partTwo (calls, boards) =
-  fmap snd
-    . maximumByMay (comparing fst)
-    . mapMaybe (flip (hylo bingoAlg . bingoCoalg 5) (calls, IS.empty))
-    $ boards
+partTwo :: SimplePuzzle BingoState Int
+partTwo =
+  solve (hylo bingoAlg)
+    $ catMaybes
+    >>> maximumByMay (comparing fst)
+    >>> fmap snd
+
+solve ::
+  ((CallState -> BingoF CallState) -> CallState -> a) ->
+  ([a] -> Maybe b) ->
+  SimplePuzzle BingoState b
+solve process findScore = do
+  views calls (,IS.empty) >>= \callState ->
+    findScore
+      . map (flip process callState . bingoCoalg 5)
+      & views boards
+      >>= maybeFail "no winners"
 
 -- | A bingo coalgebra with a carrier type that tracks the numbers remaining to
 -- be called and the set of marked numbers.
-bingoCoalg :: Int -> Board -> ([Int], IntSet) -> BingoF ([Int], IntSet)
+bingoCoalg :: Int -> Board -> CallState -> BingoF CallState
 bingoCoalg _ _ ([], _) = LostF
-bingoCoalg k board (call : calls, alreadyMarked) =
-  maybe callNext (checkIfWon . mark) (IM.lookup call board)
+bingoCoalg k board (number : numbers, alreadyMarked) =
+  maybe callNext (checkIfWon . mark) (IM.lookup number board)
   where
     mark square = IS.insert square alreadyMarked
     checkIfWon marked
-      | isWinner k marked = WonF (calculateScore call marked board)
-      | otherwise = CallF (calls, marked)
-    callNext = CallF (calls, alreadyMarked)
+      | isWinner k marked = WonF (calculateScore number marked board)
+      | otherwise = CallF (numbers, marked)
+    callNext = CallF (numbers, alreadyMarked)
 
 runGame :: Bingo -> Either (Maybe Int) Bingo
 runGame = \case
@@ -92,7 +135,7 @@ runGame = \case
 -- numbers and returns the final score in case of a winning game.
 bingoAlg :: BingoF (Maybe (Int, Int)) -> Maybe (Int, Int)
 bingoAlg = \case
-  CallF state -> first succ <$> state
+  CallF carrier -> first (+ 1) <$> carrier
   WonF score -> Just (1, score)
   LostF -> Nothing
 
@@ -115,39 +158,16 @@ isWinner k marked = any (`IS.isSubsetOf` marked) (runs k)
 -- 'Board'.
 runs :: Int -> [IntSet]
 runs k =
-  map IS.fromList . concat $
-    [ [ [n * k .. n * k + (k - 1)],
-        [n, n + k .. k * k - 1]
-      ]
+  map IS.fromList
+    . concat
+    $ [ [ [n * k .. n * k + (k - 1)],
+          [n, n + k .. k * k - 1]
+        ]
       | n <- [0 .. k - 1]
-    ]
+      ]
 
 -- Agda.Utils.Function.trampoline
 trampoline :: (a -> Either b a) -> a -> b
 trampoline f = loop
   where
     loop a = either id loop (f a)
-
-example :: IO ([Int], [Board])
-example =
-  parseString callsAndBoards . unlines $
-    [ "7,4,9,5,11,17,23,2,0,14,21,24,10,16,13,6,15,25,12,22,18,20,8,19,3,26,1",
-      "",
-      "22 13 17 11  0",
-      " 8  2 23  4 24",
-      "21  9 14 16  7",
-      " 6 10  3 18  5",
-      " 1 12 20 15 19",
-      "",
-      " 3 15  0  2 22",
-      " 9 18 13 17  5",
-      "19  8  7 25 23",
-      "20 11 10 24  4",
-      "14 21 16 12  6",
-      "",
-      "14 21 17 24  4",
-      "10 16 15  9 19",
-      "18  8 23 26 20",
-      "22 11 13  6  5",
-      " 2  0 12  3  7"
-    ]
