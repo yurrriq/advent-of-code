@@ -53,8 +53,9 @@ partTwo :: Puzzle (NonEmpty Int) PuzzleState Int
 partTwo = memoryGame 30_000_000
 
 memoryGame :: Int -> Puzzle (NonEmpty Int) PuzzleState Int
-memoryGame n = loop <* (numbersToSay <~ ask)
+memoryGame n = resetState *> loop
   where
+    resetState = put . mkState =<< ask
     loop = do
       turn += 1
       number <- withPuzzle (const (max 1 (n `div` 100))) memoryRound
