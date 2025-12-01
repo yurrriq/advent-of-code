@@ -1,21 +1,21 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+
 module AdventOfCode.Year2020.Day14.Parsers where
 
 import AdventOfCode.Year2020.Day14.Types
-import Control.Applicative ((<|>))
-import Control.Monad (void)
-import Text.Trifecta
+import Relude
+import Text.Trifecta (Parser, brackets, char, choice, natural, symbol, token)
 
 instruction :: Parser Instruction
 instruction = setMask <|> setValue
 
 setMask :: Parser Instruction
 setMask =
-  do
-    void $ symbol "mask"
-    void $ symbol "="
-    maskBits <- reverse <$> many maskBit
-    void whiteSpace
-    pure (SetMask maskBits)
+  fmap SetMask
+    $ symbol "mask"
+    *> symbol "="
+    *> token (many maskBit)
+    <&> reverse
 
 maskBit :: Parser (Maybe Bool)
 maskBit =
@@ -26,10 +26,7 @@ maskBit =
     ]
 
 setValue :: Parser Instruction
-setValue =
-  do
-    void $ symbol "mem"
-    address <- between (symbol "[") (symbol "]") (fromInteger <$> natural)
-    void $ symbol "="
-    value <- fromInteger <$> natural
-    pure $ SetValue address value
+setValue = do
+  address <- symbol "mem" *> brackets (fromInteger <$> natural)
+  value <- symbol "=" *> natural <&> fromInteger
+  pure $ SetValue address value
