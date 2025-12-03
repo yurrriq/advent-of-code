@@ -6,6 +6,7 @@ import AdventOfCode.Input (parseInputAoC, parseString)
 import AdventOfCode.Puzzle
 import AdventOfCode.TH (defaultMainPuzzle)
 import AdventOfCode.Util (count)
+import Foreign (fromBool)
 import Relude
 import Text.Trifecta (Parser, char, decimal, newline, sepEndBy)
 
@@ -17,8 +18,16 @@ partOne = asks (count (== 0) . scanl' rotate 50)
   where
     rotate delta position = (position + delta) `mod` 100
 
-partTwo :: SimplePuzzle [Integer] Int
-partTwo = fail "Not yet implemented"
+partTwo :: SimplePuzzle [Integer] Integer
+partTwo = asks (sum . snd . mapAccumL rotate 50)
+  where
+    rotate position delta = (m, zeros)
+      where
+        (d, m) = (position + delta) `divMod` 100
+        zeros
+          | delta > 0 = d
+          | m == 0 = abs d + 1
+          | otherwise = abs d - fromBool (position == 0)
 
 getInput :: IO [Integer]
 getInput = parseInputAoC 2025 1 (rotation `sepEndBy` newline)
