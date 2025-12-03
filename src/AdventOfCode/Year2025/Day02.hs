@@ -8,7 +8,7 @@ import AdventOfCode.TH (defaultMainPuzzle)
 import AdventOfCode.Util (numDigits)
 import Data.FastDigits (digits)
 import Data.Ix (range)
-import Data.List.Extra (sumOn')
+import Data.List.Extra (chunksOf, sumOn')
 import Relude
 import Text.Trifecta (Parser, char, commaSep, natural)
 
@@ -38,7 +38,16 @@ isA020338 n = {- n > 0 && -} even k && low == high
     (low, high) = splitAt (k `div` 2) (digits 10 n)
 
 partTwo :: SimplePuzzle [(Integer, Integer)] Integer
-partTwo = fail "not yet implemented"
+partTwo = asks (sumOn' (sum . filter isRepeatedSequence . range))
+
+isRepeatedSequence :: Integer -> Bool
+isRepeatedSequence n = len >= 2 && any isRepeated lengths
+  where
+    len = numDigits n
+    lengths = filter ((0 ==) . mod len) [1 .. len `div` 2]
+    isRepeated k =
+      let (ds, rest) = splitAt k (digits 10 n)
+       in all (== ds) (chunksOf k rest)
 
 main :: IO ()
 main = $(defaultMainPuzzle)
