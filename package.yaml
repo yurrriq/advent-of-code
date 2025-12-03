@@ -602,6 +602,11 @@ executables:
   aoc-2025-day01:
     <<: *executable
     main: AdventOfCode.Year2025.Day01
+  aoc-2025-day02:
+    <<: *executable
+    main: AdventOfCode.Year2025.Day02
+    dependencies:
+      - fast-digits
 _benchmark: &benchmark
   ghc-options:
     - -threaded
