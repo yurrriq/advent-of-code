@@ -612,6 +612,11 @@ executables:
     main: AdventOfCode.Year2025.Day03
     dependencies:
       - vector
+  aoc-2025-day04:
+    <<: *executable
+    main: AdventOfCode.Year2025.Day04
+    dependencies:
+      - linear
 _benchmark: &benchmark
   ghc-options:
     - -threaded
