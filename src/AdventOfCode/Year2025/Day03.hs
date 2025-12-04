@@ -5,18 +5,17 @@ module AdventOfCode.Year2025.Day03 where
 import AdventOfCode.Input (parseInputAoC, parseString)
 import AdventOfCode.Puzzle
 import AdventOfCode.TH (defaultMainPuzzle)
-import AdventOfCode.Util (maybeFail, (<.>))
+import AdventOfCode.Util (maybeFail)
 import Data.Char (digitToInt)
-import Data.Foldable (maximum)
-import Data.Semigroup (Max (..))
+import Data.Vector qualified as Vector
 import Relude
-import Text.Trifecta (digit, newline, sepEndBy)
+import Text.Trifecta (Parser, digit, newline, sepEndBy)
 
 getExample :: IO [[Int]]
-getExample =
-  flip parseString example
-    $ some (digitToInt <$> digit)
-    `sepEndBy` newline
+getExample = parseString joltageRatings example
+
+joltageRatings :: Parser [[Int]]
+joltageRatings = some (digitToInt <$> digit) `sepEndBy` newline
 
 example :: String
 example =
@@ -25,37 +24,34 @@ example =
   \234234234234278\n\
   \818181911112111"
 
-largestPair :: [Int] -> Maybe Int
-largestPair bank =
-  viaNonEmpty tail (scanr1 max bank) <&> \oneses ->
-    maximum (zipWith (\tens ones -> 10 * tens + ones) bank oneses)
+largestPossibleJoltage :: Int -> [Int] -> Maybe Int
+largestPossibleJoltage 0 _bank = Nothing
+largestPossibleJoltage n bank = go n 0 (Vector.fromList bank)
+  where
+    go 0 number _ = Just number
+    go k number ds
+      | Vector.null ds = Nothing -- length ds + 1 <= k = Nothing
+      | otherwise = do
+          let d = Vector.maximum (Vector.take (Vector.length ds - k + 1) ds)
+          i <- Vector.elemIndex d ds
+          go (k - 1) (number * 10 + d) (Vector.drop (i + 1) ds)
 
 partOne :: SimplePuzzle [[Int]] Int
-partOne = ask >>= maybeFail "ope!" . sum <.> traverse largestPair
+partOne =
+  maybeFail "some bank had fewer than two batteries"
+    . fmap sum
+    . traverse (largestPossibleJoltage 2)
+    =<< ask
 
 getInput :: IO [[Int]]
-getInput =
-  parseInputAoC 2025 3
-    $ some (digitToInt <$> digit)
-    `sepEndBy` newline
-
-largestNumber :: Int -> [Int] -> Maybe Int
-largestNumber k bank
-  | k <= 0 = Nothing
-  | otherwise = getMax <$> go k bank
-  where
-    go 1 xs = Just (Max (maximum xs))
-    go n xs =
-      case uncons xs of
-        Nothing -> Nothing
-        Just (_, []) -> Nothing
-        Just (d, ds) ->
-          let candidate = (Max d * 10 ^ (n - 1) +) <$> go (n - 1) ds
-              nextCandidate = go n ds
-           in candidate <> nextCandidate
+getInput = parseInputAoC 2025 3 joltageRatings
 
 partTwo :: SimplePuzzle [[Int]] Int
-partTwo = ask >>= maybeFail "ope!" . sum <.> traverse (largestNumber 12)
+partTwo =
+  maybeFail "some bank had fewer than two batteries"
+    . fmap sum
+    . traverse (largestPossibleJoltage 12)
+    =<< ask
 
 main :: IO ()
 main = $(defaultMainPuzzle)
