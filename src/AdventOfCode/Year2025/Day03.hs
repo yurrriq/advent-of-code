@@ -48,7 +48,7 @@ getInput = parseInputAoC 2025 3 joltageRatings
 
 partTwo :: SimplePuzzle [[Int]] Int
 partTwo =
-  maybeFail "some bank had fewer than two batteries"
+  maybeFail "some bank had fewer than twelve batteries"
     . fmap sum
     . traverse (largestPossibleJoltage 12)
     =<< ask
