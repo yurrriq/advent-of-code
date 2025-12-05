@@ -19,6 +19,7 @@ module AdventOfCode.Util
     snoc,
     wigglesum,
     fix',
+    fixM,
     adjacencies,
     neighborsOf,
     holes,
@@ -112,6 +113,11 @@ wigglesum wiggle = holesOf traverse >=> experiment wiggle
 
 fix' :: (Eq a) => (a -> a) -> a -> a
 fix' f = fix (\g !x -> let fx = f x in if fx == x then x else g fx)
+
+fixM :: (Eq a, Monad m) => (a -> m a) -> a -> m a
+fixM f x = do
+  fx <- f x
+  bool (fixM f fx) (pure x) (fx == x)
 
 adjacencies :: (Applicative f, Num a, Eq (f a), Traversable f) => [f a]
 adjacencies = filter (/= pure 0) $ sequenceA (pure [-1, 0, 1])
