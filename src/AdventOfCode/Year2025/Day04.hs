@@ -51,7 +51,10 @@ partOne =
     <.> foldMapM (fmap (Sum . fromEnum) . canAccess)
 
 partTwo :: SimplePuzzle (Set (V2 Int)) Int
-partTwo = (-) <$> asks Set.size <*> (Set.size <.> fixM removeRolls =<< ask)
+partTwo =
+  ask >>= \rolls ->
+    ((-) `on` Set.size) rolls
+      <$> fixM removeRolls rolls
   where
     removeRolls rolls = foldlM removeRoll rolls rolls
       where
