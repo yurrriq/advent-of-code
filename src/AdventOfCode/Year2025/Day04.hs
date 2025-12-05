@@ -42,9 +42,7 @@ getInput = parseInputAoC 2025 4 diagram
 
 partOne :: SimplePuzzle (Set (V2 Int)) Int
 partOne = asks \rolls ->
-  Set.size
-    $ Set.filter ((< 4) . Set.size)
-    $ Set.map (Set.intersection rolls . neighborsOf) rolls
+  Set.size $ Set.filter ((< 4) . Set.size . Set.intersection rolls . neighborsOf) rolls
 
 partTwo :: SimplePuzzle (Set (V2 Int)) Int
 partTwo = fail "not yet implemented"
