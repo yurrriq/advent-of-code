@@ -7,20 +7,23 @@ import AdventOfCode.Input (parseInputAoC, parseString)
 import AdventOfCode.Puzzle
 import AdventOfCode.TH (defaultMainPuzzle)
 import AdventOfCode.Util (count)
-import Data.Ix (inRange)
+import Data.Interval (Extended (..), Interval, (<=..<=))
+import Data.Interval qualified as Interval
+import Data.IntervalSet qualified as ISet
+import Data.List.Extra (sumOn')
 import Relude
 import Text.Trifecta (Parser, char, decimal, newline, sepEndBy)
 
-database :: Parser ([(Integer, Integer)], [Integer])
+database :: Parser ([Interval Integer], [Integer])
 database = do
   idRange <- some $ do
     from <- decimal <* char '-'
     to <- decimal <* newline
-    pure (from, to)
+    pure (Finite from <=..<= Finite to)
   ingredients <- newline *> decimal `sepEndBy` newline
   pure (idRange, ingredients)
 
-getExample :: IO ([(Integer, Integer)], [Integer])
+getExample :: IO ([Interval Integer], [Integer])
 getExample = parseString database example
 
 example :: String
@@ -37,16 +40,18 @@ example =
   \17\n\
   \32"
 
-getInput :: IO ([(Integer, Integer)], [Integer])
+getInput :: IO ([Interval Integer], [Integer])
 getInput = parseInputAoC 2025 5 database
 
-partOne :: SimplePuzzle ([(Integer, Integer)], [Integer]) Int
+partOne :: SimplePuzzle ([Interval Integer], [Integer]) Int
 partOne =
   asks \(ranges, ingredients) ->
-    count (flip any ranges . flip inRange) ingredients
+    count (flip any ranges . Interval.member) ingredients
 
-partTwo :: SimplePuzzle ([(Integer, Integer)], [Integer]) ()
-partTwo = fail "not yet implemented"
+partTwo :: SimplePuzzle ([Interval Integer], [Integer]) Integer
+partTwo =
+  sumOn' ((1 +) . Interval.width)
+    <$> withPuzzle fst (asks (ISet.toList . ISet.fromList))
 
 main :: IO ()
 main = $(defaultMainPuzzle)

@@ -620,6 +620,8 @@ executables:
   aoc-2025-day05:
     <<: *executable
     main: AdventOfCode.Year2025.Day05
+    dependencies:
+      - data-interval
 _benchmark: &benchmark
   ghc-options:
     - -threaded
