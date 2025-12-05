@@ -1,25 +1,25 @@
-{-# OPTIONS_GHC -Wno-incomplete-uni-patterns #-}
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 
 module AdventOfCode.Year2023.Day03 where
 
-import AdventOfCode.Input (parseInput, parseString)
-import AdventOfCode.TH (defaultMain, inputFilePath)
+import AdventOfCode.Input (parseInputAoC, parseString)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
 import AdventOfCode.Util (neighborsOf)
-import Control.Applicative ((<|>))
 import Control.Lens (ifoldl')
 import Data.Char (digitToInt)
 import Data.FastDigits (undigits)
-import Data.HashMap.Strict (HashMap)
 import Data.HashMap.Strict qualified as HM
-import Data.List (intercalate)
-import Data.Set (Set)
 import Data.Set qualified as Set
 import Linear (V2 (..))
+import Relude
+import Text.Show qualified
 import Text.Trifecta hiding (parseString)
 
 data Datum
-  = Number Int
-  | Symbol Char
+  = Number !Int
+  | Symbol !Char
   | Period
   deriving (Eq)
 
@@ -30,24 +30,32 @@ instance Show Datum where
 
 instance Semigroup Datum where
   Number x <> Number y = Number (x + y)
-  _ <> _ = undefined
+  _ <> _ = error "Semigroup is only defined for Number."
 
 instance Monoid Datum where
   mempty = Number 0
 
 instance Ord Datum where
   Number x <= Number y = x <= y
-  _ <= _ = undefined
+  _ <= _ = error "Ord is only defined for Number."
 
-newtype Schematic = Schematic {unSchematic :: HashMap (V2 Int) Datum}
+withNumber :: (MonadFail m) => (Int -> a) -> Datum -> m a
+withNumber f = \case
+  Number n -> pure (f n)
+  _notNumber -> fail "Not a number"
+
+type Schematic = HashMap (V2 Int) Datum
 
 main :: IO ()
-main = $(defaultMain)
+main = $(defaultMainPuzzle)
 
-partOne :: Schematic -> Int
-partOne (Schematic hm) = let Number n = mconcat ds in n
-  where
-    ds = HM.elems (HM.filterWithKey (isNumberAdjacentToSymbol hm) hm)
+partOne :: SimplePuzzle Schematic Int
+partOne = do
+  hm <- ask
+  HM.filterWithKey (isNumberAdjacentToSymbol hm) hm
+    & HM.elems
+    & mconcat
+    & withNumber id
 
 isNumberAdjacentToSymbol :: HashMap (V2 Int) Datum -> V2 Int -> Datum -> Bool
 isNumberAdjacentToSymbol hm (V2 x y) (Number n) =
@@ -55,38 +63,38 @@ isNumberAdjacentToSymbol hm (V2 x y) (Number n) =
   where
     isSymbol k = case HM.lookup k hm of
       Just (Symbol _) -> True
-      _ -> False
+      _notNumber -> False
 isNumberAdjacentToSymbol _ _ _ = False
 
 allNeighborsOf :: (Show a) => V2 Int -> a -> Set (V2 Int)
 allNeighborsOf (V2 x y) n =
-  flip Set.difference (Set.fromList points) $
-    foldr ((<>) . neighborsOf) Set.empty points
+  flip Set.difference (Set.fromList points)
+    $ foldr ((<>) . neighborsOf) Set.empty points
   where
-    points = flip V2 y <$> [x .. x + length (show n) - 1]
+    points = flip V2 y <$> [x .. x + length (show @String n) - 1]
 
 partOneExample :: IO Int
-partOneExample = partOne <$> parseString schematic example
+partOneExample = evaluatingPuzzle partOne =<< getExample
 
-partTwo :: Schematic -> Int
-partTwo = undefined
+partTwo :: SimplePuzzle Schematic Int
+partTwo = fail "Not yet implemented"
 
 getInput :: IO Schematic
-getInput = parseInput schematic $(inputFilePath)
+getInput = parseInputAoC 2023 3 schematic
 
 schematic :: Parser Schematic
 schematic = mkSchematic <$> (some datum `sepEndBy` newline)
 
 mkSchematic :: [[Datum]] -> Schematic
-mkSchematic xxs = Schematic hm
+mkSchematic xxs = hm
   where
     (hm, _) = ifoldl' (ifoldl' . go) (HM.empty, []) xxs
     go _ _ (hm', ns) (Number n) = (hm', n : ns)
     go y x (hm', []) d@(Symbol _) = (HM.insert (V2 x y) d hm', [])
     go _ _ (hm', []) Period = (hm', [])
     go y x (hm', ns) d@(Symbol _) =
-      ( HM.insert (V2 (x - length ns) y) (Number (undigits' ns)) $
-          HM.insert (V2 x y) d hm',
+      ( HM.insert (V2 (x - length ns) y) (Number (undigits' ns))
+          $ HM.insert (V2 x y) d hm',
         []
       )
     go y x (hm', ns) Period =
@@ -97,9 +105,16 @@ mkSchematic xxs = Schematic hm
 
 datum :: Parser Datum
 datum =
-  Period <$ char '.'
-    <|> Number . digitToInt <$> digit
-    <|> Symbol <$> notChar '\n'
+  Period
+    <$ char '.'
+    <|> Number
+    . digitToInt
+    <$> digit
+    <|> Symbol
+    <$> notChar '\n'
+
+getExample :: IO Schematic
+getExample = parseString schematic example
 
 example :: String
 example =

@@ -1,17 +1,18 @@
+{-# LANGUAGE BlockArguments #-}
 {-# LANGUAGE DerivingVia #-}
-{-# LANGUAGE MultiParamTypeClasses #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 
 module AdventOfCode.Year2021.Day02 where
 
-import AdventOfCode.Input (parseInput)
-import AdventOfCode.TH (defaultMain, inputFilePath)
-import Control.Applicative ((<|>))
-import Data.Functor (($>))
+import AdventOfCode.Input (parseInputAoC)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
+import AdventOfCode.Util ((<.>))
 import Data.Monoid.Action (Action (..))
-import Data.Monoid.SemiDirectProduct.Strict (Semi, embed, inject, untag)
-import Data.Semigroup (Sum (..))
+import Data.Monoid.SemiDirectProduct.Strict (embed, inject, untag)
 import Linear (V2 (..))
-import Text.Trifecta (Parser, natural, some, symbol)
+import Relude
+import Text.Trifecta (Parser, choice, natural, symbol)
 
 newtype Direction = Direction {unDirection :: V2 Int}
   deriving stock (Eq, Show)
@@ -26,34 +27,35 @@ newtype Aim = Aim Int
     via (Sum Int)
 
 instance Action Aim Direction where
-  act (Aim a) (Direction (V2 x y)) = Direction (V2 x (y + a * x))
+  act (Aim a) (Direction (V2 x y)) =
+    Direction (V2 x (y + a * x))
 
 main :: IO ()
-main = $(defaultMain)
+main = $(defaultMainPuzzle)
 
 getInput :: IO [Direction]
-getInput = parseInput (some direction) $(inputFilePath)
+getInput = parseInputAoC 2021 2 (some direction)
 
-example :: [Direction]
-example =
-  [ forward 5,
-    down 5,
-    forward 8,
-    up 3,
-    down 8,
-    forward 2
-  ]
+getExample :: IO [Direction]
+getExample =
+  pure
+    [ forward 5,
+      down 5,
+      forward 8,
+      up 3,
+      down 8,
+      forward 2
+    ]
 
-partOne :: [Direction] -> Int
-partOne = solve unDirection
+partOne :: SimplePuzzle [Direction] Int
+partOne = asks (solve unDirection)
 
-partTwo :: [Direction] -> Int
-partTwo = solve (unDirection . untag) . map lift
-  where
-    lift :: Direction -> Semi Direction Aim
-    lift dir@(Direction (V2 _ 0)) = inject dir
-    lift (Direction (V2 0 y)) = embed (Aim y)
-    lift _ = error "Invalid direction"
+partTwo :: SimplePuzzle [Direction] Int
+partTwo =
+  ask >>= solve (unDirection . untag) <.> traverse \case
+    dir@(Direction (V2 _ 0)) -> pure (inject dir)
+    Direction (V2 0 y) -> pure (embed (Aim y))
+    _invalid -> fail "Invalid direction"
 
 solve :: (Monoid m) => (m -> V2 Int) -> [m] -> Int
 solve extract = product . extract . mconcat
@@ -62,9 +64,11 @@ direction :: Parser Direction
 direction = dir <*> (fromInteger <$> natural)
   where
     dir =
-      symbol "forward" $> forward
-        <|> symbol "down" $> down
-        <|> symbol "up" $> up
+      choice
+        [ symbol "forward" $> forward,
+          symbol "down" $> down,
+          symbol "up" $> up
+        ]
 
 forward, down, up :: Int -> Direction
 forward = Direction . flip V2 0

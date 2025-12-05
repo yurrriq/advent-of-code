@@ -1,54 +1,61 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+
 module AdventOfCode.Year2017.Day06 where
 
-import AdventOfCode.Input (parseInput)
-import AdventOfCode.TH (defaultMainMaybe, inputFilePath)
-import Control.Monad ((<=<))
-import Data.Foldable (maximumBy)
-import Data.IntMap.Strict (IntMap)
+import AdventOfCode.Input (parseInputAoC)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
+import AdventOfCode.Util (maybeFail)
 import Data.IntMap.Strict qualified as IntMap
-import Data.List (elemIndex, uncons)
-import Data.Set (Set)
+import Data.List (elemIndex)
+import Data.Semigroup (Max (..))
 import Data.Set qualified as Set
-import Text.Trifecta (natural, some)
+import Relude
+import Text.Trifecta (natural)
 
 main :: IO ()
-main = $(defaultMainMaybe)
+main = $(defaultMainPuzzle)
 
-partOne :: IntMap Int -> Maybe Int
-partOne = Just . Set.size . fst . reallocate
+partOne :: SimplePuzzle (IntMap Int) Int
+partOne = asks (Set.size . fst . reallocate)
 
-partTwo :: IntMap Int -> Maybe Int
-partTwo = fmap (1 +) . uncurry elemIndex <=< (uncons . snd . reallocate)
+partTwo :: SimplePuzzle (IntMap Int) Int
+partTwo =
+  asks (snd . reallocate)
+    >>= (uncons >>> maybeFail "empty list")
+    >>= (uncurry elemIndex >>> maybeFail "not found")
+    <&> (+ 1)
+
+getExample :: IO (IntMap Int)
+getExample = pure $ IntMap.fromList (zip [0 ..] [0, 2, 7, 0])
 
 getInput :: IO (IntMap Int)
-getInput = parseInput parser $(inputFilePath)
-  where
-    parser = IntMap.fromList . zip [0 ..] <$> some (fromInteger <$> natural)
-
-example :: IntMap Int
-example = IntMap.fromList (zip [0 ..] [0, 2, 7, 0])
+getInput =
+  parseInputAoC 2017 6
+    $ IntMap.fromList
+    . zip [0 ..]
+    <$> some (fromInteger <$> natural)
 
 reallocate :: IntMap Int -> (Set (IntMap Int), [IntMap Int])
-reallocate im = go (Set.singleton im) [im] im
+reallocate = join (liftA2 go Set.singleton return)
   where
     go seen history before
       | Set.member after seen = (seen, after : history)
       | otherwise = go (Set.insert after seen) (after : history) after
       where
-        after = step before
+        after = next before
 
-step :: IntMap Int -> IntMap Int
-step im =
-  foldl' go (IntMap.insert k 0 im) $
-    take v (drop (k + 1) (cycle [0 .. IntMap.size im - 1]))
-  where
-    go im' i = IntMap.update (Just . (+ 1)) i im'
-    (k, v) = next im
+next :: IntMap Int -> IntMap Int
+next before =
+  maxValMinKey before & \(k, v) ->
+    take v (drop (k + 1) (cycle (IntMap.keys before)))
+      & foldl' (flip (IntMap.alter (fmap (+ 1)))) (IntMap.insert k 0 before)
 
-next :: IntMap Int -> (Int, Int)
-next = maximumBy comparingValue . IntMap.assocs
+maxValMinKey :: IntMap Int -> (Int, Int)
+maxValMinKey =
+  IntMap.foldMapWithKey go
+    >>> getMax
+    >>> second getDown
+    >>> swap
   where
-    comparingValue (k, v) (k', v') =
-      case compare v v' of
-        EQ -> compare k' k
-        ordering -> ordering
+    go k v = Max (v, Down k)

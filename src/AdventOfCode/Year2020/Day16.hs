@@ -1,3 +1,7 @@
+{-# LANGUAGE BlockArguments #-}
+{-# LANGUAGE RecordWildCards #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+
 module AdventOfCode.Year2020.Day16
   ( main,
     getInput,
@@ -6,84 +10,98 @@ module AdventOfCode.Year2020.Day16
   )
 where
 
-import AdventOfCode.Input (parseInput)
-import AdventOfCode.TH (inputFilePath)
-import Control.Monad (void)
+import AdventOfCode.Input (parseInputAoC)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
+import AdventOfCode.Util ((<.>))
+import Control.Lens (makeLenses, view, views)
+import Data.Foldable.Extra (productOn', sumOn')
+import Data.Function.Pointless ((.:))
 import Data.Ix (inRange)
-import Data.List (isPrefixOf, transpose, (\\))
-import Data.Maybe (mapMaybe)
+import Data.List ((\\))
+import Data.List.Infinite qualified as Infinite
+import Data.List.NonEmpty qualified as NE
 import Linear (V2 (..))
-import Text.Trifecta (Parser, anyChar, char, commaSep, eof, manyTill, natural, symbol)
+import Relude
+import Text.Trifecta (Parser, anyChar, char, comma, eof, manyTill, natural, sepByNonEmpty, symbol)
+
+data Rule
+  = Rule
+  { _field :: !String,
+    _location :: !(V2 (Int, Int))
+  }
+  deriving (Eq, Generic, Show)
+
+type Ticket = NonEmpty Int
+
+data Document
+  = Document
+  { _rules :: !(NonEmpty Rule),
+    _myTicket :: !Ticket,
+    _nearbyTickets :: !(NonEmpty Ticket)
+  }
+  deriving (Eq, Generic, Show)
+
+makeLenses ''Document
 
 main :: IO ()
-main =
-  do
-    input <- getInput
-    putStr "Part One: "
-    print $ partOne input
-    putStr "Part Two: "
-    print $ partTwo input
+main = $(defaultMainPuzzle)
 
--- TODO: Use better types
-getInput :: IO ([(String, V2 (Int, Int))], [Int], [[Int]])
-getInput = flip parseInput $(inputFilePath) $
-  do
-    ticketRules <- manyTill ticketRule (symbol "your ticket:")
-    myTicket <- commaSep posInt
-    void $ symbol "nearby tickets:"
-    nearbyTickets <- manyTill (commaSep posInt) eof
-    pure (ticketRules, myTicket, nearbyTickets)
+getInput :: IO Document
+getInput = parseInputAoC 2020 16 do
+  Document
+    <$> manyTillNonEmpty ticketRule (symbol "your ticket:")
+    <*> sepByNonEmpty posInt comma
+    <*> ( symbol "nearby tickets:"
+            *> manyTillNonEmpty (sepByNonEmpty posInt comma) eof
+        )
 
-partOne :: ([(String, V2 (Int, Int))], [Int], [[Int]]) -> Int
-partOne (rules, _, nearbyTickets) =
-  sum $ concatMap (invalidFields rules) nearbyTickets
+partOne :: SimplePuzzle Document Int
+partOne = sumOn' <$> views rules (sum .: invalidFields) <*> view nearbyTickets
 
--- FIXME: Clean this up...
-partTwo :: ([(String, V2 (Int, Int))], [Int], [[Int]]) -> Int
-partTwo (rules, myTicket, nearbyTickets) =
-  product $
-    map ((myTicket !!) . fst) $
-      filter (isPrefixOf "departure" . snd) $
-        zip [0 ..] $
-          concat $
-            iterate go possibleFields !! length nearbyTickets
+partTwo :: SimplePuzzle Document Int
+partTwo = do
+  validTickets <-
+    map NE.toList
+      <.> NE.filter
+      <$> views rules (not .: any . invalidField)
+      <*> view nearbyTickets
+  possibleFields <-
+    views rules $ NE.toList >>> \theRules ->
+      transpose validTickets <&> \fields -> do
+        Rule label ranges <- theRules
+        guard (all (flip any ranges . flip inRange) fields)
+        pure label
+  n <- views nearbyTickets (fromIntegral . length)
+  views myTicket (NE.!!) <&> \readTicket ->
+    productOn' (readTicket . fst)
+      $ filter (isPrefixOf "departure" . snd)
+      $ zip [0 ..]
+      $ concat
+      $ Infinite.iterate refine possibleFields
+      Infinite.!! n
+
+refine :: (Eq a) => [[a]] -> [[a]]
+refine haystacks = flip (foldr go) needles <$> haystacks
   where
-    go xs =
-      flip map xs $ \ys ->
-        foldr (\as bs -> if as == bs then as else bs \\ as) ys singles
-      where
-        singles = filter ((1 ==) . length) xs
-    possibleFields =
-      [ flip mapMaybe rules $ \(label, ranges) ->
-          if all (\field -> any (`inRange` field) ranges) fields
-            then Just label
-            else Nothing
-        | fields <- transpose validTickets
-      ]
-    validTickets = filter (not . any (invalidField rules)) nearbyTickets
+    needles = [needle | needle@[_] <- haystacks]
+    go needle haystack = bool (haystack \\ needle) needle (haystack == needle)
 
-ticketRule :: Parser (String, V2 (Int, Int))
-ticketRule =
-  do
-    label <- manyTill anyChar (symbol ":")
-    lhs <- intRange
-    void (symbol "or")
-    rhs <- intRange
-    pure (label, V2 lhs rhs)
+ticketRule :: Parser Rule
+ticketRule = Rule <$> label <*> intRanges
+  where
+    label = manyTill anyChar (symbol ":")
+    intRanges = V2 <$> (intRange <* symbol "or") <*> intRange
+    intRange = (,) <$> (posInt <* char '-') <*> posInt
 
-invalidFields :: [(String, V2 (Int, Int))] -> [Int] -> [Int]
-invalidFields = filter . invalidField
+invalidFields :: NonEmpty Rule -> Ticket -> [Int]
+invalidFields = NE.filter . invalidField
 
-invalidField :: [(String, V2 (Int, Int))] -> Int -> Bool
-invalidField rules field = not (any (any (`inRange` field) . snd) rules)
-
-intRange :: Parser (Int, Int)
-intRange =
-  do
-    from <- posInt
-    void (char '-')
-    to <- posInt
-    pure (from, to)
+invalidField :: NonEmpty Rule -> Int -> Bool
+invalidField knownRules n = not (any (any (`inRange` n) . _location) knownRules)
 
 posInt :: Parser Int
 posInt = fromInteger <$> natural
+
+manyTillNonEmpty :: (Alternative m) => m a -> m sep -> m (NonEmpty a)
+manyTillNonEmpty p end = (:|) <$> p <*> manyTill p end

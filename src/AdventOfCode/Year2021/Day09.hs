@@ -1,18 +1,20 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+
 module AdventOfCode.Year2021.Day09 where
 
-import AdventOfCode.Input (parseInput)
-import AdventOfCode.TH (defaultMain, inputFilePath)
+import AdventOfCode.Input (parseInputAoC)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
 import Control.Lens (ifoldl')
 import Data.Char (digitToInt)
 import Data.Ix (Ix, inRange)
-import Data.List (sortOn)
-import Data.Map.Strict (Map)
 import Data.Map.Strict qualified as M
-import Data.Ord (Down (Down))
-import Data.Set (Set, (\\))
+import Data.Set ((\\))
 import Data.Set qualified as S
 import Linear (V2 (..))
-import Text.Trifecta (Parser, digit, newline, sepEndBy, some)
+import Relude
+import Relude.Extra.Bifunctor (bimapBoth)
+import Text.Trifecta (Parser, digit, newline, sepEndBy)
 
 type Model = (HeightMap, (Point, Point))
 
@@ -23,10 +25,10 @@ type Point = V2 Int
 type Height = Int
 
 main :: IO ()
-main = $(defaultMain)
+main = $(defaultMainPuzzle)
 
 getInput :: IO Model
-getInput = parseInput model $(inputFilePath)
+getInput = parseInputAoC 2021 9 model
 
 example :: Model
 example =
@@ -38,14 +40,15 @@ example =
       [9, 8, 9, 9, 9, 6, 5, 6, 7, 8]
     ]
 
-partOne :: Model -> Int
-partOne = sum . fmap succ . findLowPoints
+partOne :: SimplePuzzle Model Int
+partOne = asks (sum . fmap (+ 1) . findLowPoints)
 
-partTwo :: Model -> Int
-partTwo modell =
-  product . take 3 . sortOn Down $
-    map (length . findBasin modell) $
-      M.keys (findLowPoints modell)
+partTwo :: SimplePuzzle Model Int
+partTwo =
+  product
+    . take 3
+    . S.toDescList
+    <$> asks (liftA2 S.map findBasinSize (M.keysSet . findLowPoints))
 
 model :: Parser Model
 model = mkModel <$> some (digitToInt <$> digit) `sepEndBy` newline
@@ -55,7 +58,7 @@ mkModel heightses = (kart, bounds)
   where
     kart = ifoldl' (ifoldl' . go) M.empty heightses
     go y x kartet height = M.insert (V2 x y) height kartet
-    bounds = (fst (M.findMin kart), fst (M.findMax kart))
+    bounds = bimapBoth fst $ (M.findMin &&& M.findMax) kart
 
 findLowPoints :: Model -> HeightMap
 findLowPoints (kart, bounds) = M.filterWithKey (isLowPoint (kart, bounds)) kart
@@ -63,11 +66,12 @@ findLowPoints (kart, bounds) = M.filterWithKey (isLowPoint (kart, bounds)) kart
 isLowPoint :: Model -> Point -> Height -> Bool
 isLowPoint _ _ 9 = False
 isLowPoint (kart, bounds) point height =
-  all ((height <) . (kart M.!)) $
-    neighborsInRange bounds point
+  all ((height <) . (kart M.!))
+    $ neighborsInRange bounds point
 
-findBasin :: Model -> Point -> Set Point
-findBasin (kart, bounds) lowPoint = S.foldl' go (S.singleton lowPoint) (S.singleton lowPoint)
+findBasinSize :: Model -> Point -> Int
+findBasinSize (kart, bounds) lowPoint =
+  S.size $ S.foldl' go (S.singleton lowPoint) (S.singleton lowPoint)
   where
     go seen point =
       let neighbors = S.filter ((< 9) . (kart M.!)) (neighborsInRange bounds point) \\ seen
