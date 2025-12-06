@@ -6,17 +6,23 @@ module AdventOfCode.Year2025.Day06 where
 import AdventOfCode.Input (parseInputAoC, parseString)
 import AdventOfCode.Puzzle
 import AdventOfCode.TH (defaultMainPuzzle)
-import Data.FastDigits (digits, undigits)
+import AdventOfCode.Util (maybeFail)
+import Data.Char (isSpace)
+import Data.List (unsnoc)
+import Data.List.Split (splitWhen)
 import Relude
-import Text.Trifecta (Parser, char, decimal, newline, sepEndBy1, symbol)
+import Text.Trifecta (Parser, natural, newline, noneOf, sepEndBy1, symbol, whiteSpace)
 
-worksheet :: Parser ([[Integer]], [[Integer] -> Integer])
-worksheet = do
-  numbers <- decimal `sepEndBy1` some (char ' ') `sepEndBy1` newline
-  operations <- some (sum <$ symbol "+" <|> symbol "*" $> product)
-  pure (transpose numbers, operations)
+worksheet :: Parser [String]
+worksheet = some (noneOf "\n") `sepEndBy1` newline
 
-getExample :: IO ([[Integer]], [[Integer] -> Integer])
+number :: Parser Integer
+number = whiteSpace *> natural
+
+operation :: Parser ([Integer] -> Integer)
+operation = sum <$ symbol "+" <|> symbol "*" $> product
+
+getExample :: IO [String]
 getExample = parseString worksheet example
 
 example :: String
@@ -26,15 +32,24 @@ example =
   \  6 98  215 314\n\
   \*   +   *   +  "
 
-getInput :: IO ([[Integer]], [[Integer] -> Integer])
+getInput :: IO [String]
 getInput = parseInputAoC 2025 6 worksheet
 
-partOne :: SimplePuzzle ([[Integer]], [[Integer] -> Integer]) Integer
-partOne = asks \(numbers, operations) ->
-  sum $ zipWith ($) operations numbers
+partOne :: SimplePuzzle [String] Integer
+partOne =
+  ask >>= maybeFail "empty worksheet" . unsnoc >>= \(nums, ops) -> do
+    numberColumns <- transpose <$> traverse (parseString (some number)) nums
+    operations <- parseString (some operation) ops
+    pure $ sum $ zipWith ($) operations numberColumns
 
-partTwo :: SimplePuzzle ([[Integer]], [[Integer] -> Integer]) ()
-partTwo = fail "not yet implemented"
+partTwo :: SimplePuzzle [String] Integer
+partTwo = asks (splitWhen (all isSpace) . transpose) >>= traverse go <&> sum
+  where
+    go problem = do
+      (lastColumn, columns) <- maybeFail "empty problem" (uncons problem)
+      (column, op) <- maybeFail "empty column" (unsnoc lastColumn)
+      parseString operation [op]
+        <*> traverse (parseString number) (column : columns)
 
 main :: IO ()
 main = $(defaultMainPuzzle)
