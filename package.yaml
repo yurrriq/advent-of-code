@@ -46,6 +46,7 @@ library:
   dependencies:
     - aeson
     - arithmoi
+    - array
     - astar
     - base16-bytestring
     - combinatorial
@@ -629,6 +630,7 @@ executables:
     <<: *executable
     main: AdventOfCode.Year2025.Day07
     dependencies:
+      - array
       - linear
 _benchmark: &benchmark
   ghc-options:
