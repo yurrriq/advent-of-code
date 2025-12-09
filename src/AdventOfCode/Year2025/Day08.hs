@@ -1,5 +1,6 @@
 {-# LANGUAGE BlockArguments #-}
 {-# LANGUAGE DerivingVia #-}
+{-# LANGUAGE StrictData #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
 module AdventOfCode.Year2025.Day08 where
@@ -7,22 +8,23 @@ module AdventOfCode.Year2025.Day08 where
 import AdventOfCode.Input (parseInputAoC, parseString)
 import AdventOfCode.Puzzle
 import AdventOfCode.TH (defaultMainPuzzle)
-import Control.Lens (makeLenses, use, uses, (%=), (.=), (<~))
-import Data.List.Ordered (sortOn')
+import Control.Lens (makeLenses, use, uses, view, (%=), (.=), (<~))
+import Data.Bifoldable (biproduct)
 import Data.Set qualified as Set
 import Generic.Data (Generically (..))
-import Linear (Metric, V3 (..), qd)
+import Linear (Metric, V3 (..), qd, _x)
 import Relude
+import Relude.Extra.Bifunctor (bimapBoth)
 import Text.Trifecta (Parser, comma, decimal, newline, sepEndBy)
 
-getExample :: IO (Set (V3 Integer))
+getExample :: IO (Set (V3 Int))
 getExample = parseString junctionBoxPositions example
 
-junctionBoxPositions :: Parser (Set (V3 Integer))
+junctionBoxPositions :: Parser (Set (V3 Int))
 junctionBoxPositions = Set.fromList <$> (go `sepEndBy` newline)
   where
     go = V3 <$> (coordinate <* comma) <*> (coordinate <* comma) <*> coordinate
-    coordinate = decimal
+    coordinate = fromInteger <$> decimal
 
 example :: String
 example =
@@ -47,29 +49,32 @@ example =
   \984,92,344\n\
   \425,690,689"
 
-getInput :: IO (Set (V3 Integer))
+getInput :: IO (Set (V3 Int))
 getInput = parseInputAoC 2025 8 junctionBoxPositions
 
 -- TODO: KD tree? VP tree?
 
 nearestPairs :: (Metric f, Num a, Ord a) => [f a] -> [(f a, f a)]
-nearestPairs pts = sortOn' (uncurry qd) [(p, q) | p : ps <- tails pts, q <- ps]
+nearestPairs pts = sortOn (uncurry qd) [(p, q) | p : ps <- tails pts, q <- ps]
 
-data PuzzleState' a
-  = PuzzleState'
+data PuzzleState a
+  = PuzzleState
   { _circuits :: Set (Set a),
     _junctionPairs :: [(a, a)]
   }
   deriving (Eq, Generic, Show)
   deriving
     (Semigroup, Monoid)
-    via (Generically (PuzzleState' a))
+    via (Generically (PuzzleState a))
 
-makeLenses ''PuzzleState'
+makeLenses ''PuzzleState
 
-type PuzzleState = PuzzleState' (V3 Integer)
+initPuzzleState :: Puzzle (Set (V3 Int)) (PuzzleState (V3 Int)) ()
+initPuzzleState = do
+  circuits <~ asks (Set.map Set.singleton)
+  junctionPairs <~ asks (nearestPairs . Set.toList)
 
-connect :: Puzzle (Set (V3 Integer)) PuzzleState (V3 Integer, V3 Integer)
+connect :: (Ord a) => Puzzle (Set a) (PuzzleState a) (a, a)
 connect = do
   (from, to) : pairs <- use junctionPairs
   junctionPairs .= pairs
@@ -79,16 +84,23 @@ connect = do
     circuits %= Set.insert (fromCircuit <> toCircuit) . Set.delete fromCircuit . Set.delete toCircuit
   pure (from, to)
 
-partOne :: SimplePuzzle (Set (V3 Integer)) Int
+partOne :: SimplePuzzle (Set (V3 Int)) Int
 partOne =
-  ask >>= evaluatingPuzzle do
-    circuits <~ asks (Set.map Set.singleton)
-    junctionPairs <~ asks (nearestPairs . Set.toList)
+  evaluatingPuzzleM do
+    initPuzzleState
     replicateM 1000 connect
       *> uses circuits (product . take 3 . Set.toDescList . Set.map Set.size)
 
-partTwo :: SimplePuzzle (Set (V3 Integer)) ()
-partTwo = undefined
+partTwo :: SimplePuzzle (Set (V3 Int)) Int
+partTwo =
+  evaluatingPuzzleM do
+    initPuzzleState
+    loop <&> biproduct . bimapBoth (view _x)
+  where
+    loop = do
+      lastPair <- connect
+      ifM (uses circuits ((1 <) . Set.size)) loop
+        $ pure lastPair
 
 main :: IO ()
 main = $(defaultMainPuzzle)
