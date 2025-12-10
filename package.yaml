@@ -637,6 +637,11 @@ executables:
     main: AdventOfCode.Year2025.Day08
     dependencies:
       - linear
+  aoc-2025-day09:
+    <<: *executable
+    main: AdventOfCode.Year2025.Day09
+    dependencies:
+      - linear
 _benchmark: &benchmark
   ghc-options:
     - -threaded
