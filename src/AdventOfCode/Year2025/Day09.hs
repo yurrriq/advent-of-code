@@ -45,7 +45,7 @@ area :: (V2 Integer, V2 Integer) -> Integer
 area = product . (1 +) . abs . uncurry (-)
 
 partTwo :: SimplePuzzle [V2 Integer] Integer
-partTwo = fail "not yet implemented"
+partTwo = fail "4589596620 is too high"
 
 main :: IO ()
 main = $(defaultMainPuzzle)
