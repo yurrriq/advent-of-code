@@ -1,6 +1,7 @@
 {-# LANGUAGE BangPatterns #-}
 {-# LANGUAGE LambdaCase #-}
 {-# LANGUAGE TypeApplications #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 
 module AdventOfCode.Util
   ( CyclicEnum (..),
@@ -12,33 +13,33 @@ module AdventOfCode.Util
     hammingDistance,
     hammingSimilar,
     iterateMaybe,
+    maybeFail,
     scan,
     count,
     snoc,
     wigglesum,
     fix',
+    fixM,
     adjacencies,
     neighborsOf,
     holes,
+    middle,
+    medianUnsafe,
     numDigits,
+    bitraverseBoth,
     (<&&>),
     (<||>),
     (<.>),
   )
 where
 
-import Control.Arrow (second, (>>>))
 import Control.Comonad.Store (experiment)
 import Control.Lens (holesOf)
-import Control.Monad (join, (>=>))
-import Data.ByteString (ByteString)
-import Data.Function (fix)
 import Data.IntMap qualified as IM
-import Data.List (unfoldr)
-import Data.Map (Map)
+import Data.List ((!!))
 import Data.Map qualified as Map
-import Data.Set (Set)
 import Data.Set qualified as Set
+import Relude
 import Text.Trifecta (Parser, Result (..), parseByteString)
 
 -- https://github.com/bravit/hid-examples/blob/master/ch02/radar/Radar.hs
@@ -86,6 +87,10 @@ hammingSimilar n xs = maybe False (<= n) . hammingDistance xs
 iterateMaybe :: (a -> Maybe a) -> a -> [a]
 iterateMaybe f x = x : unfoldr (fmap (join (,)) . f) x
 
+-- | Lift a 'Maybe' to 'MonadFail' with a given failure reason.
+maybeFail :: (MonadFail m) => String -> Maybe a -> m a
+maybeFail reason = maybe (fail reason) return
+
 findFirstDup :: (Ord a) => [a] -> Maybe a
 findFirstDup = go Set.empty
   where
@@ -109,6 +114,11 @@ wigglesum wiggle = holesOf traverse >=> experiment wiggle
 fix' :: (Eq a) => (a -> a) -> a -> a
 fix' f = fix (\g !x -> let fx = f x in if fx == x then x else g fx)
 
+fixM :: (Eq a, Monad m) => (a -> m a) -> a -> m a
+fixM f x = do
+  fx <- f x
+  bool (fixM f fx) (pure x) (fx == x)
+
 adjacencies :: (Applicative f, Num a, Eq (f a), Traversable f) => [f a]
 adjacencies = filter (/= pure 0) $ sequenceA (pure [-1, 0, 1])
 
@@ -122,8 +132,20 @@ holes :: [a] -> [(a, [a])]
 holes [] = []
 holes (x : xs) = (x, xs) : map (second (x :)) (holes xs)
 
+medianUnsafe :: (Ord a) => [a] -> a
+medianUnsafe xs = sort xs !! (length xs `div` 2)
+
+middle :: [a] -> Maybe a
+middle xs = xs !!? (length xs `div` 2)
+
 numDigits :: (Integral a) => a -> Int
 numDigits n = truncate @Double (logBase 10 (fromIntegral n) + 1)
+
+bitraverseBoth ::
+  (Bitraversable t, Applicative f) =>
+  (a -> f b) -> t a a -> f (t b b)
+bitraverseBoth f = bitraverse f f
+{-# INLINE bitraverseBoth #-}
 
 (<&&>) :: (Applicative f) => f Bool -> f Bool -> f Bool
 (<&&>) = liftA2 (&&)

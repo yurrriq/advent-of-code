@@ -1,3 +1,5 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+
 module AdventOfCode.Year2020.Day18
   ( main,
     partOne,
@@ -5,35 +7,35 @@ module AdventOfCode.Year2020.Day18
   )
 where
 
-import AdventOfCode.Input (parseInput)
-import AdventOfCode.TH (inputFilePath)
-import Control.Applicative ((<|>))
-import Control.Monad.Combinators.Expr
-import Text.Trifecta (Parser, natural, parens, some, symbol)
+import AdventOfCode.Input (parseString, rawInputAoC)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
+import Control.Monad.Combinators.Expr (Operator (InfixL), makeExprParser)
+import Relude
+import Text.Trifecta (Parser, natural, parens, symbol)
 
 main :: IO ()
-main =
-  do
-    putStr "Part One: "
-    print =<< partOne
-    putStr "Part Two: "
-    print =<< partTwo
+main = $(defaultMainPuzzle)
 
-partOne :: IO Int
-partOne = sum <$> parseInput (some expr) $(inputFilePath)
+partOne :: SimplePuzzle String Integer
+partOne = solve [[multiplication, addition]]
+
+partTwo :: SimplePuzzle String Integer
+partTwo = solve [[addition], [multiplication]]
+
+getInput :: IO String
+getInput = rawInputAoC 2020 18
+
+solve :: [[Operator Parser Integer]] -> SimplePuzzle String Integer
+solve table = ask >>= parseString (some expr) <&> sum
   where
-    expr = makeExprParser (parens expr <|> posInt) [[addition, multiplication]]
+    expr = makeExprParser (parens expr <|> natural) table
 
-partTwo :: IO Int
-partTwo = sum <$> parseInput (some expr) $(inputFilePath)
-  where
-    expr = makeExprParser (parens expr <|> posInt) [[addition], [multiplication]]
+addition :: (Num a) => Operator Parser a
+addition = binary "+" (+)
 
-addition :: Operator Parser Int
-addition = InfixL ((+) <$ symbol "+")
+multiplication :: (Num a) => Operator Parser a
+multiplication = binary "*" (*)
 
-multiplication :: Operator Parser Int
-multiplication = InfixL ((*) <$ symbol "*")
-
-posInt :: Parser Int
-posInt = fromInteger <$> natural
+binary :: String -> (a -> a -> a) -> Operator Parser a
+binary name f = InfixL (f <$ symbol name)

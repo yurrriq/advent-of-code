@@ -1,23 +1,20 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+
 module AdventOfCode.Year2019.Day06 where
 
-import AdventOfCode.Input (parseInput)
-import AdventOfCode.TH (inputFilePath)
-import Control.Monad (void)
-import Data.Map (Map, (!))
+import AdventOfCode.Input (parseInputAoC)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
+import AdventOfCode.Util (iterateMaybe)
+import Data.Map ((!), (!?))
 import Data.Map qualified as Map
-import Text.Trifecta
-  ( Parser,
-    alphaNum,
-    eof,
-    manyTill,
-    some,
-    symbol,
-    token,
-  )
+import Relude
+import Text.Show qualified
+import Text.Trifecta (Parser, alphaNum, eof, manyTill, symbol, token)
 
 data Orbit
-  = Orbit String String
-  deriving (Eq)
+  = Orbit !String !String
+  deriving (Eq, Generic)
 
 instance Show Orbit where
   show (Orbit outer inner) = outer ++ ")" ++ inner
@@ -27,11 +24,9 @@ orbits = manyTill (token orbit) eof
 
 orbit :: Parser Orbit
 orbit =
-  do
-    inner <- some alphaNum
-    void (symbol ")")
-    outer <- some alphaNum
-    pure $ Orbit outer inner
+  flip Orbit
+    <$> (some alphaNum <* symbol ")")
+    <*> some alphaNum
 
 directOrbits :: [Orbit] -> Map String String
 directOrbits = foldr go Map.empty
@@ -39,39 +34,36 @@ directOrbits = foldr go Map.empty
     go (Orbit outer inner) = Map.insert outer inner
 
 indirectOrbits :: Map String String -> Map String [String]
-indirectOrbits dorbs = Map.foldrWithKey go Map.empty dorbs
+indirectOrbits dorbs = Map.foldrWithKey outer Map.empty dorbs
   where
-    go :: String -> String -> Map String [String] -> Map String [String]
-    go outer inner = Map.insert outer (go' [] (Map.lookup inner dorbs))
-    go' inners Nothing = inners
-    go' inners (Just inner') = go' (inner' : inners) (Map.lookup inner' dorbs)
+    outer outerOrbit innerOrbit =
+      Map.insert outerOrbit
+        $ maybe [] (iterateMaybe (dorbs !?))
+        $ Map.lookup innerOrbit dorbs
 
 minimumOrbitalTransfers :: String -> String -> Map String [String] -> Int
-minimumOrbitalTransfers from to iorbs =
-  let froms = reverse (iorbs ! from)
-      tos = reverse (iorbs ! to)
-   in 2
-        + length (takeWhile (not . flip elem tos) froms)
-        + length (takeWhile (not . flip elem froms) tos)
-
-partOne :: [Orbit] -> Int
-partOne orbs = Map.size dorbs + sum (fmap length iorbs)
+minimumOrbitalTransfers from to iorbs = 2 + go froms tos + go tos froms
   where
-    dorbs = directOrbits orbs
-    iorbs = indirectOrbits dorbs
+    go these those = length (takeWhile (not . flip elem those) these)
+    froms = iorbs ! from
+    tos = iorbs ! to
 
-partTwo :: [Orbit] -> Int
-partTwo orbs = minimumOrbitalTransfers "YOU" "SAN" iorbs
-  where
-    dorbs = directOrbits orbs
-    iorbs = indirectOrbits dorbs
+partOne :: SimplePuzzle [Orbit] Int
+partOne =
+  asks
+    $ directOrbits
+    >>> (Map.size &&& sum . fmap length . indirectOrbits)
+    >>> uncurry (+)
+
+partTwo :: SimplePuzzle [Orbit] Int
+partTwo =
+  asks
+    $ directOrbits
+    >>> indirectOrbits
+    >>> minimumOrbitalTransfers "YOU" "SAN"
+
+getInput :: IO [Orbit]
+getInput = parseInputAoC 2019 6 orbits
 
 main :: IO ()
-main =
-  do
-    putStrLn "[2019] Day 6: Universal Orbit Map"
-    input <- parseInput orbits $(inputFilePath)
-    putStr "Part One: "
-    print (partOne input)
-    putStr "Part Two: "
-    print (partTwo input)
+main = $(defaultMainPuzzle)

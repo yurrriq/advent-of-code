@@ -1,3 +1,5 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+
 module AdventOfCode.Year2017.Day01
   ( main,
     getInput,
@@ -7,32 +9,29 @@ module AdventOfCode.Year2017.Day01
   )
 where
 
-import AdventOfCode.Input (parseInput)
-import AdventOfCode.TH (inputFilePath)
+import AdventOfCode.Input (parseInputAoC)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
 import Data.Char (digitToInt)
-import Data.Monoid (Sum (..))
 import Data.Vector (Vector)
 import Data.Vector qualified as V
-import Text.Trifecta (Parser, digit, some)
+import Relude
+import Text.Trifecta (Parser, digit)
 
 main :: IO ()
-main =
-  do
-    input <- getInput
-    putStr "Part One: " *> print (partOne input)
-    putStr "Part Two: " *> print (partTwo input)
+main = $(defaultMainPuzzle)
 
 getInput :: IO (Vector (Sum Int))
-getInput = parseInput digits $(inputFilePath)
+getInput = parseInputAoC 2017 1 digits
 
 digits :: Parser (Vector (Sum Int))
 digits = V.fromList <$> some (Sum . digitToInt <$> digit)
 
-partOne :: Vector (Sum Int) -> Int
-partOne = day01 1
+partOne :: SimplePuzzle (Vector (Sum Int)) Int
+partOne = asks (day01 1)
 
-partTwo :: Vector (Sum Int) -> Int
-partTwo = day01 =<< (`div` 2) . V.length
+partTwo :: SimplePuzzle (Vector (Sum Int)) Int
+partTwo = asks (day01 =<< (`div` 2) . V.length)
 
 day01 :: (Eq a, Num a) => Int -> Vector (Sum a) -> a
 day01 k v = getSum $ V.ifoldl' go mempty v
