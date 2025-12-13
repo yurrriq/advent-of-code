@@ -644,6 +644,11 @@ executables:
     dependencies:
       - diagrams-lib
       - linear
+  aoc-2025-day10:
+    <<: *executable
+    main: AdventOfCode.Year2025.Day10
+    dependencies:
+      - vector
 _benchmark: &benchmark
   ghc-options:
     - -threaded
