@@ -648,6 +648,7 @@ executables:
     <<: *executable
     main: AdventOfCode.Year2025.Day10
     dependencies:
+      - astar
       - vector
 _benchmark: &benchmark
   ghc-options:

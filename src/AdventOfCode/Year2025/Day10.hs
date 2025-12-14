@@ -1,10 +1,16 @@
+{-# LANGUAGE StrictData #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
 module AdventOfCode.Year2025.Day10 where
 
 import AdventOfCode.Input (parseInputAoC, parseString)
-import Control.Lens (ifoldl')
-import Data.Bits (clearBit, setBit)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
+import AdventOfCode.Util (maybeFail, (<.>))
+import Control.Lens (ifoldl', makeLenses, views)
+import Data.Bits (Bits, clearBit, popCount, setBit)
+import Data.Graph.AStar (aStarM)
+import Data.HashSet qualified as HashSet
 import Data.List.NonEmpty qualified as NE
 import Data.Vector (Vector)
 import Data.Vector qualified as Vector
@@ -14,19 +20,20 @@ import Text.Trifecta (Parser, braces, brackets, char, commaSep, natural, parens)
 data Machine
   = Machine
   { _lightDiagram :: Int,
-    _wiringSchematics :: NonEmpty [Int],
+    _wiringSchematics :: NonEmpty Int,
     _joltageRequirements :: Vector Int
   }
   deriving (Eq, Generic, Show)
+
+makeLenses ''Machine
 
 machine :: Parser Machine
 machine = Machine <$> diagram <*> schematics <*> joltages
   where
     diagram =
       ifoldl' (\i acc b -> bool clearBit setBit b acc i) 0
-        . reverse
         <$> brackets (some (False <$ char '.' <|> char '#' $> True))
-    schematics = NE.some1 (parens (commaSep int))
+    schematics = NE.some1 (parens (foldl' setBit 0 <$> commaSep int))
     joltages = Vector.fromList <$> braces (commaSep int)
     int = fromInteger <$> natural
 
@@ -42,5 +49,25 @@ example =
 getInput :: IO [Machine]
 getInput = parseInputAoC 2025 10 (some machine)
 
+hammingDistance :: (Bits a) => a -> a -> Int
+hammingDistance a b = popCount (a `xor` b)
+
+partOne :: SimplePuzzle [Machine] Int
+partOne = ask >>= mapM (flip withPuzzle go . const) <&> sum
+  where
+    go =
+      length
+        <.> maybeFail "could not find shortest path"
+        =<< aStarM neighbours distance heuristicDistance done (pure 0)
+    distance from to = pure (hammingDistance from to)
+    heuristicDistance = views lightDiagram . hammingDistance
+    neighbours from =
+      foldl' (\hs button -> HashSet.insert (from `xor` button) hs) HashSet.empty
+        & views wiringSchematics
+    done current = views lightDiagram (== current)
+
+partTwo :: SimplePuzzle [Machine] Int
+partTwo = fail "not yet implemented"
+
 main :: IO ()
-main = fail "not yet implemented"
+main = $(defaultMainPuzzle)
