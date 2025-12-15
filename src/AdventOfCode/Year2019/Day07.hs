@@ -1,26 +1,24 @@
 {-# LANGUAGE DeriveAnyClass #-}
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE FlexibleInstances #-}
+{-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE StrictData #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 {-# OPTIONS_GHC -Wno-incomplete-uni-patterns #-}
 
 module AdventOfCode.Year2019.Day07 where
 
-import AdventOfCode.Input (parseInput)
-import AdventOfCode.TH (inputFilePath)
-import Control.Lens (makeLenses, use, (%=), (&), (+=), (.=), (.~))
-import Control.Monad (forM, when)
-import Control.Monad.State (get, lift)
-import Control.Monad.Trans.State.Strict (StateT, execStateT)
+import AdventOfCode.Input (parseInputAoC)
+import Control.Lens (makeLenses, use, (%=), (+=), (.=), (.~))
 import Data.Conduit (ConduitM, ConduitT, await, runConduit, yield, (.|))
 import Data.Conduit.Lift (evalStateC)
 import Data.FastDigits (digits)
-import Data.List (permutations)
-import Data.Vector (Vector, fromList, modify, (!))
+import Data.Foldable (maximum)
+import Data.Vector (Vector, (!))
 import Data.Vector qualified as V
 import Data.Vector.Mutable qualified as MV
 import Foreign.Marshal.Utils (fromBool)
-import GHC.Generics (Generic)
+import Relude
 import Text.Trifecta (Parser, comma, integer, sepBy)
 
 -- ------------------------------------------------------------------- [ Types ]
@@ -68,7 +66,7 @@ main =
     partOne input
 
 getInput :: IO (Vector Int)
-getInput = parseInput parseStack $(inputFilePath)
+getInput = parseInputAoC 2019 7 parseStack
 
 -- ------------------------------------------------------------------- [ Parts ]
 
@@ -77,20 +75,20 @@ partOne prog =
   do
     let ampses = prepareAmps prog <$> permutations [0 .. 4]
     results <- forM ampses $ \[a, b, c, d, e] ->
-      runConduit $
-        yield 0
-          .| a
-          .| b
-          .| c
-          .| d
-          .| e
-          .| await'
+      runConduit
+        $ yield 0
+        .| a
+        .| b
+        .| c
+        .| d
+        .| e
+        .| await'
     print (maximum results)
 
 -- ------------------------------------------------------------------ [ Parser ]
 
 parseStack :: Parser (Vector Int)
-parseStack = fromList . map fromInteger <$> (integer `sepBy` comma)
+parseStack = V.fromList . map fromInteger <$> (integer `sepBy` comma)
 
 -- -------------------------------------------------------- [ Running Programs ]
 
@@ -98,8 +96,8 @@ runProgram :: ConduitT Int Int Program ()
 runProgram =
   do
     opCode <- lift nextInt
-    when (opCode /= 99) $
-      do
+    when (opCode /= 99)
+      $ do
         debugState
         instruction <- getInstruction (normalizeOpCode opCode)
         debugInstruction instruction
@@ -110,42 +108,42 @@ runProgram =
 debugMode :: Program ()
 debugMode =
   do
-    lift $ putStrLn "Enabling debug mode"
+    putStrLn "Enabling debug mode"
     debug .= True
 
 debugInstruction :: Instruction -> ConduitT a b Program ()
 debugInstruction ins =
   do
     st <- get
-    when (_debug st) $
-      lift (lift (print ins))
+    when (_debug st)
+      $ print ins
 
 debugState :: ConduitT a b Program ()
 debugState =
   do
     st <- get
-    when (_debug st) $
-      lift (lift (print st))
+    when (_debug st)
+      $ print st
 
 getInstruction :: [Int] -> ConduitT Int Int Program Instruction
 getInstruction [1, 0, c, b] =
-  lift $ Add <$> (mkValue c <$> nextInt) <*> (mkValue b <$> nextInt) <*> nextInt
+  lift $ (Add . mkValue c <$> nextInt) <*> (mkValue b <$> nextInt) <*> nextInt
 getInstruction [2, 0, c, b] =
-  lift $ Multiply <$> (mkValue c <$> nextInt) <*> (mkValue b <$> nextInt) <*> nextInt
+  lift $ (Multiply . mkValue c <$> nextInt) <*> (mkValue b <$> nextInt) <*> nextInt
 getInstruction [3, 0, 0, 0] =
   do
     input <- await'
     lift $ Set (ImmediateMode input) <$> nextInt
 getInstruction [4, 0, c, 0] =
-  lift $ Output <$> (mkValue c <$> nextInt)
+  lift $ Output . mkValue c <$> nextInt
 getInstruction [5, 0, c, b] =
-  lift $ JumpIfTrue <$> (mkValue c <$> nextInt) <*> (mkValue b <$> nextInt)
+  lift $ (JumpIfTrue . mkValue c <$> nextInt) <*> (mkValue b <$> nextInt)
 getInstruction [6, 0, c, b] =
-  lift $ JumpIfFalse <$> (mkValue c <$> nextInt) <*> (mkValue b <$> nextInt)
+  lift $ (JumpIfFalse . mkValue c <$> nextInt) <*> (mkValue b <$> nextInt)
 getInstruction [7, 0, c, b] =
-  lift $ LessThan <$> (mkValue c <$> nextInt) <*> (mkValue b <$> nextInt) <*> nextInt
+  lift $ (LessThan . mkValue c <$> nextInt) <*> (mkValue b <$> nextInt) <*> nextInt
 getInstruction [8, 0, c, b] =
-  lift $ Equals <$> (mkValue c <$> nextInt) <*> (mkValue b <$> nextInt) <*> nextInt
+  lift $ (Equals . mkValue c <$> nextInt) <*> (mkValue b <$> nextInt) <*> nextInt
 getInstruction _ = error "Invalid instruction"
 
 runInstruction :: Instruction -> ConduitT Int Int Program ()
@@ -160,13 +158,13 @@ runInstruction (Output vx) =
 runInstruction (JumpIfTrue vx vy) =
   lift $ do
     x <- handleValue vx
-    when (x /= 0) $
-      jump vy
+    when (x /= 0)
+      $ jump vy
 runInstruction (JumpIfFalse vx vy) =
   lift $ do
     x <- handleValue vx
-    when (x == 0) $
-      jump vy
+    when (x == 0)
+      $ jump vy
 runInstruction (LessThan vx vy dst) =
   lift $ do
     lt <- (<) <$> handleValue vx <*> handleValue vy
@@ -191,7 +189,7 @@ evalStack' st =
 -- -------------------------------------------------- [ Manipulating the Stack ]
 
 setValue :: Int -> Int -> Program ()
-setValue x dst = stack %= modify (\v -> MV.write v dst x)
+setValue x dst = stack %= V.modify (\v -> MV.write v dst x)
 
 incrementPointer :: Program ()
 incrementPointer = pointer += 1

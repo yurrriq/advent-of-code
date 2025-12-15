@@ -1,43 +1,46 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+
 module AdventOfCode.Year2022.Day01 where
 
-import AdventOfCode.Input (parseInput)
-import AdventOfCode.TH (defaultMain, inputFilePath)
-import Data.List (sortBy)
-import Data.Ord (Down (..), comparing)
-import Text.Trifecta hiding (parseString)
+import AdventOfCode.Input (parseInputAoC)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
+import Control.Monad.Combinators.NonEmpty (sepBy1)
+import Data.Foldable1 (maximum)
+import Data.List.NonEmpty qualified as NE
+import Relude
+import Text.Trifecta (Parser, decimal, newline)
 
 main :: IO ()
-main = $(defaultMain)
+main = $(defaultMainPuzzle)
 
-getInput :: IO [[Integer]]
-getInput = parseInput inventory $(inputFilePath)
+getInput :: IO (NonEmpty Integer)
+getInput = parseInputAoC 2022 1 inventory
 
-partOne :: [[Integer]] -> Integer
-partOne = maximum . map sum
+partOne :: SimplePuzzle (NonEmpty Integer) Integer
+partOne = asks maximum
 
-partTwo :: [[Integer]] -> Integer
-partTwo = sum . take 3 . sortBy (comparing Down) . map sum
+partTwo :: SimplePuzzle (NonEmpty Integer) Integer
+partTwo = asks (sum . NE.take 3 . NE.sortBy (comparing Down))
 
-inventory :: Parser [[Integer]]
-inventory = elfInventory `sepBy` newline
+inventory :: Parser (NonEmpty Integer)
+inventory = elfInventory `sepBy1` newline
   where
-    elfInventory = some (decimal <* newline)
+    elfInventory = sum <$> NE.some1 (decimal <* newline)
 
 example :: String
 example =
-  unlines
-    [ "1000",
-      "2000",
-      "3000",
-      "",
-      "4000",
-      "",
-      "5000",
-      "6000",
-      "",
-      "7000",
-      "8000",
-      "9000",
-      "",
-      "10000"
-    ]
+  "1000\n\
+  \2000\n\
+  \3000\n\
+  \\n\
+  \4000\n\
+  \\n\
+  \5000\n\
+  \6000\n\
+  \\n\
+  \7000\n\
+  \8000\n\
+  \9000\n\
+  \\n\
+  \10000\n"

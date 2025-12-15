@@ -1,4 +1,5 @@
-{-# LANGUAGE DeriveFunctor #-}
+{-# LANGUAGE BlockArguments #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 
 module AdventOfCode.Year2020.Day19
   ( main,
@@ -8,25 +9,22 @@ module AdventOfCode.Year2020.Day19
   )
 where
 
-import AdventOfCode.Input (parseInput)
-import AdventOfCode.TH (inputFilePath)
+import AdventOfCode.Input (parseInputAoC)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
 import AdventOfCode.Util (count)
-import Control.Applicative ((<|>))
-import Control.Arrow (first)
-import Control.Monad (guard, (>=>))
 import Data.Functor.Foldable (hylo)
-import Data.IntMap (IntMap, (!))
+import Data.IntMap ((!))
 import Data.IntMap qualified as IntMap
+import Relude
 import Text.Trifecta
   ( Parser,
     lower,
-    many,
     natural,
     newline,
     notFollowedBy,
     sepBy,
     sepEndBy,
-    some,
     surroundedBy,
     symbol,
     try,
@@ -38,36 +36,30 @@ data Rule a
   deriving (Eq, Show, Functor)
 
 main :: IO ()
-main =
-  do
-    input <- getInput
-    putStr "Part One: "
-    print $ partOne input
-    putStr "Part Two: "
-    print $ partTwo input
+main = $(defaultMainPuzzle)
 
 getInput :: IO (IntMap (Rule Int), [String])
-getInput = parseInput puzzleInput $(inputFilePath)
+getInput = parseInputAoC 2020 19 puzzleInput
   where
     puzzleInput = (,) <$> rules <*> messages
     rules = foldr (uncurry IntMap.insert) IntMap.empty <$> some (simpleRule <|> compoundRule)
     messages = some lower `sepEndBy` newline
 
-partOne :: (IntMap (Rule Int), [String]) -> Int
-partOne = uncurry solve
+partOne :: SimplePuzzle (IntMap (Rule Int), [String]) Int
+partOne = asks solve
 
-partTwo :: (IntMap (Rule Int), [String]) -> Int
-partTwo = uncurry solve . first patchRules
+partTwo :: SimplePuzzle (IntMap (Rule Int), [String]) Int
+partTwo = asks (solve . first patchRules)
   where
     patchRules =
-      mappend $
-        IntMap.fromList
+      mappend
+        $ IntMap.fromList
           [ (8, CompoundRule [[42], [42, 8]]),
             (11, CompoundRule [[42, 31], [42, 11, 31]])
           ]
 
-solve :: IntMap (Rule Int) -> [String] -> Int
-solve rulesMap = count (any null . match rulesMap)
+solve :: (IntMap (Rule Int), [String]) -> Int
+solve = uncurry $ \rulesMap -> count (any null . match rulesMap)
 
 match :: IntMap (Rule Int) -> String -> [String]
 match rulesMap = hylo matchRuleAlg (rulesMap !) 0
