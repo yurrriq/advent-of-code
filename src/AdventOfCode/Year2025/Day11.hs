@@ -18,11 +18,11 @@ devices = Map.fromList <$> device `sepEndBy` newline
         <$> (some lower <* symbol ":")
         <*> (some lower `sepEndBy` char ' ')
 
-getExample :: IO (Map String [String])
-getExample = parseString devices example
+getExampleOne :: IO (Map String [String])
+getExampleOne = parseString devices exampleOne
 
-example :: String
-example =
+exampleOne :: String
+exampleOne =
   "aaa: you hhh\n\
   \you: bbb ccc\n\
   \bbb: ddd eee\n\
@@ -37,10 +37,12 @@ example =
 getInput :: IO (Map String [String])
 getInput = parseInputAoC 2025 11 devices
 
-allPaths :: (Ord a) => a -> a -> Map a [a] -> Set [a]
-allPaths start goal graph = go start Set.empty
+allPaths :: (Ord a) => a -> a -> (Map a [a] -> Set a) -> Map a [a] -> Set [a]
+allPaths start goal reachability graph = go start Set.empty
   where
+    reachable = reachability graph
     go v visited
+      | Set.notMember v reachable = Set.empty
       | v == goal = Set.singleton [goal]
       | Set.member v visited = Set.empty
       | otherwise =
@@ -49,11 +51,52 @@ allPaths start goal graph = go start Set.empty
             | next <- Map.findWithDefault [] v graph
             ]
 
-partOne :: SimplePuzzle (Map String [String]) Int
-partOne = asks (Set.size . allPaths "you" "out")
+reachableToGoals :: (Ord a) => [a] -> Map a [a] -> Set a
+reachableToGoals goals graph = dfs Set.empty goals
+  where
+    reverseGraph =
+      Map.fromListWith
+        (++)
+        [ (output, [device])
+        | (device, outputs) <- Map.toList graph,
+          output <- outputs
+        ]
 
-partTwo :: SimplePuzzle (Map String [String]) ()
-partTwo = fail "not yet implemented"
+    dfs seen [] = seen
+    dfs seen (x : xs)
+      | Set.member x seen = dfs seen xs
+      | otherwise =
+          dfs
+            (Set.insert x seen)
+            (Map.findWithDefault [] x reverseGraph ++ xs)
+
+partOne :: SimplePuzzle (Map String [String]) Int
+partOne = asks (Set.size . allPaths "you" "out" (reachableToGoals ["out"]))
+
+getExampleTwo :: IO (Map String [String])
+getExampleTwo = parseString devices exampleTwo
+
+exampleTwo :: String
+exampleTwo =
+  "svr: aaa bbb\n\
+  \aaa: fft\n\
+  \fft: ccc\n\
+  \bbb: tty\n\
+  \tty: ccc\n\
+  \ccc: ddd eee\n\
+  \ddd: hub\n\
+  \hub: fff\n\
+  \eee: dac\n\
+  \dac: fff\n\
+  \fff: ggg hhh\n\
+  \ggg: out\n\
+  \hhh: out"
+
+partTwo :: SimplePuzzle (Map String [String]) Int
+partTwo = asks (Set.size . Set.filter go . allPaths "svr" "out" reachability)
+  where
+    go path = "dac" `elem` path && "fft" `elem` path
+    reachability = reachableToGoals ["out", "dac", "fft"]
 
 main :: IO ()
 main = $(defaultMainPuzzle)
