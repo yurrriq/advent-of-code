@@ -1,3 +1,4 @@
+{-# LANGUAGE BlockArguments #-}
 {-# LANGUAGE StrictData #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
@@ -6,12 +7,13 @@ module AdventOfCode.Year2025.Day10 where
 import AdventOfCode.Input (parseInputAoC, parseString)
 import AdventOfCode.Puzzle
 import AdventOfCode.TH (defaultMainPuzzle)
-import AdventOfCode.Util (maybeFail, (<.>))
-import Control.Lens (ifoldl', makeLenses, views)
-import Data.Bits (Bits, clearBit, popCount, setBit)
-import Data.Graph.AStar (aStarM)
-import Data.HashSet qualified as HashSet
+import AdventOfCode.Util ((<.>))
+import Control.Lens (ifoldl', makeLenses, view, views)
+import Data.Bits (clearBit, setBit)
+import Data.IntSet qualified as IntSet
 import Data.List.NonEmpty qualified as NE
+import Data.Sequence (Seq ((:<|)), (><))
+import Data.Sequence qualified as Seq
 import Data.Vector (Vector)
 import Data.Vector qualified as Vector
 import Relude
@@ -49,22 +51,21 @@ example =
 getInput :: IO [Machine]
 getInput = parseInputAoC 2025 10 (some machine)
 
-hammingDistance :: (Bits a) => a -> a -> Int
-hammingDistance a b = popCount (a `xor` b)
-
 partOne :: SimplePuzzle [Machine] Int
-partOne = ask >>= mapM (flip withPuzzle go . const) <&> sum
+partOne = sum <.> mapM go =<< ask
   where
-    go =
-      length
-        <.> maybeFail "could not find shortest path"
-        =<< aStarM neighbours distance heuristicDistance done (pure 0)
-    distance from to = pure (hammingDistance from to)
-    heuristicDistance = views lightDiagram . hammingDistance
-    neighbours from =
-      foldl' (\hs button -> HashSet.insert (from `xor` button) hs) HashSet.empty
-        & views wiringSchematics
-    done current = views lightDiagram (== current)
+    go maskin = withPuzzle (const maskin) do
+      buttons <- views wiringSchematics NE.toList
+      target <- view lightDiagram
+      let bfs _visited Seq.Empty = fail "could not correctly configure the indicator lights"
+          bfs visited ((lights, n) :<| rest)
+            | lights == target = pure n
+            | IntSet.member lights visited = bfs visited rest
+            | otherwise =
+                bfs (IntSet.insert lights visited)
+                  $ rest
+                  >< Seq.fromList [(lights `xor` button, n + 1) | button <- buttons]
+      bfs IntSet.empty (Seq.singleton (0, 0))
 
 partTwo :: SimplePuzzle [Machine] Int
 partTwo = fail "not yet implemented"
