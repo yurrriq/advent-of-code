@@ -1,38 +1,36 @@
+{-# LANGUAGE BlockArguments #-}
+{-# LANGUAGE MultiWayIf #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+
 module AdventOfCode.Year2017.Day02 where
 
-import AdventOfCode.Input (parseInput)
-import AdventOfCode.TH (inputFilePath)
+import AdventOfCode.Input (parseInputAoC)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
 import AdventOfCode.Util (holes)
-import Control.Arrow ((&&&))
-import Data.Maybe (catMaybes, listToMaybe, mapMaybe)
-import Text.Trifecta (digit, newline, sepBy, some, tab)
+import Data.List.Extra (maximum, minimum, sumOn')
+import Relude
+import Text.Trifecta (decimal, newline, sepBy1, sepEndBy1, tab)
 
 main :: IO ()
-main =
-  do
-    input <- getInput
-    putStr "Part One: " *> print (partOne input)
-    putStr "Part Two: " *> print (partTwo input)
+main = $(defaultMainPuzzle)
 
 getInput :: IO [[Int]]
-getInput = parseInput (some (row <* newline)) $(inputFilePath)
+getInput = parseInputAoC 2017 2 (row `sepEndBy1` newline)
   where
-    row = int `sepBy` tab
-    int = read <$> some digit
+    row = int `sepBy1` tab
+    int = fromInteger <$> decimal
 
-partOne :: [[Int]] -> Int
-partOne = sum . map (uncurry (-) . (maximum &&& minimum))
+partOne :: SimplePuzzle [[Int]] Int
+partOne = asks (sumOn' (uncurry (-) . (maximum &&& minimum)))
 
-partTwo :: [[Int]] -> Int
-partTwo = sum . mapMaybe handleRow
-  where
-    handleRow :: [Int] -> Maybe Int
-    handleRow xs =
-      listToMaybe . catMaybes $
-        do
-          (x, ys) <- holes xs
-          y <- ys
-          case (quotRem x y, quotRem y x) of
-            ((q, 0), _) -> pure $ Just q
-            (_, (q, 0)) -> pure $ Just q
-            _ -> pure Nothing
+partTwo :: SimplePuzzle [[Int]] Int
+partTwo =
+  asks $ sum . mapMaybe \row ->
+    listToMaybe do
+      (x, ys) <- holes row
+      y <- ys
+      if
+        | (q, 0) <- quotRem x y -> pure q
+        | (q, 0) <- quotRem y x -> pure q
+        | otherwise -> mzero

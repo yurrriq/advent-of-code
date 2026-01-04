@@ -1,29 +1,30 @@
 {-# LANGUAGE DataKinds #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 
 module AdventOfCode.Year2022.Day02 where
 
-import AdventOfCode.Input (parseInput)
-import AdventOfCode.TH (defaultMain, inputFilePath)
+import AdventOfCode.Input (parseInputAoC)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
 import Data.Finite (Finite, getFinite)
-import Data.Functor (($>))
-import Data.Monoid (Sum (..), getSum)
+import Relude
 import Text.Trifecta (Parser, char, choice, newline, sepEndBy, space)
 
 type Z3 = Finite 3
 
 main :: IO ()
-main = $(defaultMain)
+main = $(defaultMainPuzzle)
 
 getInput :: IO [(Z3, Z3)]
-getInput = parseInput strategyGuide $(inputFilePath)
+getInput = parseInputAoC 2022 2 strategyGuide
 
-partOne :: [(Z3, Z3)] -> Integer
-partOne = followGuide snd scoreOutcome
+partOne :: SimplePuzzle [(Z3, Z3)] Integer
+partOne = asks (followGuide snd scoreOutcome)
   where
     scoreOutcome (opponent, player) = player + (1 - opponent)
 
-partTwo :: [(Z3, Z3)] -> Integer
-partTwo = followGuide scoreShape snd
+partTwo :: SimplePuzzle [(Z3, Z3)] Integer
+partTwo = asks (followGuide scoreShape snd)
   where
     scoreShape (opponent, outcome) = outcome - (1 - opponent)
 

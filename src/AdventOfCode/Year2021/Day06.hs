@@ -1,83 +1,53 @@
-{-# LANGUAGE DataKinds #-}
-{-# LANGUAGE QuantifiedConstraints #-}
-{-# OPTIONS_GHC -Wno-orphans #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 
 module AdventOfCode.Year2021.Day06 where
 
-import AdventOfCode.Input (parseInput)
-import AdventOfCode.TH (defaultMain, inputFilePath)
-import Control.Lens ((%~))
+import AdventOfCode.Input (parseInputAoC)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
+import Control.Lens (over)
 import Data.Finite (Finite)
-import Data.Maybe (fromJust, mapMaybe)
-import Data.Semigroup (stimes)
-import Data.Vector.Generic qualified as VG
-import Data.Vector.Generic.Sized qualified as VGS
+import Data.Matrix (Matrix (..), colVector, matrix)
 import Data.Vector.Sized qualified as VS
-import GHC.TypeNats (KnownNat)
-import Linear (Additive (..), negated, scaled, (!*), (!*!))
+import Foreign.Marshal.Utils (fromBool)
+import Relude
 import Text.Trifecta (commaSep, natural)
 
 type Lanternfish = Finite 9
 
-type State = VS.Vector 9 Int
-
-newtype STM n = STM {unSTM :: VS.Vector n (VS.Vector n Int)}
-  deriving (Eq, Show)
-
-instance (Functor v, KnownNat n, forall a. VG.Vector v a) => Additive (VGS.Vector v n) where
-  zero = VGS.replicate 0
-  liftU2 = VGS.zipWith
-  liftI2 = VGS.zipWith
-
-instance (KnownNat n) => Num (STM n) where
-  STM x + STM y = STM (x ^+^ y)
-  STM x - STM y = STM (x ^-^ y)
-  STM x * STM y = STM (x !*! y)
-  negate = STM . negated . unSTM
-  abs = undefined
-  signum = undefined
-  fromInteger = STM . scaled . fromInteger
-
-instance (KnownNat n) => Semigroup (STM n) where
-  STM x <> STM y = STM (x !*! y)
-
 main :: IO ()
-main = $(defaultMain)
+main = $(defaultMainPuzzle)
 
-getInput :: IO [Lanternfish]
-getInput = parseInput (commaSep (fromInteger <$> natural)) $(inputFilePath)
+getInput :: IO (Matrix Int)
+getInput = mkColumn <$> parseInputAoC 2021 6 (commaSep (fromInteger <$> natural))
+
+getExample :: IO (Matrix Int)
+getExample = pure (mkColumn example)
 
 example :: [Lanternfish]
 example = [3, 4, 3, 1, 2]
 
-partOne :: [Lanternfish] -> Int
+partOne :: SimplePuzzle (Matrix Int) Int
 partOne = simulate 80
 
-partTwo :: [Lanternfish] -> Int
+partTwo :: SimplePuzzle (Matrix Int) Int
 partTwo = simulate 256
 
-simulate :: Int -> [Lanternfish] -> Int
-simulate n = sum . (unSTM (stm ^ n) !*) . mkState
+simulate :: Int -> SimplePuzzle (Matrix Int) Int
+simulate n = asks (sum . ((day ^ n) *))
 
-ssimulate :: Int -> [Lanternfish] -> Int
-ssimulate n = sum . (unSTM (stimes n stm) !*) . mkState
+mkColumn :: (Foldable t) => t Lanternfish -> Matrix Int
+mkColumn =
+  colVector
+    . VS.fromSized
+    . foldr ((`over` (+ 1)) . VS.ix) (pure 0)
 
-mkState :: [Lanternfish] -> State
-mkState = foldr ((%~ succ) . VS.ix) (pure 0)
+simulateDay :: Matrix Int -> Matrix Int
+simulateDay timers = day * timers
 
-stm :: STM 9
-stm =
-  STM
-    . fromJust
-    . VS.fromListN
-    . mapMaybe VS.fromListN
-    $ [ [0, 1, 0, 0, 0, 0, 0, 0, 0],
-        [0, 0, 1, 0, 0, 0, 0, 0, 0],
-        [0, 0, 0, 1, 0, 0, 0, 0, 0],
-        [0, 0, 0, 0, 1, 0, 0, 0, 0],
-        [0, 0, 0, 0, 0, 1, 0, 0, 0],
-        [0, 0, 0, 0, 0, 0, 1, 0, 0],
-        [1, 0, 0, 0, 0, 0, 0, 1, 0],
-        [0, 0, 0, 0, 0, 0, 0, 0, 1],
-        [1, 0, 0, 0, 0, 0, 0, 0, 0]
-      ]
+day :: Matrix Int
+day = matrix 9 9 $ \case
+  (6, 7) -> 1
+  (7, 1) -> 1
+  (9, 1) -> 1
+  (y, x) -> fromBool (x == y + 1)

@@ -7,8 +7,7 @@ module AdventOfCode.Year2019.Day09
   )
 where
 
-import AdventOfCode.Input (parseInput)
-import AdventOfCode.TH (inputFilePath)
+import AdventOfCode.Input (parseInputAoC)
 import Conduit
 import Control.Monad (liftM2, when)
 import Control.Monad.State (get, gets, put)
@@ -29,7 +28,7 @@ import Text.Trifecta (Parser, comma, integer, sepBy)
 main :: IO ()
 main =
   do
-    input <- parseInput stack $(inputFilePath)
+    input <- parseInputAoC 2019 9 stack
     putStr "Part One: "
     print =<< partOne input
 

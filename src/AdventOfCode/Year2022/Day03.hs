@@ -1,32 +1,33 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+
 module AdventOfCode.Year2022.Day03 where
 
-import AdventOfCode.Input (parseInput, parseString)
-import AdventOfCode.TH (defaultMain, inputFilePath)
-import Control.Applicative ((<|>))
-import Data.Char (ord)
-import Data.List (intersect, nub)
+import AdventOfCode.Input (parseInputAoC, parseString)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
+import Data.List (foldl1, intersect)
 import Data.List.Split (chunksOf)
-import Data.Monoid (Sum (..), getSum)
-import Text.Trifecta (Parser, lower, newline, sepEndBy, some, upper)
+import Relude
+import Text.Trifecta (Parser, lower, newline, sepEndBy, upper)
 
 main :: IO ()
-main = $(defaultMain)
+main = $(defaultMainPuzzle)
 
-partOne :: [[Int]] -> Int
-partOne = day03 (uncurry intersect . halve)
+partOne :: SimplePuzzle [[Int]] Int
+partOne = asks $ day03 (uncurry intersect . halve)
   where
     halve xs = splitAt (length xs `div` 2) xs
 
-partTwo :: [[Int]] -> Int
-partTwo = day03 (foldl1 intersect') . chunksOf 3
+partTwo :: SimplePuzzle [[Int]] Int
+partTwo = asks $ day03 (foldl1 intersect') . chunksOf 3
   where
-    intersect' xs ys = nub (xs `intersect` ys)
+    intersect' xs ys = ordNub (xs `intersect` ys)
 
 day03 :: (a -> [Int]) -> [a] -> Int
 day03 f = getSum . mconcat . foldMap (map Sum . take 1 . f)
 
 getInput :: IO [[Int]]
-getInput = parseInput rucksacks $(inputFilePath)
+getInput = parseInputAoC 2022 3 rucksacks
 
 rucksacks :: Parser [[Int]]
 rucksacks = some prioritizedItem `sepEndBy` newline
@@ -35,13 +36,14 @@ rucksacks = some prioritizedItem `sepEndBy` newline
     lowerItem = subtract 96 . ord <$> lower
     upperItem = subtract 38 . ord <$> upper
 
-example :: IO [[Int]]
+getExample :: IO [[Int]]
+getExample = parseString rucksacks example
+
+example :: String
 example =
-  parseString rucksacks . unlines $
-    [ "vJrwpWtwJgWrhcsFMMfFFhFp",
-      "jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL",
-      "PmmdzqPrVvPwwTWBwg",
-      "wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn",
-      "ttgJtRGJQctTZtZT",
-      "CrZsJsPPZsGzwwsLwLmpwMDw"
-    ]
+  "vJrwpWtwJgWrhcsFMMfFFhFp\n\
+  \jqHRNqRjqzjGDLGLrsFMfFZSrLrFZsSL\n\
+  \PmmdzqPrVvPwwTWBwg\n\
+  \wMqvLMZHhHMvwLHjbvcjnnSBnvTQFn\n\
+  \ttgJtRGJQctTZtZT\n\
+  \CrZsJsPPZsGzwwsLwLmpwMDw\n"

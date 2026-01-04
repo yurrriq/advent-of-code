@@ -1,33 +1,41 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+
 module AdventOfCode.Year2023.Day06 where
 
-import AdventOfCode.Input (parseInput, parseString)
-import AdventOfCode.TH (defaultMain, inputFilePath)
+import AdventOfCode.Input (parseInputAoC, parseString)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
+import AdventOfCode.Util (bitraverseBoth, (<.>))
 import Data.List.Extra (productOn')
-import Text.Trifecta (Parser, natural, some, symbol)
+import Relude
+import Relude.Extra.Bifunctor (bimapBoth)
+import Text.Trifecta (Parser, natural, symbol)
 
 main :: IO ()
-main = $(defaultMain)
+main = $(defaultMainPuzzle)
 
-partOne :: [(Int, Int)] -> Int
-partOne = productOn' waysToWin
+partOne :: SimplePuzzle [(Int, Int)] Int
+partOne = asks (productOn' waysToWin)
 
-partTwo :: [(Int, Int)] -> Int
-partTwo races = waysToWin (time, distance)
-  where
-    time = read $ concatMap (show . fst) races
-    distance = read $ concatMap (show . snd) races
+partTwo :: SimplePuzzle [(Int, Int)] Int
+partTwo =
+  ask
+    >>= waysToWin
+    <.> bitraverseBoth (parseString posInt)
+    . foldMap (bimapBoth (show @String))
 
 waysToWin :: (Int, Int) -> Int
-waysToWin (time, distance) = maxTime - minTime + 1
+waysToWin = bimapBoth fromIntegral >>> waysToWin'
+
+waysToWin' :: (Double, Double) -> Int
+waysToWin' (time, distance) = maxTime - minTime + 1
   where
-    maxTime = floor ((time' + delta) / 2)
-    minTime = ceiling ((time' - delta) / 2)
-    delta, time' :: Double
-    delta = sqrt $ time' ** 2 - 4 * fromIntegral distance
-    time' = fromIntegral time
+    maxTime = floor ((time + delta) / 2)
+    minTime = ceiling ((time - delta) / 2)
+    delta = sqrt $ time ** 2 - 4 * distance
 
 getInput :: IO [(Int, Int)]
-getInput = parseInput document $(inputFilePath)
+getInput = parseInputAoC 2023 6 document
 
 document :: Parser [(Int, Int)]
 document =

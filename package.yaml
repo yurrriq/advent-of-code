@@ -13,12 +13,14 @@ extra-source-files:
 data-files:
   - input/*/day*.txt
 dependencies:
+  - advent-of-code-api
   - base
   - bytestring
   - comonad
   - containers
   - extra
   - foldl
+  - generic-data
   - lens
   - monad-logger
   - parsers
@@ -31,6 +33,7 @@ dependencies:
   - trifecta
   - universe-base
   - unordered-containers
+  - utf8-string
 default-extensions:
   - TemplateHaskell
 ghc-options:
@@ -43,26 +46,27 @@ library:
   dependencies:
     - aeson
     - arithmoi
+    - array
     - astar
     - base16-bytestring
     - combinatorial
-    - comonad
     - composition
     - conduit
     - containers
     - cryptohash-md5
     - data-interval
     - data-ordlist
+    - diagrams-lib
     - dlist
-    - extra
     - fast-digits
+    - finitary
     - finite-typelits
     - free-algebras
     - groups
     - hashable
     - infinite-list
-    - lens
     - linear
+    - matrix
     - monoid-extras
     - mtl
     - parser-combinators
@@ -71,6 +75,7 @@ library:
     - safe
     - scientific
     - semirings
+    - time
     - transformers
     - unordered-containers
     - utility-ht
@@ -92,28 +97,15 @@ executables:
   aoc-2015-day01:
     <<: *executable
     main: AdventOfCode.Year2015.Day01
-    other-modules:
-      - AdventOfCode.Input
-      - AdventOfCode.TH
-      - Paths_advent_of_code
   aoc-2015-day02:
     <<: *executable
     main: AdventOfCode.Year2015.Day02
-    other-modules:
-      - AdventOfCode.Input
-      - AdventOfCode.TH
-      - Paths_advent_of_code
     dependencies:
       - extra
       - linear
   aoc-2015-day06:
     <<: *executable
     main: AdventOfCode.Year2015.Day06
-    other-modules:
-      - AdventOfCode.Input
-      - AdventOfCode.TH
-      - AdventOfCode.Util
-      - Paths_advent_of_code
     dependencies:
       - containers
       - linear
@@ -196,6 +188,7 @@ executables:
       - unordered-containers
     other-modules:
       - AdventOfCode.Input
+      - AdventOfCode.Puzzle
       - AdventOfCode.TH
       - AdventOfCode.Util
       - AdventOfCode.Year2015.Day22.Types
@@ -249,8 +242,7 @@ executables:
     <<: *executable
     main: AdventOfCode.Year2017.Day03
     dependencies:
-      - containers
-      - extra
+      - infinite-list
       - linear
   aoc-2017-day04:
     <<: *executable
@@ -274,6 +266,8 @@ executables:
   aoc-2017-day08:
     <<: *executable
     main: AdventOfCode.Year2017.Day08
+    dependencies:
+      - parser-combinators
   aoc-2018-day01:
     <<: *executable
     main: AdventOfCode.Year2018.Day01
@@ -283,9 +277,13 @@ executables:
   aoc-2018-day03:
     <<: *executable
     main: AdventOfCode.Year2018.Day03
+    dependencies:
+      - linear
   aoc-2018-day04:
     <<: *executable
     main: AdventOfCode.Year2018.Day04
+    dependencies:
+      - time
   aoc-2018-day05:
     <<: *executable
     main: AdventOfCode.Year2018.Day05
@@ -297,10 +295,13 @@ executables:
     <<: *executable
     main: AdventOfCode.Year2019.Day02
     dependencies:
+      - pointless-fun
       - vector
   aoc-2019-day03:
     <<: *executable
     main: AdventOfCode.Year2019.Day03
+    dependencies:
+      - linear
   aoc-2019-day04:
     <<: *executable
     main: AdventOfCode.Year2019.Day04
@@ -349,6 +350,7 @@ executables:
     <<: *executable
     main: AdventOfCode.Year2019.Day12
     dependencies:
+      - infinite-list
       - linear
   aoc-2020-day01:
     <<: *executable
@@ -380,6 +382,7 @@ executables:
     main: AdventOfCode.Year2020.Day07
     other-modules:
       - AdventOfCode.Input
+      - AdventOfCode.Puzzle
       - AdventOfCode.TH
       - AdventOfCode.Util
       - Data.Digraph
@@ -422,6 +425,7 @@ executables:
       - mtl
     other-modules:
       - AdventOfCode.Input
+      - AdventOfCode.Puzzle
       - AdventOfCode.TH
       - AdventOfCode.Util
       - AdventOfCode.Year2020.Day14.Parsers
@@ -436,11 +440,14 @@ executables:
     <<: *executable
     main: AdventOfCode.Year2020.Day16
     dependencies:
+      - infinite-list
       - linear
+      - pointless-fun
   aoc-2020-day17:
     <<: *executable
     main: AdventOfCode.Year2020.Day17
     dependencies:
+      - infinite-list
       - linear
   aoc-2020-day18:
     <<: *executable
@@ -486,7 +493,7 @@ executables:
     dependencies:
       - finite-typelits
       - linear
-      - vector
+      - matrix
       - vector-sized
   aoc-2021-day07:
     <<: *executable
@@ -504,14 +511,19 @@ executables:
   aoc-2021-day10:
     <<: *executable
     main: AdventOfCode.Year2021.Day10
+    dependencies:
+      - finitary
   aoc-2021-day11:
     <<: *executable
     main: AdventOfCode.Year2021.Day11
     dependencies:
+      - finite-typelits
       - linear
   aoc-2022-day01:
     <<: *executable
     main: AdventOfCode.Year2022.Day01
+    dependencies:
+      - parser-combinators
   aoc-2022-day02:
     <<: *executable
     main: AdventOfCode.Year2022.Day02
@@ -563,8 +575,6 @@ executables:
   aoc-2024-day01:
     <<: *executable
     main: AdventOfCode.Year2024.Day01
-    dependencies:
-      - extra
   aoc-2024-day02:
     <<: *executable
     main: AdventOfCode.Year2024.Day02
@@ -591,6 +601,58 @@ executables:
   aoc-2024-day07:
     <<: *executable
     main: AdventOfCode.Year2024.Day07
+  aoc-2025-day01:
+    <<: *executable
+    main: AdventOfCode.Year2025.Day01
+  aoc-2025-day02:
+    <<: *executable
+    main: AdventOfCode.Year2025.Day02
+    dependencies:
+      - fast-digits
+  aoc-2025-day03:
+    <<: *executable
+    main: AdventOfCode.Year2025.Day03
+    dependencies:
+      - vector
+  aoc-2025-day04:
+    <<: *executable
+    main: AdventOfCode.Year2025.Day04
+    dependencies:
+      - linear
+  aoc-2025-day05:
+    <<: *executable
+    main: AdventOfCode.Year2025.Day05
+    dependencies:
+      - data-interval
+  aoc-2025-day06:
+    <<: *executable
+    main: AdventOfCode.Year2025.Day06
+  aoc-2025-day07:
+    <<: *executable
+    main: AdventOfCode.Year2025.Day07
+    dependencies:
+      - array
+      - linear
+  aoc-2025-day08:
+    <<: *executable
+    main: AdventOfCode.Year2025.Day08
+    dependencies:
+      - linear
+  aoc-2025-day09:
+    <<: *executable
+    main: AdventOfCode.Year2025.Day09
+    dependencies:
+      - diagrams-lib
+      - linear
+  aoc-2025-day10:
+    <<: *executable
+    main: AdventOfCode.Year2025.Day10
+    dependencies:
+      - astar
+      - vector
+  aoc-2025-day11:
+    <<: *executable
+    main: AdventOfCode.Year2025.Day11
 _benchmark: &benchmark
   ghc-options:
     - -threaded

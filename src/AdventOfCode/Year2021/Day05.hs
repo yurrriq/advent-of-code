@@ -1,98 +1,94 @@
+{-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE NoImplicitPrelude #-}
+
 module AdventOfCode.Year2021.Day05 where
 
-import AdventOfCode.Input (parseInput)
-import AdventOfCode.TH (defaultMain, inputFilePath)
+import AdventOfCode.Input (parseInputAoC, parseString)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
 import AdventOfCode.Util (frequencies)
-import Control.Applicative (Alternative (..))
-import Control.Lens ((^.))
+import Control.Lens (views)
 import Data.Map qualified as M
-import Linear (V2 (..), (*^), _x, _y)
-import Text.Trifecta (comma, natural, symbol)
+import Linear (R2 (..), V2 (..), (*^), _x, _y)
+import Relude
+import Text.Printf (printf)
+import Text.Show qualified
+import Text.Trifecta (Parser, comma, natural, symbol)
 
-type Field = [Vent]
+data Vent
+  = Vent
+  { _from :: !(V2 Int),
+    _to :: !(V2 Int)
+  }
+  deriving (Eq, Generic)
 
-type Vent = V2 (V2 Int)
+instance Show Vent where
+  show (Vent (V2 x1 y1) (V2 x2 y2)) =
+    printf "%d,%d -> %d,%d" x1 y1 x2 y2
+
+newtype Field
+  = Field {unField :: [Vent]}
+  deriving (Eq, Generic)
+
+instance Show Field where
+  show (Field vents) =
+    toString
+      $ unlines
+        [ foldMap (\x -> maybe "." show (M.lookup (V2 x y) freqs)) [0 .. 9]
+        | y <- [0 .. 9]
+        ]
+    where
+      freqs = frequencies (concatMap line vents)
 
 main :: IO ()
-main = $(defaultMain)
+main = $(defaultMainPuzzle)
 
-getInput :: IO [Vent]
-getInput = parseInput (some vent) $(inputFilePath)
+getInput :: IO Field
+getInput = parseInputAoC 2021 5 field
+
+field :: Parser Field
+field = Field <$> some vent
   where
-    vent = V2 <$> point <* arrow <*> point
+    vent = Vent <$> point <* arrow <*> point
     arrow = symbol "->"
     point = V2 <$> int <* comma <*> int
     int = fromInteger <$> natural
 
-example :: [Vent]
+getExample :: IO Field
+getExample = parseString field example
+
+example :: String
 example =
-  [ V2 (V2 0 9) (V2 5 9),
-    V2 (V2 8 0) (V2 0 8),
-    V2 (V2 9 4) (V2 3 4),
-    V2 (V2 2 2) (V2 2 1),
-    V2 (V2 7 0) (V2 7 4),
-    V2 (V2 6 4) (V2 2 0),
-    V2 (V2 0 9) (V2 2 9),
-    V2 (V2 3 4) (V2 1 4),
-    V2 (V2 0 0) (V2 8 8),
-    V2 (V2 5 5) (V2 8 2)
-  ]
+  "0,9 -> 5,9\n\
+  \8,0 -> 0,8\n\
+  \9,4 -> 3,4\n\
+  \2,2 -> 2,1\n\
+  \7,0 -> 7,4\n\
+  \6,4 -> 2,0\n\
+  \0,9 -> 2,9\n\
+  \3,4 -> 1,4\n\
+  \0,0 -> 8,8\n\
+  \5,5 -> 8,2\n"
 
-partOne :: [Vent] -> Int
-partOne = partTwo . filter (liftA2 (||) isHorizontal isVertical)
+partOne :: SimplePuzzle Field Int
+partOne =
+  asks (filter (liftA2 (||) isHorizontal isVertical) . unField) >>= \vents ->
+    evalPuzzle (Field vents) mempty partTwo
 
-partTwo :: [Vent] -> Int
-partTwo = M.size . M.filter (>= 2) . frequencies . concatMap line
+partTwo :: SimplePuzzle Field Int
+partTwo =
+  asks (M.size . M.filter (>= 2) . frequencies . concatMap line . unField)
 
 isHorizontal :: Vent -> Bool
-isHorizontal (V2 from to) = from ^. _y == to ^. _y
+isHorizontal (Vent from to) = to - from & views _y (== 0)
 
 isVertical :: Vent -> Bool
-isVertical (V2 from to) = from ^. _x == to ^. _x
+isVertical (Vent from to) = to - from & views _x (== 0)
 
-line :: V2 (V2 Int) -> [V2 Int]
-line (V2 from to) = [from + t *^ step | t <- [0 .. gcf]]
+-- Bresenham seems like overkill.
+line :: Vent -> [V2 Int]
+line (Vent from to) = [from + t *^ step | t <- [0 .. gcf]]
   where
-    step = (`div` gcf) <$> diff
+    step = diff <&> (`div` gcf)
     diff@(V2 dx dy) = to - from
     gcf = gcd dx dy
-
-{-
-bresenham :: V2 (V2 Int) -> [V2 Int]
-bresenham (V2 (V2 x1 y1) to@(V2 x2 y2)) = to : unfoldr go (V3 x1 y1 (dx + dy))
-  where
-    dx = abs (x2 - x1)
-    dy = negate (abs (y2 - y1))
-    sx = if x1 < x2 then 1 else -1
-    sy = if y1 < y2 then 1 else -1
-    go st@(V3 x y err)
-      | x == x2 && y == y2 = Nothing
-      | otherwise = Just (V2 x y, f st)
-      where
-        e2 = 2 * err
-        f =
-          bool id ((_y +~ sy) . (_z +~ dx)) (e2 <= dx)
-          . bool id ((_x +~ sx) . (_z +~ dy)) (e2 >= dy)
--}
-
-showField :: [Vent] -> String
-showField vents =
-  unlines
-    [ concat
-        [ maybe "." show (M.lookup (V2 x y) freqs)
-          | x <- [0 .. 9]
-        ]
-      | y <- [0 .. 9]
-    ]
-  where
-    freqs = frequencies (concatMap line vents)
-
-showVent :: Vent -> String
-showVent (V2 (V2 x1 y1) (V2 x2 y2)) =
-  show x1
-    <> ","
-    <> show y1
-    <> " -> "
-    <> show x2
-    <> ","
-    <> show y2

@@ -1,13 +1,13 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+
 module AdventOfCode.Year2022.Day05 where
 
-import AdventOfCode.Input (parseInput, parseString)
-import AdventOfCode.TH (defaultMain, inputFilePath)
-import Control.Applicative ((<|>))
-import Control.Monad (void)
-import Data.IntMap (IntMap, (!))
+import AdventOfCode.Input (parseInputAoC, parseString)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
+import Data.IntMap ((!))
 import Data.IntMap qualified as IM
-import Data.List (transpose)
-import Data.Maybe (catMaybes, listToMaybe, mapMaybe)
+import Relude
 import Text.Trifecta
   ( Parser,
     char,
@@ -15,7 +15,6 @@ import Text.Trifecta
     decimal,
     newline,
     sepBy,
-    some,
     surroundedBy,
     symbol,
     token,
@@ -24,19 +23,19 @@ import Text.Trifecta
   )
 
 main :: IO ()
-main = $(defaultMain)
+main = $(defaultMainPuzzle)
 
-partOne :: (IntMap [Char], [(Int, (Int, Int))]) -> String
-partOne = day05 reverse
+partOne :: SimplePuzzle (IntMap [Char], [(Int, (Int, Int))]) String
+partOne = asks (solveWith reverse)
 
-partTwo :: (IntMap [Char], [(Int, (Int, Int))]) -> String
-partTwo = day05 id
+partTwo :: SimplePuzzle (IntMap [Char], [(Int, (Int, Int))]) String
+partTwo = asks (solveWith id)
 
-day05 :: ([Char] -> [Char]) -> (IntMap [Char], [(Int, (Int, Int))]) -> String
-day05 f = mapMaybe listToMaybe . IM.elems . uncurry (rearrange f)
+solveWith :: ([Char] -> [Char]) -> (IntMap [Char], [(Int, (Int, Int))]) -> String
+solveWith f = mapMaybe listToMaybe . IM.elems . uncurry (rearrange f)
 
 getInput :: IO (IntMap [Char], [(Int, (Int, Int))])
-getInput = parseInput drawing $(inputFilePath)
+getInput = parseInputAoC 2022 5 drawing
 
 drawing :: Parser (IntMap [Char], [(Int, (Int, Int))])
 drawing = (,) <$> (stacks <* labels <* newline) <*> some rearrangement
@@ -71,17 +70,17 @@ rearrange f stacks ((howMany, (from, to)) : rearrangements) =
   where
     (xs, ys) = splitAt howMany (stacks ! from)
 
-example :: IO (IntMap [Char], [(Int, (Int, Int))])
+getExample :: IO (IntMap [Char], [(Int, (Int, Int))])
+getExample = parseString drawing example
+
+example :: String
 example =
-  parseString drawing $
-    unlines
-      [ "    [D]    ",
-        "[N] [C]    ",
-        "[Z] [M] [P]",
-        " 1   2   3 ",
-        "",
-        "move 1 from 2 to 1",
-        "move 3 from 1 to 3",
-        "move 2 from 2 to 1",
-        "move 1 from 1 to 2"
-      ]
+  "    [D]    \n\
+  \[N] [C]    \n\
+  \[Z] [M] [P]\n\
+  \ 1   2   3 \n\
+  \\n\
+  \move 1 from 2 to 1\n\
+  \move 3 from 1 to 3\n\
+  \move 2 from 2 to 1\n\
+  \move 1 from 1 to 2\n"

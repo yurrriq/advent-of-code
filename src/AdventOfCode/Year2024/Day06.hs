@@ -4,20 +4,22 @@
 {-# LANGUAGE GADTs #-}
 {-# LANGUAGE MultiWayIf #-}
 {-# LANGUAGE ParallelListComp #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 
 module AdventOfCode.Year2024.Day06 where
 
-import AdventOfCode.Input (parseInput, parseString)
-import AdventOfCode.TH (defaultMain, inputFilePath)
-import AdventOfCode.Util (CyclicEnum (..))
-import Control.Applicative ((<|>))
-import Control.Lens (ifoldl', makeLenses, to, (%=), (%~), (&), (&~), (+~), (.=), (.~), (^.))
+import AdventOfCode.Input (parseInputAoC, parseString)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
+import AdventOfCode.Util (CyclicEnum (..), count)
+import Control.Lens (ifoldl', makeLenses, to, (%=), (%~), (&~), (+~), (.=), (.~), (<.=), (^.))
 import Data.Ix (inRange)
-import Data.Set (Set)
 import Data.Set qualified as Set
 import Linear (V2 (..), _x, _y)
-import Text.Trifecta (Parser, char, newline, sepEndBy, some)
-import Prelude hiding (Either (..))
+import Relude hiding (Down, Either (..), unlines)
+import Text.Show qualified as Show
+import Text.Trifecta (Parser, char, newline, sepEndBy)
+import Prelude (unlines)
 
 data Heading
   = Up
@@ -35,8 +37,8 @@ data Position where
 type Coordinates = V2 Int
 
 data Guard = Guard
-  { _position :: Coordinates,
-    _heading :: Heading
+  { _position :: !Coordinates,
+    _heading :: !Heading
   }
   deriving (Eq, Show)
 
@@ -44,9 +46,9 @@ makeLenses ''Guard
 
 data SituationMap
   = SituationMap
-  { _bounds :: Coordinates,
-    _guard :: Guard,
-    _obstacles :: Set Coordinates
+  { _mapBounds :: !Coordinates,
+    _mapGuard :: !Guard,
+    _mapObstacles :: !(Set Coordinates)
   }
   deriving (Eq)
 
@@ -56,66 +58,70 @@ instance Show SituationMap where
   show situation =
     unlines
       [ [ if
-            | V2 x y == situation ^. guard . position ->
-                case situation ^. guard . heading of
+            | V2 x y == situation ^. mapGuard . position ->
+                case situation ^. mapGuard . heading of
                   Up -> '^'
                   Right -> '>'
                   Down -> 'v'
                   Left -> '<'
-            | Set.member (V2 x y) (situation ^. obstacles) -> '#'
+            | Set.member (V2 x y) (situation ^. mapObstacles) -> '#'
             | otherwise -> '.'
-        | x <- [0 .. situation ^. bounds . _x]
+        | x <- [0 .. situation ^. mapBounds . _x]
         ]
-      | y <- [0 .. situation ^. bounds . _y]
+      | y <- [0 .. situation ^. mapBounds . _y]
       ]
 
-main :: IO ()
-main = $(defaultMain)
+type PuzzleState = GPuzzleState1 Int
 
-partOne :: SituationMap -> Int
-partOne = Set.size . go . (Set.empty,)
+main :: IO ()
+main = $(defaultMainPuzzle)
+
+partOne :: Puzzle SituationMap PuzzleState Int
+partOne = do
+  situation <- ask
+  answerOne <.= Set.size (go (Set.empty, situation))
   where
     go (visited, situation) =
       moveGuard situation & \moved ->
         if guardInBounds moved
-          then go (Set.insert (moved ^. guard . position) visited, moved)
+          then go (Set.insert (moved ^. mapGuard . position) visited, moved)
           else visited
 
-partTwo :: SituationMap -> Int
--- partTwo situation = count (not . causesParadox situation) candidates
---   where
---     candidates =
---       [ coords
---       | x <- [0 .. situation ^. bounds . _x],
---         y <- [0 .. situation ^. bounds . _y],
---         let coords = V2 x y,
---         coords /= situation ^. guard . position,
---         situation ^. obstacles . to (Set.notMember coords)
---       ]
-partTwo = undefined
+partTwo :: Puzzle SituationMap PuzzleState Int
+partTwo = do
+  situation <- ask
+  let candidates =
+        [ coords
+        | x <- [0 .. situation ^. mapBounds . _x],
+          y <- [0 .. situation ^. mapBounds . _y],
+          let coords = V2 x y,
+          coords /= situation ^. mapGuard . position,
+          situation ^. mapObstacles . to (Set.notMember coords)
+        ]
+  answerTwo <.= count (not . causesParadox situation) candidates
 
 causesParadox :: SituationMap -> Coordinates -> Bool
-causesParadox situation candidate = go (Set.empty, situation & obstacles %~ Set.insert candidate)
+causesParadox situation candidate = go (Set.empty, situation & mapObstacles %~ Set.insert candidate)
   where
     go (visited, situation') =
       moveGuard situation' & \moved ->
         guardInBounds moved
-          && ( Set.member (moved ^. guard . position) visited
-                 || go (Set.insert (moved ^. guard . position) visited, moved)
+          && ( Set.member (moved ^. mapGuard . position) visited
+                 || go (Set.insert (moved ^. mapGuard . position) visited, moved)
              )
 
 guardInBounds :: SituationMap -> Bool
 guardInBounds situation =
-  situation ^. guard . position . to (inRange (0, situation ^. bounds))
+  situation ^. mapGuard . position . to (inRange (0, situation ^. mapBounds))
 
 moveGuard :: SituationMap -> SituationMap
 moveGuard situation =
-  if Set.member (moved ^. position) (situation ^. obstacles)
-    then situation & guard . heading %~ csucc & moveGuard
-    else situation & guard .~ moved
+  if Set.member (moved ^. position) (situation ^. mapObstacles)
+    then situation & mapGuard . heading %~ csucc & moveGuard
+    else situation & mapGuard .~ moved
   where
     moved =
-      (situation ^. guard) & \theGuard ->
+      (situation ^. mapGuard) & \theGuard ->
         theGuard & position +~ (theGuard ^. heading . to headingToCoordinates)
 
 headingToCoordinates :: Heading -> Coordinates
@@ -126,19 +132,19 @@ headingToCoordinates = \case
   Left -> V2 (-1) 0
 
 getInput :: IO SituationMap
-getInput = parseInput situationMap $(inputFilePath)
+getInput = parseInputAoC 2024 6 situationMap
 
 situationMap :: Parser SituationMap
 situationMap =
-  fmap mkSituationMap $
-    flip sepEndBy newline $
-      some $
-        (Empty <$ char '.')
-          <|> (AnObstacle <$ char '#')
-          <|> (TheGuard Up <$ char '^')
-          <|> (TheGuard Down <$ char 'v')
-          <|> (TheGuard Left <$ char '<')
-          <|> (TheGuard Right <$ char '>')
+  fmap mkSituationMap
+    $ flip sepEndBy newline
+    $ some
+    $ (Empty <$ char '.')
+    <|> (AnObstacle <$ char '#')
+    <|> (TheGuard Up <$ char '^')
+    <|> (TheGuard Down <$ char 'v')
+    <|> (TheGuard Left <$ char '<')
+    <|> (TheGuard Right <$ char '>')
 
 mkSituationMap :: [[Position]] -> SituationMap
 mkSituationMap = ifoldl' (ifoldl' . go) (SituationMap (pure 0) (Guard (pure 0) Up) Set.empty)
@@ -146,14 +152,16 @@ mkSituationMap = ifoldl' (ifoldl' . go) (SituationMap (pure 0) (Guard (pure 0) U
     go y x situation = \case
       TheGuard theHeading ->
         situation
-          & bounds .~ V2 x y
-          & guard .~ Guard (V2 x y) theHeading
+          & mapBounds
+          .~ V2 x y
+            & mapGuard
+          .~ Guard (V2 x y) theHeading
       AnObstacle ->
         situation &~ do
-          bounds .= V2 x y
-          obstacles %= Set.insert (V2 x y)
+          mapBounds .= V2 x y
+          mapObstacles %= Set.insert (V2 x y)
       Empty ->
-        situation & bounds .~ V2 x y
+        situation & mapBounds .~ V2 x y
 
 getExample :: IO SituationMap
 getExample = parseString situationMap example

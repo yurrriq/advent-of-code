@@ -1,43 +1,46 @@
+{-# LANGUAGE BlockArguments #-}
 {-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 
 module AdventOfCode.Year2023.Day04 where
 
-import AdventOfCode.Input (parseInput, parseString)
-import AdventOfCode.TH (defaultMain, inputFilePath)
-import Control.Arrow ((>>>))
+import AdventOfCode.Input (parseInputAoC, parseString)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
 import Data.IntMap.Strict ((!))
 import Data.IntMap.Strict qualified as IntMap
-import Data.List (sortOn)
 import Data.List.Extra (sumOn')
-import Data.Set (Set)
 import Data.Set qualified as Set
+import Relude
 import Text.Trifecta hiding (parseString)
 
 newtype Scratchcard = Scratchcard {unScratchcard :: (Int, (Set Int, Set Int))}
   deriving (Eq, Ord, Show)
 
 main :: IO ()
-main = $(defaultMain)
+main = $(defaultMainPuzzle)
 
-partOne :: [Scratchcard] -> Int
+partOne :: SimplePuzzle [Scratchcard] Int
 partOne =
-  sumOn' $
-    countWinners >>> \case
+  asks
+    $ sumOn'
+    $ countWinners
+    >>> \case
       0 -> 0
       k -> 2 ^ (k - 1)
 
-partTwo :: [Scratchcard] -> Int
-partTwo cards = sum . IntMap.elems $ foldl winCopies initial sortedCards
-  where
-    winCopies copies card@(Scratchcard (i, _)) =
-      case countWinners card of
-        0 -> copies
-        k -> foldl (flip (IntMap.adjust (+ copies ! i))) copies [i + 1 .. i + k]
-    initial = IntMap.fromList [(i, 1) | Scratchcard (i, _) <- cards]
-    sortedCards = sortOn (fst . unScratchcard) cards
+partTwo :: SimplePuzzle [Scratchcard] Int
+partTwo = asks \cards ->
+  let winCopies copies card@(Scratchcard (i, _)) =
+        case countWinners card of
+          0 -> copies
+          k -> foldl' (flip (IntMap.adjust (+ copies ! i))) copies [i + 1 .. i + k]
+      initial = IntMap.fromList [(i, 1) | Scratchcard (i, _) <- cards]
+      sortedCards = sortOn (fst . unScratchcard) cards
+   in sum . IntMap.elems $ foldl' winCopies initial sortedCards
 
 getInput :: IO [Scratchcard]
-getInput = parseInput (some scratchcard) $(inputFilePath)
+getInput = parseInputAoC 2023 4 (some scratchcard)
 
 countWinners :: Scratchcard -> Int
 countWinners (Scratchcard (_, (winners, numbers))) =
@@ -55,21 +58,19 @@ posInt :: Parser Int
 posInt = fromInteger <$> natural
 
 partOneExample :: IO Int
-partOneExample = partOne <$> getExample
+partOneExample = evaluatingPuzzle partOne =<< getExample
 
 partTwoExample :: IO Int
-partTwoExample = partTwo <$> getExample
+partTwoExample = evaluatingPuzzle partTwo =<< getExample
 
 getExample :: IO [Scratchcard]
 getExample = parseString (some scratchcard) example
 
 example :: String
 example =
-  unlines
-    [ "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53",
-      "Card 2: 13 32 20 16 61 | 61 30 68 82 17 32 24 19",
-      "Card 3:  1 21 53 59 44 | 69 82 63 72 16 21 14  1",
-      "Card 4: 41 92 73 84 69 | 59 84 76 51 58  5 54 83",
-      "Card 5: 87 83 26 28 32 | 88 30 70 12 93 22 82 36",
-      "Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11"
-    ]
+  "Card 1: 41 48 83 86 17 | 83 86  6 31 17  9 48 53\n\
+  \Card 2: 13 32 20 16 61 | 61 30 68 82 17 32 24 19\n\
+  \Card 3:  1 21 53 59 44 | 69 82 63 72 16 21 14  1\n\
+  \Card 4: 41 92 73 84 69 | 59 84 76 51 58  5 54 83\n\
+  \Card 5: 87 83 26 28 32 | 88 30 70 12 93 22 82 36\n\
+  \Card 6: 31 18 13 56 72 | 74 77 10 23 35 67 36 11\n"

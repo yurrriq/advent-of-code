@@ -1,12 +1,15 @@
+{-# LANGUAGE DerivingVia #-}
 {-# LANGUAGE NoImplicitPrelude #-}
 
 module AdventOfCode.Puzzle where
 
-import Control.Monad.Logger (LoggingT, MonadLogger)
+import Control.Lens (makeLenses)
+import Control.Monad.Logger (LoggingT, MonadLogger, runStderrLoggingT)
+import Generic.Data (GenericProduct (..))
 import Relude
 
-newtype Puzzle i s a = Puzzle
-  {runPuzzle :: ReaderT i (StateT s (LoggingT IO)) a}
+newtype Puzzle r s a = Puzzle
+  {runPuzzle :: ReaderT r (StateT s (LoggingT IO)) a}
   deriving
     ( Functor,
       Applicative,
@@ -14,6 +17,39 @@ newtype Puzzle i s a = Puzzle
       MonadIO,
       MonadLogger,
       MonadState s,
-      MonadReader i,
+      MonadReader r,
       MonadFail
     )
+
+type SimplePuzzle r a = Puzzle r () a
+
+data GPuzzleState a b
+  = GPuzzleState
+  { _answerOne :: !a,
+    _answerTwo :: !b
+  }
+  deriving (Eq, Generic, Show)
+  deriving
+    (Semigroup, Monoid)
+    via (GenericProduct (GPuzzleState (Sum a) (Sum b)))
+
+makeLenses ''GPuzzleState
+
+type GPuzzleState1 a = GPuzzleState a a
+
+evalPuzzle :: (MonadIO m) => r -> s -> Puzzle r s a -> m a
+evalPuzzle input initialState =
+  liftIO
+    . runStderrLoggingT
+    . evaluatingStateT initialState
+    . usingReaderT input
+    . runPuzzle
+
+evaluatingPuzzle :: (MonadIO m, Monoid s) => Puzzle r s a -> r -> m a
+evaluatingPuzzle puzzle input = evalPuzzle input mempty puzzle
+
+evaluatingPuzzleM :: (MonadIO m, MonadReader r m, Monoid s) => Puzzle r s a -> m a
+evaluatingPuzzleM puzzle = ask >>= \input -> evalPuzzle input mempty puzzle
+
+withPuzzle :: (r' -> r) -> Puzzle r s a -> Puzzle r' s a
+withPuzzle f puzzle = Puzzle $ withReaderT f (runPuzzle puzzle)

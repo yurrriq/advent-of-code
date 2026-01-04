@@ -1,60 +1,59 @@
+{-# LANGUAGE NoImplicitPrelude #-}
+
 module AdventOfCode.Year2024.Day03 where
 
-import AdventOfCode.Input (parseInput)
-import AdventOfCode.TH (defaultMain, inputFilePath)
-import Control.Applicative ((<|>))
-import Control.Monad (void)
-import Data.Either (rights)
+import AdventOfCode.Input (parseInputAoC)
+import AdventOfCode.Puzzle
+import AdventOfCode.TH (defaultMainPuzzle)
+import Control.Lens ((<.=))
 import Data.List.Extra (sumOn')
+import Relude
 import Text.Parser.LookAhead (lookAhead)
-import Text.Trifecta
-  ( anyChar,
-    comma,
-    decimal,
-    eof,
-    manyTill,
-    parens,
-    some,
-    string,
-    try,
-  )
+import Text.Trifecta (anyChar, comma, decimal, eof, manyTill, parens, string, try)
+
+type PuzzleState = GPuzzleState1 Integer
 
 main :: IO ()
-main = $(defaultMain)
+main = $(defaultMainPuzzle)
 
-partOne :: [Either Bool (Integer, Integer)] -> Integer
-partOne = sumOn' (uncurry (*)) . rights
+partOne :: Puzzle [Either Bool (Integer, Integer)] PuzzleState Integer
+partOne = do
+  memory <- asks rights
+  answerOne <.= partOne' memory
 
-partTwo :: [Either Bool (Integer, Integer)] -> Integer
-partTwo = go
-  where
-    go [] = 0
-    go (Left False : muls) = go (dropWhile (/= Left True) muls)
-    go muls =
-      let (xs, ys) = span (/= Left False) muls
-       in partOne xs + go ys
+partOne' :: [(Integer, Integer)] -> Integer
+partOne' = sumOn' (uncurry (*))
+
+partTwo :: Puzzle [Either Bool (Integer, Integer)] PuzzleState Integer
+partTwo = do
+  memory <- ask
+  answerTwo <.= partTwo' memory
+
+partTwo' :: [Either Bool (Integer, Integer)] -> Integer
+partTwo' = \case
+  [] -> 0
+  (Left False : muls) -> partTwo' (dropWhile (/= Left True) muls)
+  muls ->
+    uncurry (+)
+      $ bimap (partOne' . rights) partTwo'
+      $ span (/= Left False) (dropWhile (== Left False) muls)
 
 getInput :: IO [Either Bool (Integer, Integer)]
-getInput = parseInput (some go) $(inputFilePath)
+getInput = parseInputAoC 2024 3 (some (skipNoise *> instruction))
   where
-    go =
-      skipNoise
-        *> ( (Left <$> toggle)
-               <|> (Right <$> multiplication)
-           )
+    instruction = (Left <$> toggle) <|> (Right <$> multiplication)
     skipNoise =
       do
-        void . manyTill anyChar $
-          lookAhead
-            ( void multiplication
-                <|> void toggle
+        void
+          . manyTill anyChar
+          $ lookAhead
+            ( void (try multiplication)
+                <|> void (try toggle)
                 <|> eof
             )
     toggle =
-      try $
-        (True <$ string "do()")
-          <|> (False <$ string "don't()")
+      (True <$ string "do()")
+        <|> (False <$ string "don't()")
     multiplication =
-      try $
-        string "mul"
-          *> parens ((,) <$> (decimal <* comma) <*> decimal)
+      string "mul"
+        *> parens ((,) <$> (decimal <* comma) <*> decimal)

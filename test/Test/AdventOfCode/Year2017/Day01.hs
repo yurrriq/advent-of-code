@@ -1,6 +1,7 @@
 module Test.AdventOfCode.Year2017.Day01 where
 
 import AdventOfCode.Input (parseString)
+import AdventOfCode.Puzzle
 import AdventOfCode.Year2017.Day01
 import Data.Monoid (Sum)
 import Data.Vector (Vector)
@@ -31,14 +32,14 @@ test_day01_answers =
   testGroup
     "Answers"
     [ testCase "Part One" $
-        (1034 @=?) . partOne =<< getInput,
+        getInput >>= evaluatingPuzzle partOne >>= (@?= 1034),
       testCase "Part Two" $
-        (1356 @=?) . partTwo =<< getInput
+        getInput >>= evaluatingPuzzle partTwo >>= (@?= 1356)
     ]
 
-mkExample :: (Vector (Sum Int) -> Int) -> (String, Int) -> TestTree
-mkExample f (str, expected) =
+mkExample :: SimplePuzzle (Vector (Sum Int)) Int -> (String, Int) -> TestTree
+mkExample puzzle (str, expected) =
   testCase str $
     do
       input <- parseString digits str
-      f input @?= expected
+      evaluatingPuzzle puzzle input >>= (@?= expected)

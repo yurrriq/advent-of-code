@@ -1,64 +1,53 @@
+{-# LANGUAGE BlockArguments #-}
 {-# LANGUAGE LambdaCase #-}
+{-# LANGUAGE NoImplicitPrelude #-}
 
 module AdventOfCode.Year2020.Day14 where
 
-import AdventOfCode.Input (parseInput)
-import AdventOfCode.TH (inputFilePath)
+import AdventOfCode.Input (parseInputAoC)
+import AdventOfCode.TH (defaultMainPuzzle)
 import AdventOfCode.Year2020.Day14.Parsers
 import AdventOfCode.Year2020.Day14.Types
-import Control.Applicative (some)
-import Control.Lens
-import Control.Monad.State (State, execState, gets)
+import Control.Lens (ifoldl', ifoldlM, modifying, uses, (%=), (.=))
 import Data.Bits (clearBit, setBit)
 import Data.IntMap qualified as IM
+import Relude
 
 main :: IO ()
-main =
-  do
-    input <- getInput
-    putStr "Part One: "
-    print $ partOne input
-    putStr "Part Two: "
-    print $ partTwo input
+main = $(defaultMainPuzzle)
 
 getInput :: IO [Instruction]
-getInput = parseInput (some instruction) $(inputFilePath)
+getInput = parseInputAoC 2020 14 (some instruction)
 
-partOne :: [Instruction] -> Int
-partOne = execProgram runInstructionV1
+partOne :: Program Int
+partOne = execProgram runInstruction
+  where
+    runInstruction (SetMask newMask) = mask .= newMask
+    runInstruction (SetValue addr val) =
+      uses mask (applyMask val)
+        >>= modifying memory
+        . IM.insert addr
 
-runInstructionV1 :: Instruction -> State ProgState ()
-runInstructionV1 (SetMask newMask) = mask .= newMask
-runInstructionV1 (SetValue addr val) =
-  do
-    newVal <- gets (applyMaskV1 val <$> view mask)
-    memory %= IM.insert addr newVal
+    applyMask = ifoldl' \i x -> \case
+      Nothing -> x
+      Just False -> x `clearBit` i
+      Just True -> x `setBit` i
 
-applyMaskV1 :: Int -> [Maybe Bool] -> Int
-applyMaskV1 = ifoldl' $ \i x -> \case
-  Nothing -> x
-  Just False -> x `clearBit` i
-  Just True -> x `setBit` i
+partTwo :: Program Int
+partTwo = execProgram runInstruction
+  where
+    runInstruction (SetMask newMask) = mask .= newMask
+    runInstruction (SetValue encodedAddress val) =
+      uses mask (applyMask encodedAddress) >>= mapM_ \addr -> do
+        memory %= IM.insert addr val
 
-partTwo :: [Instruction] -> Int
-partTwo = execProgram runInstructionV2
+    applyMask = ifoldlM \i x -> \case
+      Nothing -> [x `clearBit` i, x `setBit` i]
+      Just False -> [x]
+      Just True -> [x `setBit` i]
 
-runInstructionV2 :: Instruction -> State ProgState ()
-runInstructionV2 (SetMask newMask) = mask .= newMask
-runInstructionV2 (SetValue addr val) =
-  do
-    addresses <- gets (applyMaskV2 addr <$> view mask)
-    mapM_ ((memory %=) . flip IM.insert val) addresses
-
-applyMaskV2 :: Int -> [Maybe Bool] -> [Int]
-applyMaskV2 = ifoldlM $ \i x -> \case
-  Nothing -> [x `clearBit` i, x `setBit` i]
-  Just False -> [x]
-  Just True -> [x `setBit` i]
-
-execProgram :: (Instruction -> State ProgState ()) -> [Instruction] -> Int
-execProgram runInstruction instructions =
-  execState (mapM_ runInstruction instructions) initialState ^. memory & sum
-
-initialState :: ProgState
-initialState = ProgState [] IM.empty
+execProgram :: (Instruction -> Program ()) -> Program Int
+execProgram runInstruction = do
+  put mempty
+  ask >>= mapM_ runInstruction
+  uses memory sum
